@@ -138,8 +138,8 @@ contract MyTestContract is Quorum {
     quorum.registerBallot('mintReward', 'majority', 1, 0, 50) // (<method_name>, <election_type>, <num_of_voters>, <threshold>, <voting_window>)
   }
 
-  function mintReward(address _addr) public returns (bool) {
-    require(quorum.vote('mintReward', msg.sender, abi.encode(_addr)), "consensus has not been achieved")
+  function mintReward(address _addr, uint256 _amount) public returns (bool) {
+    require(quorum.vote('mintReward', msg.sender, abi.encode(_addr, _amount)), "consensus has not been achieved")
     ...
     ...
   }
