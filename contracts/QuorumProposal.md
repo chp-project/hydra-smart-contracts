@@ -28,7 +28,6 @@ type Ballot {
   uint256 threshold;
   uint256 votingWindow;
   uint256 startBlock;
-  uint256 endBlock;
 }
 ```
 
