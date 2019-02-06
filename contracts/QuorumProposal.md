@@ -52,10 +52,10 @@ function registerBallot(string method, string type, uint256 numOfVoters, int256 
 |   Properties   |  Description | Required | Type   |
 |:--------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------:|--------|
 | method | Name of the method you wish to decorate with Quroum functionality. | yes | string |
-| type | Electoral System - Only accepted values are "majority" or "threshold". | no | string |
-| numOfVoters | The total number of registerd votes allowed to participate in voting rounds (NOTE: this number can be updated). | no | int256 |
-| threshold | Specify the number of votes required to achieve consensus. Only applies to "threshold" ballots. Provide a value of `0` if using a different type of ballot. | no | int256 |
-| votingWindow | Number of blocks before voting round is closed | no | int256 |
+| type | Electoral System - Only accepted values are "majority" or "threshold". | yes | string |
+| numOfVoters | The total number of registerd votes allowed to participate in voting rounds (NOTE: this number can be updated). | yes | int256 |
+| threshold | Specify the number of votes required to achieve consensus. Only applies to "threshold" ballots. Provide a value of `0` if using a different type of ballot. | yes | int256 |
+| votingWindow | Number of blocks before voting round is closed | yes | int256 |
 
 #### For example:
 ```
@@ -108,6 +108,7 @@ function vote(string method, address voter, bytes32 hash) public returns (bool);
 
 The `vote()` method will be used to register a vote for a particular voting round based on the hash provided. New voting rounds are triggered by supplying a unique hash as the second argument of this function. The method will return a value of `true` if consensus has been reached based on the criteria of the Ballot's electoral system specified upon registering the ballot.
 
+<br>
 
 > Example:
 ```
