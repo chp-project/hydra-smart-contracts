@@ -12,3 +12,5 @@
 function stake(bytes32 _nodeIp, bytes32 _nodePublicKey, uint256 _amount, uint256 _duration) public returns (bool);
 ```
 
+
+
