@@ -1,15 +1,32 @@
 # Brainstorming Quorum Specification
 
-Introducing a generic Smart Contract that would "decorate" methods in a smart contract providing
-a simple voting mechanism. 
+Introducing a generic Smart Contract that would "decorate" methods in a smart contract providing a simple voting mechanism. The premise of introducing such functionality is to "short-circuit" method calls that have not registered enough votes to reach a quorum. 
 
-There are two types of Electoral Systems supported:
+## Concepts
+
+**Ballot:**
+A Ballot is created (registered) for each method in your smart contract that you would like to decorate with the capabi
+
+----------
+
+**Voting Round:**
+Are implicitly created upon receiving a unique hash. Voting rounds have a specified duration (in blocks). When registering a ballot, you must specify how long (# of block) the voting window will remain open. If enough votes are registered with the same hash provided within the round's voting window to reach a quorum, the result from invoking the `vote()` method will resolve successfully and allow the smart contract method to finish executing.
+
+----------
+
+**Vote:** Ethereum Addresses, whether contracts or externally owned accounts can only vote once. All votes carry the same weight. A vote is registered by invoking the `vote()` method exposed by the Quorum Smart Contract and accepts two arguments: 1) `msg.sender`, 2) keccak256 hash of argument(s) passed into the method upon invocation
+
+> Conceptually, it's easier to reason with this functionality when thinking along the lines of "you are voting for this method to be executed only when a quorum has been reached over the value of the arguments provided to this method." You are indirectly voting over whether or not this method runs. More importantly you are voting on the arguments that are provided to the method being invoked.
+
+----------
+
+**Supported Electoral Systems:** (One of the following electoral systems must be provided upon registering a ballot for a method in your smart contract)
 1. Majority - Where a 50%-plus-one-vote is required
 2. Threshold - Where M is the threshold of votes required to pass, and N is the total number of votes
 
 > NOTE: Once you've registered a ballot and specified the electoral system that is to be used, you will NOT be able to migrate to a different electoral system. 
 
-<br>
+----------
 
 ## Smart Contract API:
 * registerBallot()
