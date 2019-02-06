@@ -9,6 +9,8 @@ There are two types of Electoral Systems supported:
 
 > NOTE: Once you've registered a ballot and specified the electoral system that is to be used, you will NOT be able to migrate to a different electoral system. 
 
+<br>
+
 ## Smart Contract API:
 * registerBallot()
 * updateBallot()
@@ -16,7 +18,7 @@ There are two types of Electoral Systems supported:
 * pruneBallots()
 * vote()
 
-### Types:
+## Types:
 
 ```
 type Ballot {
