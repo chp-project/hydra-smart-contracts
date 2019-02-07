@@ -1,6 +1,6 @@
 
 import "remix_tests.sol"; // this import is automatically injected by Remix.
-import "./ChainpointRegistry.sol";
+import "../contracts/ChainpointRegistry.sol";
 
 contract test3 {
    
