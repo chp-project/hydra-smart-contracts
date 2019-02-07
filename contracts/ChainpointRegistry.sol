@@ -67,14 +67,14 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev coreIp is the IPV4 address of the Node
     /// @dev corePublicKey is the public key of the Node
     /// @dev staked Node is actively staked
-    /// @dev isActive Will always be true unless a Core is acting in bad faith and is therefore being punished by the rest of the Network
+    /// @dev isHealthy Will always be true unless a Core is acting in bad faith and is therefore being punished by the rest of the Network
     /// @dev amountStaked is the amount of TNT the node has staked
     /// @dev stakeLockedUntil is the epoch timestamp up to when the Node is staked into the Chainpoint Network
     struct Core {
       bytes32 coreIp;
       bytes32 corePublicKey;
       bool staked;
-      bool isActive;
+      bool isHealthy;
       uint256 amountStaked;
       uint256 stakeLockedUntil;
     }
@@ -84,7 +84,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     ///
     /// @notice only IRNAdmins or Owner can call, otherwise throw
     modifier onlyCoreOperatororOwner() {
-        require(msg.sender == owner() || cores[msg.sender].isActive, "must be owner or an active core operator");
+        require(msg.sender == owner() || cores[msg.sender].isHealthy, "must be owner or an active core operator");
         _;
     }
     
@@ -141,14 +141,14 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @param _sender Core Operator staking a node
     /// @param _coreIp IP address of Core Node
     /// @param _corePublicKey Core Operator public key
-    /// @param _isActive Is Core Operator currently Active
+    /// @param _isHealthy Is Core Operator currently Active
     /// @param _amountStaked is the total amount of TNT the Node has staked
     /// @param _duration is the epoch timestamp up to when the Node is staked into the Chainpoint Network
     event CoreStaked(
         address indexed _sender,
         bytes32 _coreIp,
         bytes32 _corePublicKey,
-        bool _isActive,
+        bool _isHealthy,
         uint256 _amountStaked,
         uint256 _duration
     );
@@ -157,14 +157,14 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @param _sender Core Operator staking a node
     /// @param _coreIp IP address of Core Node
     /// @param _corePublicKey Core Operator public key
-    /// @param _isActive Is Core Operator currently Active
+    /// @param _isHealthy Is Core Operator currently Active
     /// @param _amountStaked is the total amount of TNT the Node has staked
     /// @param _duration is the epoch timestamp up to when the Node is staked into the Chainpoint Network
     event CoreStakeUpdated(
         address indexed _sender,
         bytes32 _coreIp,
         bytes32 _corePublicKey,
-        bool _isActive,
+        bool _isHealthy,
         uint256 _amountStaked,
         uint256 _duration
     );
@@ -274,7 +274,7 @@ contract ChainpointRegistry is Ownable, Pausable {
             msg.sender,
             c.coreIp,
             c.corePublicKey,
-            c.isActive,
+            c.isHealthy,
             c.amountStaked,
             c.stakeLockedUntil
         );
@@ -389,7 +389,7 @@ contract ChainpointRegistry is Ownable, Pausable {
         c.coreIp = _coreIp;
         c.corePublicKey = _corePublicKey;
         c.staked = true;
-        c.isActive = true;
+        c.isHealthy = true;
         c.amountStaked = _amount;
         c.stakeLockedUntil = stakeLockedUntil;
         

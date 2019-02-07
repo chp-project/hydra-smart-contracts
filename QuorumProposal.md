@@ -32,7 +32,7 @@ Are implicitly created upon receiving a unique hash. Voting rounds have a specif
 * registerBallot()
 * updateBallot()
 * deleteBallot()
-* pruneBallots()
+* pruneVotingRounds()
 * vote()
 
 ## Types:
@@ -108,10 +108,10 @@ This method will "soft" delete an existing registered ballot. Meaning that a cal
 
 <br/>
 
-## pruneBallots()
+## pruneVotingRounds()
 
 ```
-function pruneBallots(string[] methods) public returns (bool);
+function pruneVotingRounds(string[] methods) public returns (bool);
 ```
 
 This method should be invoked periodically to prune stale voting rounds. For voting rounds that never achieved consensus and have lasted longer than the max allowed voting window (number of blocks that specifies the duration of the voting round) remove them from storage. This method is automatically invoked from within the `vote()` method when a voting round resolves successfully after achieving consensus, but for voting rounds that expire and do NOT achieve consensus, you will want to invoke this method periodically to remove stale data from smart contract storage.
