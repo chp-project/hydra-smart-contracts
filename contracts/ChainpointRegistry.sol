@@ -1,7 +1,7 @@
 pragma solidity >=0.4.22 <0.6.0;
 
-import "http://github.com/OpenZeppelin/openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
 import "./lib/ERC20.sol";
 import "./lib/SafeMath.sol";
