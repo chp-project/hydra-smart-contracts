@@ -57,7 +57,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     struct Node {
       bytes32 nodeIp;
       bytes32 nodePublicKey;
-      bool staked;
+      bool isStaked;
       uint256 amountStaked;
       uint256 stakeLockedUntil;
     }
@@ -73,7 +73,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     struct Core {
       bytes32 coreIp;
       bytes32 corePublicKey;
-      bool staked;
+      bool isStaked;
       bool isHealthy;
       uint256 amountStaked;
       uint256 stakeLockedUntil;
