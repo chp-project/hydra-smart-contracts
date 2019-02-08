@@ -90,13 +90,9 @@ contract ChainpointRegistry is Ownable, Pausable {
     
     /// @notice Constructor sets the ERC Token contract and initial values for network fees
     /// @param _token is the Atonomi Token contract address (must be ERC20)
-    /// @param _settings is the Atonomi Network Settings contract address
-    constructor (address _token, address _settings) public {
+    constructor (address _token) public {
         require(_token != address(0), "token address cannot be 0x0");
-        require(_settings != address(0), "settings address cannot be 0x0");
         token = ERC20(_token);
-        // TODO: 
-        // settings = SettingsInterface(_settings);
         
         // TODO: Replace hardcoded stakingRates initialization with values provided by SettingsInterface
         stakingRates["defaultNodeStake"][0] = 5000;
