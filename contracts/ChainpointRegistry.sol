@@ -82,9 +82,15 @@ contract ChainpointRegistry is Ownable, Pausable {
     ///
     /// MODIFIERS
     ///
-    /// @notice only IRNAdmins or Owner can call, otherwise throw
-    modifier onlyCoreOperatororOwner() {
+    /// @notice only Staked Core Operators or Owner can call, otherwise throw
+    modifier onlyOwnerOrCoreOperator() {
         require(msg.sender == owner() || cores[msg.sender].isHealthy, "must be owner or an active core operator");
+        _;
+    }
+
+    /// @notice only Core Operators can call, otherwise throw
+    modifier onlyCoreOperator() {
+        require(cores[msg.sender].isHealthy, "must be core operator");
         _;
     }
     
@@ -197,8 +203,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @param _corePublicKey is the public key of the Node
     /// @param _amount is the amount of TNT the node has staked
     /// @return true if successful, otherwise false
-    function stake(bytes32 _coreIp, bytes32 _corePublicKey, uint256 _amount, bool _isCore) public whenNotPaused returns (bool) {
-        require(_isCore, "core parameter was not provided");
+    function stakeCore(bytes32 _coreIp, bytes32 _corePublicKey, uint256 _amount) public whenNotPaused returns (bool) {
         require(_addCoreToRegistry(_coreIp, _corePublicKey, _amount), "node did not stake into the chainpoint network");
         
         emit CoreStaked(
@@ -226,7 +231,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev tokens will be deducted from the Node Operator and added to the balance of the ChainpointRegistry Address
     /// @dev owner has ability to pause this operation
     function updateStake(bytes32 _nodeIp, bytes32 _nodePublicKey) public whenNotPaused returns (bool) {
-        require(nodes[msg.sender].staked, "node has not staked into the Chainpoint network");
+        require(nodes[msg.sender].isStaked, "node has not staked into the Chainpoint network");
         require(_nodeIp != 0, "node IP address is required");
         require(_nodePublicKey != 0, "node public key is required is required");
         
@@ -256,9 +261,9 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev msg.sender is expected to be the Node Operator
     /// @dev tokens will be deducted from the Node Operator and added to the balance of the ChainpointRegistry Address
     /// @dev owner has ability to pause this operation
-    function updateStake(bytes32 _coreIp, bytes32 _corePublicKey, bool _isCore) public whenNotPaused returns (bool) {
+    function updateStakeCore(bytes32 _coreIp, bytes32 _corePublicKey, bool _isCore) public whenNotPaused returns (bool) {
         require(_isCore, "core parameter was not provided");
-        require(cores[msg.sender].staked, "core has not staked into the Chainpoint network");
+        require(cores[msg.sender].isStaked, "core has not staked into the Chainpoint network");
         require(_coreIp != 0, "core IP address is required");
         require(_corePublicKey != 0, "core public key is required");
         
@@ -287,7 +292,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev tokens that were previously timelocked will be transferred back to the Node Operator
     /// @dev owner has ability to pause this operation
     function unStake() public whenNotPaused returns (bool) {
-        require(nodes[msg.sender].staked, "node has not staked into the Chainpoint network");
+        require(nodes[msg.sender].isStaked, "node has not staked into the Chainpoint network");
         require(now >= nodes[msg.sender].stakeLockedUntil, "tokens are timelocked");
         
         require(token.transfer(msg.sender, nodes[msg.sender].amountStaked), "transferFrom failed");
@@ -299,15 +304,13 @@ contract ChainpointRegistry is Ownable, Pausable {
     ///
     /// Un-Stake a Core, tokens must no longer be timelocked
     ///
-    /// @param _isCore Core Operator
     /// @notice Allows a Core to un-stake from the Chainpoint Network given that stakeLockedUntil duration has elapsed
     /// @return true if successful, otherwise false
     /// @dev msg.sender is expected to be the Node Operator
     /// @dev tokens that were previously timelocked will be transferred back to the Core Operator
     /// @dev owner has ability to pause this operation
-    function unStake(bool _isCore) public whenNotPaused returns (bool) {
-        require(_isCore, "core parameter was not provided");
-        require(cores[msg.sender].staked, "core has not staked into the Chainpoint network");
+    function unStakeCore() public whenNotPaused returns (bool) {
+        require(cores[msg.sender].isStaked, "core has not staked into the Chainpoint network");
         require(now >= cores[msg.sender].stakeLockedUntil, "tokens are timelocked");
         
         require(token.transfer(msg.sender, cores[msg.sender].amountStaked), "transferFrom failed");
@@ -325,7 +328,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev msg.sender is expected to be the Node Operator
     /// @dev owner has ability to pause this operation
     function totalStakedFor(address addr) public view returns (uint256 amount, uint256 unlocks_at) {
-        require(nodes[addr].staked, "node has not staked into the Chainpoint network");
+        require(nodes[addr].isStaked, "node has not staked into the Chainpoint network");
         
         return (nodes[addr].amountStaked, nodes[addr].stakeLockedUntil);
     }
@@ -342,7 +345,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev tokens will be deducted from the Node Operator and added to the balance of the ChainpointRegistry Address
     /// @dev owner has ability to pause this operation
     function _addNodeToRegistry(bytes32 _nodeIp, bytes32 _nodePublicKey, uint256 _amount) internal returns (bool) {
-        require(!nodes[msg.sender].staked, "node has already staked. invoke renewStake() method to renew");
+        require(!nodes[msg.sender].isStaked, "node has already staked. invoke renewStake() method to renew");
         require(_nodeIp != 0, "node IP address is required");
         require(_nodePublicKey != 0, "node public key is required is required");
         require(_amount >= stakingRates["defaultNodeStake"][0], "minimum staking amount not met");
@@ -354,7 +357,7 @@ contract ChainpointRegistry is Ownable, Pausable {
         
         n.nodeIp = _nodeIp;
         n.nodePublicKey = _nodePublicKey;
-        n.staked = true;
+        n.isStaked = true;
         n.amountStaked = _amount;
         n.stakeLockedUntil = stakeLockedUntil;
         
@@ -373,7 +376,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev tokens will be deducted from the Core Operator and added to the balance of the ChainpointRegistry Address
     /// @dev owner has ability to pause this operation indirectly
     function _addCoreToRegistry(bytes32 _coreIp, bytes32 _corePublicKey, uint256 _amount) internal returns (bool) {
-        require(!cores[msg.sender].staked, "core has already staked. invoke updateStake() method to update");
+        require(!cores[msg.sender].isStaked, "core has already staked. invoke updateStake() method to update");
         require(_coreIp != 0, "node IP address is required");
         require(_corePublicKey != 0, "node public key is required is required");
         require(_amount >= stakingRates["defaultCoreStake"][0], "minimum staking amount not met");
@@ -384,7 +387,7 @@ contract ChainpointRegistry is Ownable, Pausable {
         
         c.coreIp = _coreIp;
         c.corePublicKey = _corePublicKey;
-        c.staked = true;
+        c.isStaked = true;
         c.isHealthy = true;
         c.amountStaked = _amount;
         c.stakeLockedUntil = stakeLockedUntil;
