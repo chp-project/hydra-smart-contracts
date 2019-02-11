@@ -3,7 +3,9 @@ pragma solidity >=0.4.22 <0.6.0;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
+import "./ChainpointRegistry.sol";
 import "./lib/SafeMath.sol";
+import "./lib/ERC20.sol";
 
 contract ChainpointQuorum {
     using SafeMath for uint256;
@@ -11,19 +13,28 @@ contract ChainpointQuorum {
     /// @title TNT Token Contract
     string public name = "Chainpoint Registry";
     
+    /// @title TNT Token Contract
+    /// @notice Standard ERC20 Token
+    ERC20 private token;
+    
+    /// @title TNT Token Contract
+    /// @notice Standard ERC20 Token
+    ChainpointRegistry private chainpointRegistry;
+    
     ///
     /// MAPPINGS
     ///
-    /// @title Registered Chainpoint Nodes
+    /// @title Registered Ballots
     /// @notice Contains all Chainpoint Nodes that have staked and are participating in the Chainpoint Network
     /// @dev Key is ethereum account for Chainpoint Node owner
     /// @dev Value is struct representing Node attributes
     mapping (string => Ballot) private registeredBallots;
     
+    mapping (string => mapping(bytes32 => VotingRound)) methodVotingRounds;
+    
     ///
     /// TYPES 
     ///
-    
     /// @title BallotType
     /// @notice BallotType is an enum that only supports two values: majority or threshold
     enum BallotType {majority, threshold}
@@ -42,6 +53,27 @@ contract ChainpointQuorum {
         uint256 threshold;
         uint256 votingWindow;
         uint256 startBlock;
+    }
+    
+    struct VotingRound {
+        uint256 startBlock;
+        uint256 endBlock;
+        Vote[] votes;
+    }
+    
+    /// @title Vote
+    /// @notice Ballot struct which contains all relevant ballot parameters
+    /// @dev voter Address of the party submitting a vote
+    /// @dev block Block height at which the vote was registered
+    struct Vote {
+        address voter;
+        uint256 block;
+    }
+    
+    constructor (address _token) public {
+        require(_token != address(0), "token address cannot be 0x0");
+        token = ERC20(_token);
+        
     }
   
 }
