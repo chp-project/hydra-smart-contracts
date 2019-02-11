@@ -40,7 +40,7 @@ Are implicitly created upon receiving a unique hash. Voting rounds have a specif
 ```
 type Ballot {
   string method;
-  BallotType type;
+  BallotType ballotType;
   uint256 numOfVoters;
   uint256 threshold;
   uint256 votingWindow;
