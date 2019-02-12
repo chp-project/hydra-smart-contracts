@@ -17,6 +17,9 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @notice Standard ERC20 Token
     ERC20 public token;
     
+    // @title Chainpoint Quorum Smart Contract address
+    address quorumContractAddress;
+    
     uint256 public MIN_STAKING_AMOUNT = 5000;
     uint256 public MIN_STAKING_DURATION = 600;
     
@@ -45,6 +48,11 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @notice Convenient iterable data structure containing a list of Core Operators
     /// @dev Value Address of the registered Core
     address[] public coresArr;
+    
+    /// @title White-listed Chainpoint Cores Array
+    /// @notice List of white-listed Cores that are able to stake, but have not done so
+    /// @dev Value Address of the white-listed Core
+    address[] public whitelistedCoresArr;
     
     ///
     /// TYPES 
@@ -85,6 +93,11 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @notice only Staked Core Operators or Owner can call, otherwise throw
     modifier onlyOwnerOrCoreOperator() {
         require(msg.sender == owner() || cores[msg.sender].isHealthy, "must be owner or an active core operator");
+        _;
+    }
+    
+    modifier onlyOwnerOrQuorum() {
+        require(msg.sender == owner() || msg.sender == quorumContractAddress, "must be owner or quorum contract");
         _;
     }
 
@@ -331,6 +344,26 @@ contract ChainpointRegistry is Ownable, Pausable {
         require(nodes[addr].isStaked, "node has not staked into the Chainpoint network");
         
         return (nodes[addr].amountStaked, nodes[addr].stakeLockedUntil);
+    }
+    
+    ///
+    /// Get White-listed Core Operators
+    ///
+    /// @notice Returns the amount of tokens that a Node Operator has staked and the timestamp as to when the tokens are locked
+    /// @return address[] if successful, otherwise false
+    /// @dev msg.sender is expected to be the Node Operator
+    /// @dev owner has ability to pause this operation
+    function whitelistCore(address _address) public onlyOwnerOrCoreOperator returns (bool) {
+        bool exists;
+        
+        for (uint i = 0; i < whitelistedCoresArr.length; i++) {
+            if (whitelistedCoresArr[i] == _address) {
+                break;
+            }
+        }
+        whitelistedCoresArr.push(_address);
+        
+        return true;
     }
     
     ///

@@ -73,7 +73,7 @@ function registerBallot(string method, string type, uint256 numOfVoters, int256 
 | type | Electoral System - Only accepted values are "majority" or "threshold". | yes | string |
 | numOfVoters | The total number of registerd votes allowed to participate in voting rounds (NOTE: this number can be updated). | yes | int256 |
 | threshold | Specify the number of votes required to achieve consensus. Only applies to "threshold" ballots. Provide a value of `0` if using a different type of ballot. | yes | int256 |
-| votingWindow | Number of blocks before voting round is closed | yes | int256 |
+| votingWindow | Number of blocks before voting round is closed. Provide a value of `-1` if voting windows are to live infinitely until consensus is reached | yes | int256 |
 
 #### For example:
 ```

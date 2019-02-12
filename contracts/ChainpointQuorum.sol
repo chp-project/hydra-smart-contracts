@@ -8,7 +8,7 @@ import "./lib/ChainpointRegistryInterface.sol";
 import "./lib/SafeMath.sol";
 import "./lib/ERC20.sol";
 
-contract ChainpointQuorum {
+contract ChainpointQuorum is Ownable, Pausable {
     using SafeMath for uint256;
   
     /// @title TNT Token Contract
@@ -44,15 +44,13 @@ contract ChainpointQuorum {
     /// @notice Ballot struct which contains all relevant ballot parameters
     /// @dev method name of the method that needs Quorum capability
     /// @dev ballotType Enum (majority|threshold)
-    /// @dev numOfVoters is the amount of TNT the node has staked
     /// @dev votingWindow Number of blocks that the voting round is open for
     /// @dev startBlock Block height in which voting window begins
     struct Ballot {
         string method;
         BallotType ballotType;
-        uint256 numOfVoters;
         uint256 threshold;
-        uint256 votingWindow;
+        int256 votingWindow;
         uint256 startBlock;
         bool isActive;
     }
@@ -86,18 +84,79 @@ contract ChainpointQuorum {
     /// @param _ballotType Enum (majority|threshold)
     /// @param _threshold Min. number of votes required for consesnsus
     /// @param _votingWindow Duration of voting windows expressed in number of blocks
-    /// @return Core
+    /// @return bool
     /// @dev msg.sender is expected to be the Core Operator
-    /// @dev tokens will be deducted from the Core Operator and added to the balance of the ChainpointRegistry Address
     /// @dev owner has ability to pause this operation indirectly
-    function registerBallot(string memory _method, string memory _ballotType, int256 _threshold, int256 _votingWindow) public returns (bool) {
+    function registerBallot(string memory _method, string memory _ballotType, uint256 _threshold, int256 _votingWindow) public onlyOwner returns (bool) {
         require(registeredBallots[_method].isActive, 'method has a ballot registered already');
+        require(bytes(_method).length > 0, "smart contract method name is required");
+        require(_votingWindow > 0, "voting window must be greater than 0");
+        
+        bool majorityBallot = keccak256(abi.encode(_ballotType)) == keccak256("majority");
+        bool thresholdBallot = keccak256(abi.encode(_ballotType)) == keccak256("majority");
+        
+        require(!majorityBallot && !thresholdBallot, "method type must be one of the following values: 1) majority, 2) threshold");
+        
+        if(thresholdBallot) {
+            require(_threshold > 0, "when Ballot Type is set to threshold, a value greater than 0 is required");
+        }
         
         Ballot storage b = registeredBallots[_method];
         
-        // c.coreIp = _coreIp;
+        b.method = _method;
+        if (majorityBallot) {
+            b.ballotType = BallotType.majority;
+        } else {
+            b.ballotType = BallotType.threshold;
+        }
         
+        b.threshold = (thresholdBallot) ? _threshold : 0;
+        b.votingWindow = _votingWindow;
+        b.startBlock = block.number;
+        b.isActive = true;
         
+        return true;
     }
   
+    ///
+    /// Update Ballot for specified method
+    ///
+    /// @notice Updates a Ballot for a smart contract method
+    /// @param _method Name of the smart contract method
+    /// @param _threshold Min. number of votes required for consesnsus
+    /// @param _votingWindow Duration of voting windows expressed in number of blocks
+    /// @return bool
+    /// @dev msg.sender is expected to be the Core Operator
+    /// @dev owner has ability to pause this operation indirectly
+    function updateBallot(string memory _method, uint256 _threshold, int256 _votingWindow) public onlyOwner returns (bool) {
+        require(registeredBallots[_method].isActive, 'a ballot has not been registered for the specified method');
+        require(_votingWindow > 0, "voting window must be greater than 0");
+        if (registeredBallots[_method].ballotType == BallotType.threshold) {
+            require(_threshold > 0, "when Ballot Type is set to threshold, a value greater than 0 is required");
+        }
+        
+        Ballot storage b = registeredBallots[_method];
+        
+        b.threshold = (registeredBallots[_method].ballotType == BallotType.threshold) ? _threshold : 0;
+        b.votingWindow = _votingWindow;
+        
+        return true;
+    }
+
+    ///
+    /// Delete Ballot for specified method
+    ///
+    /// @notice Deletes a Ballot for a smart contract method
+    /// @param _method Name of the smart contract method
+    /// @return bool
+    /// @dev msg.sender is expected to be the Core Operator
+    /// @dev owner has ability to pause this operation indirectly
+    function deleteBallot(string memory _method) public onlyOwner returns (bool) {
+        require(registeredBallots[_method].isActive, 'a ballot has not been registered for the specified method');
+        
+        Ballot storage b = registeredBallots[_method];
+        delete registeredBallots[_method];
+        
+        return true;
+    }
 }
