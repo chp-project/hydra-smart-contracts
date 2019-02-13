@@ -26,14 +26,23 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// MAPPINGS
     ///
     /// @title Registered Ballots
-    /// @notice Contains all Chainpoint Nodes that have staked and are participating in the Chainpoint Network
-    /// @dev Key is ethereum account for Chainpoint Node owner
-    /// @dev Value is struct representing Node attributes
+    /// @notice Contains all registered ballots
+    /// @dev Key is hash representation of the method name
+    /// @dev Value is struct representing Ballot
     mapping (bytes32 => Ballot) private registeredBallots;
     
-    bytes32[] registeredBallotsArr;
-    
+    /// @title Methods Voting Rounds
+    /// @notice Contains all of the Voting Rounds that have been triggered as a result of invoking vote() with a method hash and a unique arguments hash
+    /// @dev Key is hash representation of the method name
+    /// @dev Value is struct representing VotingRound
     mapping (bytes32 => mapping(bytes32 => VotingRound)) methodVotingRounds;
+    
+    ///
+    /// ARRAYS
+    ///
+    /// @title List of Registered Ballots
+    /// @notice Convenient list of registered ballots for iteration
+    bytes32[] registeredBallotsArr;
     
     ///
     /// TYPES 
