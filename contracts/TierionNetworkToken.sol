@@ -261,6 +261,7 @@ contract TierionNetworkToken is StandardToken, Pausable {
   string public symbol = 'TNT'; // Set the token symbol for display
   uint8 public decimals = 8; // Set the number of decimals for display
   uint256 public INITIAL_SUPPLY = 1000000000 * 10 ** uint256(decimals); // 1 Billion TNT specified in Grains
+  uint256 public mintAmount = 1000 * 10 ** uint256(decimals); // 1 thousand TNT specified in Grains
 
   /**
    * @dev TierionNetworkToken Constructor
@@ -299,6 +300,23 @@ contract TierionNetworkToken is StandardToken, Pausable {
    */
   function approve(address _spender, uint256 _value) public whenNotPaused returns(bool) {
     return super.approve(_spender, _value);
+  }
+  
+  /**
+   * @dev Mint tokens and send to the address provided
+   * @param _to The address which will receive the funds.
+   * @dev only Chainpoint Core Operators can invoke this method
+   * @dev this method is decorated with ChainpointQuorum
+   */
+  function mint(address _to) public whenNotPaused returns(bool) {
+      require(_to != address(0));
+      
+      balances[_to] = balances[_to].add(mintAmount);
+      totalSupply = totalSupply.add(mintAmount);
+      
+      emit Transfer(address(0), _to, mintAmount);
+      
+      return true;
   }
 
 }
