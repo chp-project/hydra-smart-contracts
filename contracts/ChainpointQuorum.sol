@@ -243,7 +243,20 @@ contract ChainpointQuorum is Ownable, Pausable {
     }
     
     function pruneBallots() public onlyOwnerOrCoreOperator returns (bool) {
+        for (uint i=0; i < registeredBallotsArr.length; i++) {
+            Ballot storage b = registeredBallots[registeredBallotsArr[i]];
+            
+            for (uint j=0; j < b.votingRoundHashes.length; j++) {
+                VotingRound storage vr = methodVotingRounds[registeredBallotsArr[i]][b.votingRoundHashes[j]];
+                
+                // Check to see if current block height > VotingRound.endBlock, if so, go ahead and prune the Voting Rounds for the registered ballot
+                if (block.number > vr.endBlock) {
+                    _pruneBallot(registeredBallotsArr[i], b.votingRoundHashes[j]);
+                }
+            }
+        }
         
+        return true;
     }
     
     function _hasConsensus(bytes32 _method, bytes32 _hash) private onlyOwnerOrCoreOperator returns (bool consensus, bool votingRoundExpired) {
