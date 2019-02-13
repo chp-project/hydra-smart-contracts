@@ -29,9 +29,9 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @notice Contains all Chainpoint Nodes that have staked and are participating in the Chainpoint Network
     /// @dev Key is ethereum account for Chainpoint Node owner
     /// @dev Value is struct representing Node attributes
-    mapping (string => Ballot) private registeredBallots;
+    mapping (bytes32 => Ballot) private registeredBallots;
     
-    mapping (string => mapping(bytes32 => VotingRound)) methodVotingRounds;
+    mapping (bytes32 => mapping(bytes32 => VotingRound)) methodVotingRounds;
     
     ///
     /// TYPES 
@@ -47,12 +47,13 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @dev votingWindow Number of blocks that the voting round is open for
     /// @dev startBlock Block height in which voting window begins
     struct Ballot {
-        string method;
+        bytes32 methodHash;
         BallotType ballotType;
         uint256 threshold;
-        int256 votingWindow;
+        uint256 votingWindow;
         uint256 startBlock;
         bool isActive;
+        mapping (bytes32 => VotingRound) votingRounds;
     }
     
     struct VotingRound {
@@ -67,7 +68,16 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @dev block Block height at which the vote was registered
     struct Vote {
         address voter;
-        uint256 block;
+        uint256 blockHeight;
+    }
+    
+    ///
+    /// MODIFIERS
+    ///
+    /// @notice only Staked Core Operators or Owner can call, otherwise throw
+    modifier onlyOwnerOrCoreOperator() {
+        require(msg.sender == owner() || chainpointRegistry.isHealthyCore(msg.sender), "must be owner or an active core operator");
+        _;
     }
     
     constructor (address _token, address _registry) public {
@@ -75,6 +85,39 @@ contract ChainpointQuorum is Ownable, Pausable {
         token = ERC20(_token);
         chainpointRegistry = ChainpointRegistryInterface(_registry);
     }
+    
+    ///
+    /// EVENTS 
+    ///
+    /// @notice emitted when a Voting Round is closed
+    /// @param _voter address of the voter
+    /// @param _method Hash of the smart contract method
+    /// @param _hash Hash of the function arguments being voted on
+    /// @param _blockHeight did vote pass as a result of consensus being achieved
+    event Voted(
+        address _voter,
+        bytes32 _method,
+        bytes32 _hash,
+        uint256 _blockHeight,
+        uint256 _votingRoundClosesAt
+    );
+
+    ///
+    /// @notice emitted when a Voting Round is closed
+    /// @param _method Hash of the smart contract method
+    /// @param _hash Hash of the function arguments being voted on
+    /// @param _hasConsensus did vote pass as a result of consensus being achieved
+    /// @param _votes number of votes for particular method + hash combo
+    /// @param _expired did the Voting Round expire
+    /// @param _pruned did the Voting Round get pruned from storage
+    event VotingRoundClosed(
+        bytes32 _method,
+        bytes32 _hash,
+        bool _hasConsensus,
+        uint256 _votes,
+        bool _expired,
+        bool _pruned
+    );
     
     ///
     /// Register Ballot for method
@@ -87,9 +130,9 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @return bool
     /// @dev msg.sender is expected to be the Core Operator
     /// @dev owner has ability to pause this operation indirectly
-    function registerBallot(string memory _method, string memory _ballotType, uint256 _threshold, int256 _votingWindow) public onlyOwner returns (bool) {
+    function registerBallot(bytes32 _method, string memory _ballotType, uint256 _threshold, uint256 _votingWindow) public onlyOwner returns (bool) {
         require(registeredBallots[_method].isActive, 'method has a ballot registered already');
-        require(bytes(_method).length > 0, "smart contract method name is required");
+        require(_method.length > 0, "smart contract method name is required");
         require(_votingWindow > 0, "voting window must be greater than 0");
         
         bool majorityBallot = keccak256(abi.encode(_ballotType)) == keccak256("majority");
@@ -103,7 +146,7 @@ contract ChainpointQuorum is Ownable, Pausable {
         
         Ballot storage b = registeredBallots[_method];
         
-        b.method = _method;
+        b.methodHash = _method;
         if (majorityBallot) {
             b.ballotType = BallotType.majority;
         } else {
@@ -128,8 +171,8 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @return bool
     /// @dev msg.sender is expected to be the Core Operator
     /// @dev owner has ability to pause this operation indirectly
-    function updateBallot(string memory _method, uint256 _threshold, int256 _votingWindow) public onlyOwner returns (bool) {
-        require(registeredBallots[_method].isActive, 'a ballot has not been registered for the specified method');
+    function updateBallot(bytes32 _method, uint256 _threshold, uint256 _votingWindow) public onlyOwner returns (bool) {
+        require(registeredBallots[_method].isActive, 'ballot has not been registered for the specified method');
         require(_votingWindow > 0, "voting window must be greater than 0");
         if (registeredBallots[_method].ballotType == BallotType.threshold) {
             require(_threshold > 0, "when Ballot Type is set to threshold, a value greater than 0 is required");
@@ -151,11 +194,96 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @return bool
     /// @dev msg.sender is expected to be the Core Operator
     /// @dev owner has ability to pause this operation indirectly
-    function deleteBallot(string memory _method) public onlyOwner returns (bool) {
-        require(registeredBallots[_method].isActive, 'a ballot has not been registered for the specified method');
+    function deleteBallot(bytes32 _method) public onlyOwner returns (bool) {
+        require(registeredBallots[_method].isActive, 'ballot has not been registered for the specified method');
         
         Ballot storage b = registeredBallots[_method];
         delete registeredBallots[_method];
+        
+        return true;
+    }
+    
+    ///
+    /// Register a Vote
+    ///
+    /// @notice Submits a vote to be included in a voting round for the smart contract method specified
+    /// @param _method Name of the smart contract method
+    /// @param _hash Hash of the arguments the Core operator voting wants to invoke the specified method with
+    /// @return bool
+    /// @dev msg.sender is expected to be the Core Operator
+    /// @dev owner has ability to pause this operation indirectly
+    function vote(bytes32 _method, bytes32 _hash) public onlyOwnerOrCoreOperator returns (bool, bool) {
+        require(registeredBallots[_method].isActive, 'ballot has not been registered for the specified method');
+        
+        VotingRound storage vr = methodVotingRounds[_method][_hash];
+        
+        // Check Voting Round exists based on the value of _hash, if it doesn't create a VotingRound and register a vote
+        if (vr.startBlock > 0) {
+            // Voting Round exists, check to see if round is still open; if so, register the vote
+            if (block.number <= vr.endBlock) {
+                vr.votes.push(Vote(msg.sender, block.number));
+                
+                emit Voted(msg.sender, _method, _hash, block.number, vr.endBlock);
+            }
+        } else {
+            // Voting Round does NOT exist, create a Voting Round and register a vote
+            vr.startBlock = block.number;
+            vr.endBlock = block.number.add(registeredBallots[_method].votingWindow);
+            vr.votes.push(Vote(msg.sender, block.number));
+            
+            emit Voted(msg.sender, _method, _hash, block.number, vr.endBlock);
+        }
+        
+        return _hasConsensus(_method, _hash);
+    }
+    
+    function _hasConsensus(bytes32 _method, bytes32 _hash) private onlyOwnerOrCoreOperator returns (bool consensus, bool votingRoundExpired) {
+        VotingRound storage vr = methodVotingRounds[_method][_hash];
+        // Check based on BallotType
+        if (registeredBallots[_method].ballotType == BallotType.threshold) {
+            bool consensus = (vr.votes.length >= registeredBallots[_method].threshold);
+            bool votingRoundExpired = (block.number <= vr.endBlock);
+            bool votingRoundPruned;
+            uint256 votes = vr.votes.length;
+            
+            if (consensus || votingRoundExpired) {
+                votingRoundPruned = true;
+                require(_pruneBallot(_method, _hash), "failed to prune voting round"); 
+            }
+            emit VotingRoundClosed(_method, _hash, consensus, votes, votingRoundExpired, votingRoundPruned);
+            
+            return (consensus, votingRoundExpired);
+        } else { // BallotType == majority
+            bool consensus;
+            bool votingRoundExpired = (block.number <= vr.endBlock);
+            bool votingRoundPruned;
+            uint256 votes = vr.votes.length;
+            uint256 numOfCores = chainpointRegistry.getCoreCount();
+             
+            // Calculate consensus for "majority" Electoral System
+            if (numOfCores == 1) {
+                consensus = (votes == 1);
+            } else if (numOfCores == 2) {
+                consensus = (votes == 2);
+            } else {
+                uint256 majority = numOfCores.div(2).add(1);
+                consensus = (votes >= majority);
+            }
+            
+            if (consensus || votingRoundExpired) {
+                votingRoundPruned = true;
+                require(_pruneBallot(_method, _hash), "failed to prune voting round"); 
+            }
+            
+            emit VotingRoundClosed(_method, _hash, consensus, votes, votingRoundExpired, votingRoundPruned);
+            
+            return (consensus, votingRoundExpired);
+        } // ***END {else}
+        
+    }
+    
+    function _pruneBallot(bytes32 _method, bytes32 _hash) private returns (bool) {
+        delete methodVotingRounds[_method][_hash];
         
         return true;
     }

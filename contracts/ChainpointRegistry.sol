@@ -347,6 +347,26 @@ contract ChainpointRegistry is Ownable, Pausable {
     }
     
     ///
+    /// Get Count of staked Core Operators
+    ///
+    /// @notice Returns length of coresArr
+    /// @return uint256 of the length of coresArr
+    function getCoreCount() public view returns (uint256) {
+        return coresArr.length;
+    }
+    
+    ///
+    /// Is Core healthy?
+    ///
+    /// @notice Returns whether or not a Core is healthy
+    /// @return bool if successful, otherwise false
+    /// @dev msg.sender is expected to be the Node Operator
+    /// @dev owner has ability to pause this operation
+    function isHealthyCore(address _address) public returns (bool) {
+        return cores[msg.sender].isHealthy;
+    }
+    
+    ///
     /// Get White-listed Core Operators
     ///
     /// @notice Returns the amount of tokens that a Node Operator has staked and the timestamp as to when the tokens are locked

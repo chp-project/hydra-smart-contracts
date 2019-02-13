@@ -39,6 +39,8 @@ contract ChainpointRegistryInterface is Ownable, Pausable {
         uint256 _duration
     );
     
+    // Variables
+    address[] public coresArr;
     
     // Methods
     function stake(bytes32 _nodeIp, bytes32 _nodePublicKey, uint256 _amount) public returns (bool);
@@ -48,4 +50,6 @@ contract ChainpointRegistryInterface is Ownable, Pausable {
     function unStake() public returns (bool);
     function unStakeCore() public returns (bool);
     function totalStakedFor(address addr) public view returns (uint256 amount, uint256 unlocks_at);
+    function isHealthyCore(address _address) public returns (bool);
+    function getCoreCount() public view returns (uint256);
 }
