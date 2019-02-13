@@ -242,6 +242,13 @@ contract ChainpointQuorum is Ownable, Pausable {
         return _hasConsensus(_method, _hash);
     }
     
+    ///
+    /// Prune Ballots
+    ///
+    /// @notice This method must be explicitly invoked to prune Voting Rounds that have expired (aka timeout) and no longer to be persisted within the contract
+    /// @return bool
+    /// @dev msg.sender is expected to be the Core Operator or Owner, and can be called at the discretion of any authorized party
+    /// @dev owner has ability to pause this operation indirectly
     function pruneBallots() public onlyOwnerOrCoreOperator returns (bool) {
         for (uint i=0; i < registeredBallotsArr.length; i++) {
             Ballot storage b = registeredBallots[registeredBallotsArr[i]];
@@ -259,6 +266,13 @@ contract ChainpointQuorum is Ownable, Pausable {
         return true;
     }
     
+    ///
+    /// Has Voting Round for particular method reached consensus?
+    ///
+    /// @notice This method will determine if a Voting Round has successfully resolved with a consensus amongst Core Operators
+    /// @return (bool consensus, bool votingRoundExpired)
+    /// @dev msg.sender is expected to be the Core Operator
+    /// @dev owner has ability to pause this operation indirectly
     function _hasConsensus(bytes32 _method, bytes32 _hash) private onlyOwnerOrCoreOperator returns (bool consensus, bool votingRoundExpired) {
         VotingRound storage vr = methodVotingRounds[_method][_hash];
         // Check based on BallotType
@@ -304,7 +318,16 @@ contract ChainpointQuorum is Ownable, Pausable {
         
     }
     
-    function _pruneBallot(bytes32 _method, bytes32 _hash) private returns (bool) {
+    ///
+    /// Prune Ballot
+    ///
+    /// @notice Will prune Voting Rounds for the provided method and hash vote
+    /// @param _method Name of the smart contract method
+    /// @param _hash Hash of the arguments the Core operator voting wants to invoke the specified method with
+    /// @return bool
+    /// @dev msg.sender is expected to be the Core Operator
+    /// @dev owner has ability to pause this operation indirectly
+    function _pruneBallot(bytes32 _method, bytes32 _hash) private onlyOwnerOrCoreOperator returns (bool) {
         delete methodVotingRounds[_method][_hash];
         
         return true;
