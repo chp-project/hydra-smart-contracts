@@ -31,6 +31,8 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @dev Value is struct representing Node attributes
     mapping (bytes32 => Ballot) private registeredBallots;
     
+    bytes32[] registeredBallotsArr;
+    
     mapping (bytes32 => mapping(bytes32 => VotingRound)) methodVotingRounds;
     
     ///
@@ -53,7 +55,7 @@ contract ChainpointQuorum is Ownable, Pausable {
         uint256 votingWindow;
         uint256 startBlock;
         bool isActive;
-        mapping (bytes32 => VotingRound) votingRounds;
+        bytes32[] votingRoundHashes;
     }
     
     struct VotingRound {
@@ -158,6 +160,8 @@ contract ChainpointQuorum is Ownable, Pausable {
         b.startBlock = block.number;
         b.isActive = true;
         
+        registeredBallotsArr.push(_method);
+        
         return true;
     }
   
@@ -227,6 +231,7 @@ contract ChainpointQuorum is Ownable, Pausable {
             }
         } else {
             // Voting Round does NOT exist, create a Voting Round and register a vote
+            registeredBallots[_method].votingRoundHashes.push(_hash);
             vr.startBlock = block.number;
             vr.endBlock = block.number.add(registeredBallots[_method].votingWindow);
             vr.votes.push(Vote(msg.sender, block.number));
@@ -235,6 +240,10 @@ contract ChainpointQuorum is Ownable, Pausable {
         }
         
         return _hasConsensus(_method, _hash);
+    }
+    
+    function pruneBallots() public onlyOwnerOrCoreOperator returns (bool) {
+        
     }
     
     function _hasConsensus(bytes32 _method, bytes32 _hash) private onlyOwnerOrCoreOperator returns (bool consensus, bool votingRoundExpired) {
