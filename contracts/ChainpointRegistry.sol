@@ -44,6 +44,11 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev Value staking duration
     mapping (string => mapping(uint256 => uint256)) stakingRates;
     
+    /// @title Registered Chainpoint Nodes Array
+    /// @notice Convenient iterable data structure containing a list of Node Operators
+    /// @dev Value Address of the registered Node
+    address[] public nodesArr;
+    
     /// @title Registered Chainpoint Cores Array
     /// @notice Convenient iterable data structure containing a list of Core Operators
     /// @dev Value Address of the registered Core
@@ -328,6 +333,20 @@ contract ChainpointRegistry is Ownable, Pausable {
         
         require(token.transfer(msg.sender, cores[msg.sender].amountStaked), "transferFrom failed");
         delete cores[msg.sender];
+        
+        return true;
+    }
+    
+    ///
+    /// Reward
+    ///
+    /// @notice Invoked by a Core on a set interval, will then invoke mint() method on ERC20 token contract
+    /// @return true if successful, otherwise false
+    /// @dev msg.sender is expected to be the Node Operator
+    /// @dev Only core Operators can call method
+    /// @dev owner has ability to pause this operation
+    function reward() public whenNotPaused onlyCoreOperator returns (bool) {
+        // Construct list of staked and healthy Nodes
         
         return true;
     }
