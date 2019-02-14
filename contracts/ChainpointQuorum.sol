@@ -18,8 +18,8 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @notice Standard ERC20 Token
     ERC20 private token;
     
-    /// @title TNT Token Contract
-    /// @notice Standard ERC20 Token
+    /// @title Chainpoint Registry
+    /// @notice Chainpoint Registry Contract
     ChainpointRegistryInterface private chainpointRegistry;
     
     ///

@@ -31,6 +31,62 @@ library SafeMath {
 }
 
 /**
+ * @title ChainpointRegistryInterface
+ * @dev ChainpointRegistry interface
+ * @dev see https://...
+ */
+contract ChainpointRegistryInterface {
+    // EVENTS
+    event NodeStaked(
+        address indexed _sender,
+        bytes32 _nodeIp,
+        bytes32 _nodePublicKey,
+        uint256 _amountStaked,
+        uint256 _duration
+    );
+    
+    event NodeStakeUpdated(
+        address indexed _sender,
+        bytes32 _nodeIp,
+        bytes32 _publicKey,
+        uint256 _amountStaked,
+        uint256 _duration
+    );
+    
+    event CoreStaked(
+        address indexed _sender,
+        bytes32 _coreIp,
+        bytes32 _corePublicKey,
+        bool _isHealthy,
+        uint256 _amountStaked,
+        uint256 _duration
+    );
+    
+    event CoreStakeUpdated(
+        address indexed _sender,
+        bytes32 _coreIp,
+        bytes32 _corePublicKey,
+        bool _isHealthy,
+        uint256 _amountStaked,
+        uint256 _duration
+    );
+    
+    // Variables
+    address[] public coresArr;
+    
+    // Methods
+    function stake(bytes32 _nodeIp, bytes32 _nodePublicKey, uint256 _amount) public returns (bool);
+    function stakeCore(bytes32 _coreIp, bytes32 _corePublicKey, uint256 _amount) public returns (bool);
+    function updateStake(bytes32 _nodeIp, bytes32 _nodePublicKey) public returns (bool);
+    function updateStakeCore(bytes32 _coreIp, bytes32 _corePublicKey, bool _isCore) public returns (bool);
+    function unStake() public returns (bool);
+    function unStakeCore() public returns (bool);
+    function totalStakedFor(address addr) public view returns (uint256 amount, uint256 unlocks_at);
+    function isHealthyCore(address _address) public returns (bool);
+    function getCoreCount() public view returns (uint256);
+}
+
+/**
  * @title ERC20Basic
  * @dev Simpler version of ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/179
@@ -257,11 +313,35 @@ contract Pausable is Ownable {
  */
 contract TierionNetworkToken is StandardToken, Pausable {
 
-  string public name = 'Tierion Network Token'; // Set the token name for display
-  string public symbol = 'TNT'; // Set the token symbol for display
-  uint8 public decimals = 8; // Set the number of decimals for display
-  uint256 public INITIAL_SUPPLY = 1000000000 * 10 ** uint256(decimals); // 1 Billion TNT specified in Grains
-  uint256 public mintAmount = 1000 * 10 ** uint256(decimals); // 1 thousand TNT specified in Grains
+    string public name = 'Tierion Network Token'; // Set the token name for display
+    string public symbol = 'TNT'; // Set the token symbol for display
+    uint8 public decimals = 8; // Set the number of decimals for display
+    uint256 public INITIAL_SUPPLY = 1000000000 * 10 ** uint256(decimals); // 1 Billion TNT specified in Grains
+    uint256 public mintAmount = 10000 * 10 ** uint256(decimals); // 10 thousand TNT specified in Grains
+    
+    ///
+    /// Minting Parameters
+    ///
+    
+    /// @title Minting Interval (in # of blocks)
+    uint256 public mintingInterval = 5760; // 86,400 (seconds in 1 day) / 15 (average block time in seconds)
+    /// @title Last Token Minting timestamp
+    uint256 public lastMintedAt;
+    /// @title Last Token Minting block height
+    uint256 public lastMintedAtBlock;
+    
+    /// @title Chainpoint Registry
+    /// @notice Chainpoint Registry Contract
+    ChainpointRegistryInterface private chainpointRegistry;
+  
+    ///
+    /// MODIFIERS
+    ///
+    /// @notice only Staked Core Operators or Owner can call, otherwise throw
+    modifier onlyCoreOperator() {
+        require(chainpointRegistry.isHealthyCore(msg.sender), "must be owner or an active core operator");
+        _;
+    }
 
   /**
    * @dev TierionNetworkToken Constructor
@@ -271,6 +351,19 @@ contract TierionNetworkToken is StandardToken, Pausable {
     totalSupply = INITIAL_SUPPLY; // Set the total supply
     balances[msg.sender] = INITIAL_SUPPLY; // Creator address is assigned all
   }
+  
+  ///
+    /// EVENTS 
+    ///
+    /// @notice emitted on successful token minting
+    /// @param _nodeCount number of Node Operators that were rewarded tokens
+    /// @param _reward is the total number of tokens rewarded to each Node Operator
+    /// @param _blockHeight The block height in which token minting occurred
+    event Mint(
+        uint256 _nodeCount,
+        uint256 _reward,
+        uint256 _blockHeight
+    );
 
   /**
    * @dev Transfer token for a specified address when not paused
@@ -308,13 +401,20 @@ contract TierionNetworkToken is StandardToken, Pausable {
    * @dev only Chainpoint Core Operators can invoke this method
    * @dev this method is decorated with ChainpointQuorum
    */
-  function mint(address _to) public whenNotPaused returns(bool) {
-      require(_to != address(0));
+  function mint(address[] memory _nodes) public whenNotPaused onlyCoreOperator returns(bool) {
+      require(block.number >= lastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
+      require(_nodes.length > 0, "list of nodes is required");
       
-      balances[_to] = balances[_to].add(mintAmount);
+      uint256 reward = mintAmount.div(_nodes.length);
+      
+      // Iterate through list of Nodes and award tokens
+      for(uint256 i=0; i < _nodes.length; i++) {
+          balances[_nodes[i]] = balances[_nodes[i]].add(reward);
+      }
+      // Increase totalSupply
       totalSupply = totalSupply.add(mintAmount);
       
-      emit Transfer(address(0), _to, mintAmount);
+      emit Mint(_nodes.length, reward, block.number);
       
       return true;
   }

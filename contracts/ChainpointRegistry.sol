@@ -369,16 +369,14 @@ contract ChainpointRegistry is Ownable, Pausable {
     ///
     /// Get White-listed Core Operators
     ///
-    /// @notice Returns the amount of tokens that a Node Operator has staked and the timestamp as to when the tokens are locked
-    /// @return address[] if successful, otherwise false
+    /// @notice Will return true if _address is pushed to whitelistedCoresArr, else if the _address is already included in the list return false
+    /// @return bool if successful, otherwise false
     /// @dev msg.sender is expected to be the Node Operator
     /// @dev owner has ability to pause this operation
     function whitelistCore(address _address) public onlyOwnerOrCoreOperator returns (bool) {
-        bool exists;
-        
         for (uint i = 0; i < whitelistedCoresArr.length; i++) {
             if (whitelistedCoresArr[i] == _address) {
-                break;
+                return false;
             }
         }
         whitelistedCoresArr.push(_address);

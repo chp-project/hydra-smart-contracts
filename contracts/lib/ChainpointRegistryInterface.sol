@@ -1,9 +1,6 @@
 pragma solidity >=0.4.22 <0.6.0;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
-
-contract ChainpointRegistryInterface is Ownable, Pausable {
+contract ChainpointRegistryInterface {
     // EVENTS
     event NodeStaked(
         address indexed _sender,
