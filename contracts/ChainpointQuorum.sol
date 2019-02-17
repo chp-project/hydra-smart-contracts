@@ -210,7 +210,6 @@ contract ChainpointQuorum is Ownable, Pausable {
     function deleteBallot(bytes32 _method) public onlyOwner returns (bool) {
         require(registeredBallots[_method].isActive, 'ballot has not been registered for the specified method');
         
-        Ballot storage b = registeredBallots[_method];
         delete registeredBallots[_method];
         
         return true;
@@ -282,7 +281,7 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @return (bool consensus, bool votingRoundExpired)
     /// @dev msg.sender is expected to be the Core Operator
     /// @dev owner has ability to pause this operation indirectly
-    function _hasConsensus(bytes32 _method, bytes32 _hash) private onlyOwnerOrCoreOperator returns (bool consensus, bool votingRoundExpired) {
+    function _hasConsensus(bytes32 _method, bytes32 _hash) private onlyOwnerOrCoreOperator returns (bool _consensus, bool _votingRoundExpired) {
         VotingRound storage vr = methodVotingRounds[_method][_hash];
         // Check based on BallotType
         if (registeredBallots[_method].ballotType == BallotType.threshold) {

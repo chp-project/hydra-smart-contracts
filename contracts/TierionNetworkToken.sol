@@ -118,8 +118,7 @@ contract ERC20 is ERC20Basic {
  * @dev Basic version of StandardToken, with no allowances. 
  */
 contract BasicToken is ERC20Basic {
-  using SafeMath
-  for uint256;
+  using SafeMath for uint256;
 
   mapping(address => uint256) balances;
 
@@ -154,8 +153,9 @@ contract BasicToken is ERC20Basic {
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
 contract StandardToken is ERC20, BasicToken {
+  using SafeMath for uint256;
 
-  mapping(address => mapping(address => uint256)) allowed;
+  mapping(address => mapping(address => uint256)) public allowed;
 
 
   /**
@@ -165,15 +165,15 @@ contract StandardToken is ERC20, BasicToken {
    * @param _value uint256 the amout of tokens to be transfered
    */
   function transferFrom(address _from, address _to, uint256 _value) public returns(bool) {
-    uint256 _allowance = allowed[_from][msg.sender];
-
     // Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
     // require (_value <= _allowance);
-
-    balances[_to] = balances[_to].add(_value);
+    
     balances[_from] = balances[_from].sub(_value);
-    allowed[_from][msg.sender] = _allowance.sub(_value);
+    allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
+    balances[_to] = balances[_to].add(_value);
+
     emit Transfer(_from, _to, _value);
+    
     return true;
   }
 
@@ -332,7 +332,7 @@ contract TierionNetworkToken is StandardToken, Pausable {
     
     /// @title Chainpoint Registry
     /// @notice Chainpoint Registry Contract
-    ChainpointRegistryInterface private chainpointRegistry;
+    ChainpointRegistryInterface public chainpointRegistry;
   
     ///
     /// MODIFIERS
@@ -397,7 +397,7 @@ contract TierionNetworkToken is StandardToken, Pausable {
   
   /**
    * @dev Mint tokens and send to the address provided
-   * @param _to The address which will receive the funds.
+   * @param _nodes The addresses of Nodes which will receive the funds.
    * @dev only Chainpoint Core Operators can invoke this method
    * @dev this method is decorated with ChainpointQuorum
    */
@@ -415,6 +415,14 @@ contract TierionNetworkToken is StandardToken, Pausable {
       totalSupply = totalSupply.add(mintAmount);
       
       emit Mint(_nodes.length, reward, block.number);
+      
+      return true;
+  }
+  
+  function setChainpointRegistry(address _addr) public onlyOwner returns(bool) {
+      require(_addr != address(0));
+      
+      chainpointRegistry = ChainpointRegistryInterface(_addr);
       
       return true;
   }
