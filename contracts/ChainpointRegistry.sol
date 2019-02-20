@@ -21,12 +21,12 @@ contract ChainpointRegistry is Ownable, Pausable {
     
     // @title Chainpoint Quorum Smart Contract address
     address quorumContractAddress;
-    
+
     uint256 public NODE_STAKING_AMOUNT = 500000000000; // 5000 TNT specified in grains
-    uint256 public NODE_STAKING_DURATION = 600; // 10mins specified in seconds
+    uint256 public NODE_STAKING_DURATION = 120; // 2mins specified in seconds TODO: fix for PROD
     
     uint256 public CORE_STAKING_AMOUNT = 2500000000000; // 25,000 TNT specified in grains
-    uint256 public CORE_STAKING_DURATION = 600; // 10mins specified in seconds
+    uint256 public CORE_STAKING_DURATION = 600; // 10mins specified in seconds TODO: fix for PROD
     
     ///
     /// MAPPINGS
@@ -381,21 +381,11 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev msg.sender is expected to be the Node Operator
     /// @dev owner has ability to pause this operation
     function whitelistCore(address _address) public onlyOwnerOrCoreOperator returns (bool) {
-        for (uint i = 0; i < whitelistedCoresArr.length; i++) {
-            if (whitelistedCoresArr[i] == _address) {
-                return false;
-            }
-        }
+        require(_address != address(0));
+        
         whitelistedCoresArr.push(_address);
         
         return true;
-    }
-    
-    function g() public view returns (uint256) {
-        // require(token.transferFrom(msg.sender, address(this), 500000000000), "transferFrom failed");
-        // require(token.transferFrom(address(this), msg.sender, 500000000000), "transferFrom failed");
-        
-        return token.mintingInterval();
     }
     
     ///
@@ -409,9 +399,9 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev tokens will be deducted from the Node Operator and added to the balance of the ChainpointRegistry Address
     /// @dev owner has ability to pause this operation
     function _addNodeToRegistry(bytes32 _nodeIp, bytes32 _nodePublicKey) internal returns (bool) {
-        require(!nodes[msg.sender].isStaked, "node has already staked. invoke renewStake() method to renew");
-        require(_nodeIp[0] != 0, "node IP address is required");
-        require(_nodePublicKey[0] != 0, "node public key is required is required");
+        // require(!nodes[msg.sender].isStaked, "node has already staked. invoke renewStake() method to renew");
+        // require(_nodeIp[0] != 0, "node IP address is required");
+        // require(_nodePublicKey[0] != 0, "node public key is required is required");
         
         uint256 stakeLockedUntil = now + NODE_STAKING_DURATION;
         

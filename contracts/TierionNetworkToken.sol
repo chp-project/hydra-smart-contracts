@@ -169,7 +169,7 @@ contract StandardToken is ERC20, BasicToken {
     // require (_value <= _allowance);
     
     balances[_from] = balances[_from].sub(_value);
-    allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
+    // allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
 
     emit Transfer(_from, _to, _value);
@@ -317,7 +317,7 @@ contract TierionNetworkToken is StandardToken, Pausable {
     string public symbol = 'TNT'; // Set the token symbol for display
     uint8 public decimals = 8; // Set the number of decimals for display
     uint256 public INITIAL_SUPPLY = 1000000000 * 10 ** uint256(decimals); // 1 Billion TNT specified in Grains
-    uint256 public mintAmount = 10000 * 10 ** uint256(decimals); // 10 thousand TNT specified in Grains
+    uint256 public mintAmount = 333 * 10 ** uint256(decimals); // 333 TNT specified in Grains
     
     ///
     /// Minting Parameters
@@ -356,12 +356,12 @@ contract TierionNetworkToken is StandardToken, Pausable {
     /// EVENTS 
     ///
     /// @notice emitted on successful token minting
-    /// @param _nodeCount number of Node Operators that were rewarded tokens
-    /// @param _reward is the total number of tokens rewarded to each Node Operator
+    /// @param _nodes number of Node Operators that were rewarded tokens
+    /// @param _mintAmount is the total number of tokens rewarded to each Node Operator
     /// @param _blockHeight The block height in which token minting occurred
     event Mint(
-        uint256 _nodeCount,
-        uint256 _reward,
+        address[3] _nodes,
+        uint256 _mintAmount,
         uint256 _blockHeight
     );
 
@@ -401,22 +401,26 @@ contract TierionNetworkToken is StandardToken, Pausable {
    * @dev only Chainpoint Core Operators can invoke this method
    * @dev this method is decorated with ChainpointQuorum
    */
-  function mint(address[] memory _nodes) public whenNotPaused onlyCoreOperator returns(bool) {
+  function mint(address[3] memory _nodes) public whenNotPaused onlyCoreOperator returns(bool) {
       require(block.number >= lastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
-      require(_nodes.length > 0, "list of nodes is required");
+      require(_nodes.length == 3, "list of 3 nodes is required");
       
-      uint256 reward = mintAmount.div(_nodes.length);
       
       // Iterate through list of Nodes and award tokens
-      for(uint256 i=0; i < _nodes.length; i++) {
-          balances[_nodes[i]] = balances[_nodes[i]].add(reward);
+      for(uint8 i=0; i < _nodes.length; i++) {
+          balances[_nodes[i]] = balances[_nodes[i]].add(mintAmount);
+          
+          // Increase totalSupply
+          totalSupply = totalSupply.add(mintAmount);
       }
-      // Increase totalSupply
-      totalSupply = totalSupply.add(mintAmount);
       
-      emit Mint(_nodes.length, reward, block.number);
+      emit Mint(_nodes, mintAmount, block.number);
       
       return true;
+  }
+
+  function getOwner() public view returns (address) {
+    return owner;
   }
   
   function setChainpointRegistry(address _addr) public onlyOwner returns(bool) {

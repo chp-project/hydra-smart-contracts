@@ -4,12 +4,17 @@
   "description": "### Contracts * TNTToken.sol * NodeRegistry.sol",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:e2e": "node e2e-testing/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ethers": "^4.0.25",
+    "lodash": "^4.17.11",
     "openzeppelin-solidity": "^2.1.2",
-    "truffle-hdwallet-provider": "^1.0.4"
+    "ramda": "^0.26.1",
+    "truffle-hdwallet-provider": "^1.0.4",
+    "web3": "^1.0.0-beta.46"
   }
 }
