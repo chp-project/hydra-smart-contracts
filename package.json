@@ -10,8 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chalk": "^2.4.2",
     "ethers": "^4.0.25",
     "lodash": "^4.17.11",
+    "log-symbols": "^2.2.0",
     "openzeppelin-solidity": "^2.1.2",
     "ramda": "^0.26.1",
     "truffle-hdwallet-provider": "^1.0.4",

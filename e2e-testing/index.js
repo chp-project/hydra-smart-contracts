@@ -12,9 +12,7 @@ const REGISTRY_CONTRACT_ADDRESS = "0xBCFD345565283689d21EB1bA6ea88f58d193fd5d";
 
 // Deployment is asynchronous, so we use an async IIFE
 (async function() {
-  // Notice we pass in "Hello World" as the parameter to the constructor
   let tokenContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, require('../build/contracts/TierionNetworkToken.json').abi, account001);
-  // Deploy Registry contract
   let registryContract = new ethers.Contract(REGISTRY_CONTRACT_ADDRESS, require('../build/contracts/ChainpointRegistry.json').abi, account001);
   
   ///

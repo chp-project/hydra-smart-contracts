@@ -26,7 +26,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     uint256 public NODE_STAKING_DURATION = 120; // 2mins specified in seconds TODO: fix for PROD
     
     uint256 public CORE_STAKING_AMOUNT = 2500000000000; // 25,000 TNT specified in grains
-    uint256 public CORE_STAKING_DURATION = 600; // 10mins specified in seconds TODO: fix for PROD
+    uint256 public CORE_STAKING_DURATION = 120; // 10mins specified in seconds TODO: fix for PROD
     
     ///
     /// MAPPINGS

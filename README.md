@@ -4,8 +4,8 @@
 
 | Contract  | Address |
 | ------------- | ------------- |
-| TierionNetworkToken (TNT)  | [0x9105a3b44075bb0BE3E5A328Fc14367ce88bd27f](https://ropsten.etherscan.io/address/0x9105a3b44075bb0BE3E5A328Fc14367ce88bd27f) |
-| ChainpointRegistry | [0x0e30923DfBA8fEB7418A63b2Be8Ed78B8B387b88](https://ropsten.etherscan.io/address/0x0e30923DfBA8fEB7418A63b2Be8Ed78B8B387b88) |
+| TierionNetworkToken (TNT)  | [0xcF8EE11ef3E6846701eFde105AB0EF60A46d55C1](https://ropsten.etherscan.io/address/0xcF8EE11ef3E6846701eFde105AB0EF60A46d55C1) |
+| ChainpointRegistry | [0x2aaDDFD5290421A770Fb880B87B376B465E0950d](https://ropsten.etherscan.io/address/0x2aaDDFD5290421A770Fb880B87B376B465E0950d) |
 
 <!-- ### Kovan Chain (STAGING) -->
 
