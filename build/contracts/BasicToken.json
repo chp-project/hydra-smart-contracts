@@ -21522,7 +21522,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.1",
-  "updatedAt": "2019-02-21T05:34:21.537Z",
+  "updatedAt": "2019-02-21T19:42:18.516Z",
   "devdoc": {
     "details": "Basic version of StandardToken, with no allowances. ",
     "methods": {
