@@ -1,55 +1,96 @@
 {
-  "contractName": "BasicToken",
+  "contractName": "ChainpointQuorumInterface",
   "abi": [
     {
-      "constant": true,
-      "inputs": [],
-      "name": "totalSupply",
-      "outputs": [
+      "anonymous": false,
+      "inputs": [
         {
-          "name": "",
+          "indexed": false,
+          "name": "_voter",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "_method",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "_hash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "_blockHeight",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "_votingRoundClosesAt",
           "type": "uint256"
         }
       ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
+      "name": "Voted",
+      "type": "event"
     },
     {
       "anonymous": false,
       "inputs": [
         {
-          "indexed": true,
-          "name": "from",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "name": "to",
-          "type": "address"
+          "indexed": false,
+          "name": "_method",
+          "type": "bytes32"
         },
         {
           "indexed": false,
-          "name": "value",
+          "name": "_hash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "_hasConsensus",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "name": "_votes",
           "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "_expired",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "name": "_pruned",
+          "type": "bool"
         }
       ],
-      "name": "Transfer",
+      "name": "VotingRoundClosed",
       "type": "event"
     },
     {
       "constant": false,
       "inputs": [
         {
-          "name": "_to",
-          "type": "address"
+          "name": "_method",
+          "type": "bytes32"
         },
         {
-          "name": "_value",
+          "name": "_ballotType",
+          "type": "string"
+        },
+        {
+          "name": "_threshold",
+          "type": "uint256"
+        },
+        {
+          "name": "_votingWindow",
           "type": "uint256"
         }
       ],
-      "name": "transfer",
+      "name": "registerBallot",
       "outputs": [
         {
           "name": "",
@@ -61,29 +102,97 @@
       "type": "function"
     },
     {
-      "constant": true,
+      "constant": false,
       "inputs": [
         {
-          "name": "_owner",
-          "type": "address"
-        }
-      ],
-      "name": "balanceOf",
-      "outputs": [
+          "name": "_method",
+          "type": "bytes32"
+        },
         {
-          "name": "balance",
+          "name": "_threshold",
+          "type": "uint256"
+        },
+        {
+          "name": "_votingWindow",
           "type": "uint256"
         }
       ],
+      "name": "updateBallot",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
       "payable": false,
-      "stateMutability": "view",
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_method",
+          "type": "bytes32"
+        }
+      ],
+      "name": "deleteBallot",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_method",
+          "type": "bytes32"
+        },
+        {
+          "name": "_hash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "vote",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        },
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "pruneBallots",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
       "type": "function"
     }
   ],
-  "bytecode": "0x608060405234801561001057600080fd5b506103ac806100206000396000f3fe608060405260043610610057576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806318160ddd1461005c57806370a0823114610087578063a9059cbb146100ec575b600080fd5b34801561006857600080fd5b5061007161015f565b6040518082815260200191505060405180910390f35b34801561009357600080fd5b506100d6600480360360208110156100aa57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610165565b6040518082815260200191505060405180910390f35b3480156100f857600080fd5b506101456004803603604081101561010f57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190803590602001909291905050506101ae565b604051808215151515815260200191505060405180910390f35b60005481565b6000600160008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020549050919050565b600061020282600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000205461034990919063ffffffff16565b600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000208190555061029782600160008673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000205461036290919063ffffffff16565b600160008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055508273ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff167fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef846040518082815260200191505060405180910390a36001905092915050565b600082821115151561035757fe5b818303905092915050565b600080828401905083811015151561037657fe5b809150509291505056fea165627a7a72305820ed6f2a3eaaf81e34e02c3efce5e8ca565c2cf1a9179c5de41e002ea229c035410029",
-  "deployedBytecode": "0x608060405260043610610057576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806318160ddd1461005c57806370a0823114610087578063a9059cbb146100ec575b600080fd5b34801561006857600080fd5b5061007161015f565b6040518082815260200191505060405180910390f35b34801561009357600080fd5b506100d6600480360360208110156100aa57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610165565b6040518082815260200191505060405180910390f35b3480156100f857600080fd5b506101456004803603604081101561010f57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190803590602001909291905050506101ae565b604051808215151515815260200191505060405180910390f35b60005481565b6000600160008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020549050919050565b600061020282600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000205461034990919063ffffffff16565b600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000208190555061029782600160008673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000205461036290919063ffffffff16565b600160008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055508273ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff167fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef846040518082815260200191505060405180910390a36001905092915050565b600082821115151561035757fe5b818303905092915050565b600080828401905083811015151561037657fe5b809150509291505056fea165627a7a72305820ed6f2a3eaaf81e34e02c3efce5e8ca565c2cf1a9179c5de41e002ea229c035410029",
-  "sourceMap": "4310:822:3:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;4310:822:3;;;;;;;",
-  "deployedSourceMap": "4310:822:3:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3529:26;;8:9:-1;5:2;;;30:1;27;20:12;5:2;3529:26:3;;;;;;;;;;;;;;;;;;;;;;;5023:106;;8:9:-1;5:2;;;30:1;27;20:12;5:2;5023:106:3;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;5023:106:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4574:242;;8:9:-1;5:2;;;30:1;27;20:12;5:2;4574:242:3;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;4574:242:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3529:26;;;;:::o;5023:106::-;5078:15;5108:8;:16;5117:6;5108:16;;;;;;;;;;;;;;;;5101:23;;5023:106;;;:::o;4574:242::-;4636:4;4671:32;4696:6;4671:8;:20;4680:10;4671:20;;;;;;;;;;;;;;;;:24;;:32;;;;:::i;:::-;4648:8;:20;4657:10;4648:20;;;;;;;;;;;;;;;:55;;;;4725:25;4743:6;4725:8;:13;4734:3;4725:13;;;;;;;;;;;;;;;;:17;;:25;;;;:::i;:::-;4709:8;:13;4718:3;4709:13;;;;;;;;;;;;;;;:41;;;;4782:3;4761:33;;4770:10;4761:33;;;4787:6;4761:33;;;;;;;;;;;;;;;;;;4807:4;4800:11;;4574:242;;;;:::o;560:109::-;617:7;644:1;639;:6;;632:14;;;;;;663:1;659;:5;652:12;;560:109;;;;:::o;673:128::-;730:7;745:9;761:1;757;:5;745:17;;780:1;775;:6;;768:14;;;;;;795:1;788:8;;;673:128;;;;:::o",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
   "source": "pragma solidity >=0.4.22 <0.6.0;\n\n/**\n * @title SafeMath\n * @dev Math operations with safety checks that throw on error\n */\nlibrary SafeMath {\n  function mul(uint256 a, uint256 b) internal pure returns(uint256) {\n    uint256 c = a * b;\n    assert(a == 0 || c / a == b);\n    return c;\n  }\n\n  function div(uint256 a, uint256 b) internal pure returns(uint256) {\n    // assert(b > 0); // Solidity automatically throws when dividing by 0\n    uint256 c = a / b;\n    // assert(a == b * c + a % b); // There is no case in which this doesn't hold \n    return c;\n  }\n\n  function sub(uint256 a, uint256 b) internal pure returns(uint256) {\n    assert(b <= a);\n    return a - b;\n  }\n\n  function add(uint256 a, uint256 b) internal pure returns(uint256) {\n    uint256 c = a + b;\n    assert(c >= a);\n    return c;\n  }\n}\n\n/**\n * @title ChainpointRegistryInterface\n * @dev ChainpointRegistry interface\n * @dev see https://...\n */\ncontract ChainpointRegistryInterface {\n    // EVENTS\n    event NodeStaked(\n        address indexed _sender,\n        bytes32 _nodeIp,\n        bytes32 _nodePublicKey,\n        uint256 _amountStaked,\n        uint256 _duration\n    );\n    \n    event NodeStakeUpdated(\n        address indexed _sender,\n        bytes32 _nodeIp,\n        bytes32 _publicKey,\n        uint256 _amountStaked,\n        uint256 _duration\n    );\n    \n    event CoreStaked(\n        address indexed _sender,\n        bytes32 _coreIp,\n        bytes32 _corePublicKey,\n        bool _isHealthy,\n        uint256 _amountStaked,\n        uint256 _duration\n    );\n    \n    event CoreStakeUpdated(\n        address indexed _sender,\n        bytes32 _coreIp,\n        bytes32 _corePublicKey,\n        bool _isHealthy,\n        uint256 _amountStaked,\n        uint256 _duration\n    );\n    \n    // Variables\n    address[] public coresArr;\n    \n    // Methods\n    function stake(bytes32 _nodeIp, bytes32 _nodePublicKey, uint256 _amount) public returns (bool);\n    function stakeCore(bytes32 _coreIp, bytes32 _corePublicKey, uint256 _amount) public returns (bool);\n    function updateStake(bytes32 _nodeIp, bytes32 _nodePublicKey) public returns (bool);\n    function updateStakeCore(bytes32 _coreIp, bytes32 _corePublicKey, bool _isCore) public returns (bool);\n    function unStake() public returns (bool);\n    function unStakeCore() public returns (bool);\n    function totalStakedFor(address addr) public view returns (uint256 amount, uint256 unlocks_at);\n    function isHealthyCore(address _address) public returns (bool);\n    function getCoreCount() public view returns (uint256);\n}\n\ncontract ChainpointQuorumInterface {\n    event Voted(\n        address _voter,\n        bytes32 _method,\n        bytes32 _hash,\n        uint256 _blockHeight,\n        uint256 _votingRoundClosesAt\n    );\n    \n    event VotingRoundClosed(\n        bytes32 _method,\n        bytes32 _hash,\n        bool _hasConsensus,\n        uint256 _votes,\n        bool _expired,\n        bool _pruned\n    );\n    \n    function registerBallot(bytes32 _method, string memory _ballotType, uint256 _threshold, uint256 _votingWindow) public returns (bool);\n    function updateBallot(bytes32 _method, uint256 _threshold, uint256 _votingWindow) public returns (bool);\n    function deleteBallot(bytes32 _method) public returns (bool);\n    function vote(bytes32 _method, bytes32 _hash) public returns (bool, bool);\n    function pruneBallots() public returns (bool);\n}\n\n/**\n * @title ERC20Basic\n * @dev Simpler version of ERC20 interface\n * @dev see https://github.com/ethereum/EIPs/issues/179\n */\ncontract ERC20Basic {\n  uint256 public totalSupply;\n\n  function balanceOf(address who) public view returns(uint256);\n\n  function transfer(address to, uint256 value) public returns(bool);\n  event Transfer(address indexed from, address indexed to, uint256 value);\n}\n\n/**\n * @title ERC20 interface\n * @dev see https://github.com/ethereum/EIPs/issues/20\n */\ncontract ERC20 is ERC20Basic {\n  function allowance(address owner, address spender) public view returns(uint256);\n\n  function transferFrom(address from, address to, uint256 value) public returns(bool);\n\n  function approve(address spender, uint256 value) public returns(bool);\n  event Approval(address indexed owner, address indexed spender, uint256 value);\n}\n\n/**\n * @title Basic token\n * @dev Basic version of StandardToken, with no allowances. \n */\ncontract BasicToken is ERC20Basic {\n  using SafeMath for uint256;\n\n  mapping(address => uint256) balances;\n\n  /**\n   * @dev transfer token for a specified address\n   * @param _to The address to transfer to.\n   * @param _value The amount to be transferred.\n   */\n  function transfer(address _to, uint256 _value) public returns(bool) {\n    balances[msg.sender] = balances[msg.sender].sub(_value);\n    balances[_to] = balances[_to].add(_value);\n    emit Transfer(msg.sender, _to, _value);\n    return true;\n  }\n\n  /**\n   * @dev Gets the balance of the specified address.\n   * @param _owner The address to query the the balance of. \n   * @return An uint256 representing the amount owned by the passed address.\n   */\n  function balanceOf(address _owner) public view returns(uint256 balance) {\n    return balances[_owner];\n  }\n\n}\n\n/**\n * @title Standard ERC20 token\n *\n * @dev Implementation of the basic standard token.\n * @dev https://github.com/ethereum/EIPs/issues/20\n * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol\n */\ncontract StandardToken is ERC20, BasicToken {\n  using SafeMath for uint256;\n\n  mapping(address => mapping(address => uint256)) public allowed;\n\n\n  /**\n   * @dev Transfer tokens from one address to another\n   * @param _from address The address which you want to send tokens from\n   * @param _to address The address which you want to transfer to\n   * @param _value uint256 the amout of tokens to be transfered\n   */\n  function transferFrom(address _from, address _to, uint256 _value) public returns(bool) {\n    // Check is not needed because sub(_allowance, _value) will already throw if this condition is not met\n    // require (_value <= _allowance);\n    \n    balances[_from] = balances[_from].sub(_value);\n    allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);\n    balances[_to] = balances[_to].add(_value);\n\n    emit Transfer(_from, _to, _value);\n    \n    return true;\n  }\n\n  /**\n   * @dev Aprove the passed address to spend the specified amount of tokens on behalf of msg.sender.\n   * @param _spender The address which will spend the funds.\n   * @param _value The amount of tokens to be spent.\n   */\n  function approve(address _spender, uint256 _value) public returns(bool) {\n\n    // To change the approve amount you first have to reduce the addresses`\n    //  allowance to zero by calling `approve(_spender, 0)` if it is not\n    //  already 0 to mitigate the race condition described here:\n    //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729\n    require((_value == 0) || (allowed[msg.sender][_spender] == 0));\n\n    allowed[msg.sender][_spender] = _value;\n    emit Approval(msg.sender, _spender, _value);\n    return true;\n  }\n\n  /**\n   * @dev Function to check the amount of tokens that an owner allowed to a spender.\n   * @param _owner address The address which owns the funds.\n   * @param _spender address The address which will spend the funds.\n   * @return A uint256 specifing the amount of tokens still avaible for the spender.\n   */\n  function allowance(address _owner, address _spender) public view returns(uint256 remaining) {\n    return allowed[_owner][_spender];\n  }\n\n}\n\n/**\n * @title Ownable\n * @dev The Ownable contract has an owner address, and provides basic authorization control\n * functions, this simplifies the implementation of \"user permissions\".\n */\ncontract Ownable {\n  address public owner;\n\n\n  /**\n   * @dev The Ownable constructor sets the original `owner` of the contract to the sender\n   * account.\n   */\n  constructor() public {\n    owner = msg.sender;\n  }\n\n\n  /**\n   * @dev Throws if called by any account other than the owner.\n   */\n  modifier onlyOwner() {\n    require(msg.sender == owner);\n    _;\n  }\n\n\n  /**\n   * @dev Allows the current owner to transfer control of the contract to a newOwner.\n   * @param newOwner The address to transfer ownership to.\n   */\n  function transferOwnership(address newOwner) public onlyOwner {\n    if (newOwner != address(0)) {\n      owner = newOwner;\n    }\n  }\n\n}\n\n/**\n * @title Pausable\n * @dev Base contract which allows children to implement an emergency stop mechanism.\n */\ncontract Pausable is Ownable {\n  event Pause();\n  event Unpause();\n\n  bool public paused = false;\n\n\n  /**\n   * @dev modifier to allow actions only when the contract IS paused\n   */\n  modifier whenNotPaused() {\n    require(!paused);\n    _;\n  }\n\n  /**\n   * @dev modifier to allow actions only when the contract IS NOT paused\n   */\n  modifier whenPaused {\n    require(paused);\n    _;\n  }\n\n  /**\n   * @dev called by the owner to pause, triggers stopped state\n   */\n  function pause() public onlyOwner whenNotPaused returns(bool) {\n    paused = true;\n    emit Pause();\n    return true;\n  }\n\n  /**\n   * @dev called by the owner to unpause, returns to normal state\n   */\n  function unpause() public onlyOwner whenPaused returns(bool) {\n    paused = false;\n    emit Unpause();\n    return true;\n  }\n}\n\n/**\n * @title Tierion Network Token\n * @dev ERC20 Tierion Network Token (TNT)\n *\n * TNT Tokens are divisible by 1e8 (100,000,000) base\n * units referred to as 'Grains'.\n *\n * TNT are displayed using 8 decimal places of precision.\n *\n * 1 TNT is equivalent to:\n *   100000000 == 1 * 10**8 == 1e8 == One Hundred Million Grains\n *\n * 1 Billion TNT (total supply) is equivalent to:\n *   100000000000000000 == 1000000000 * 10**8 == 1e17 == One Hundred Quadrillion Grains\n *\n * All initial TNT Grains are assigned to the creator of\n * this contract.\n *\n */\ncontract TierionNetworkToken is StandardToken, Pausable {\n\n    string public name = 'Tierion Network Token'; // Set the token name for display\n    string public symbol = 'TNT'; // Set the token symbol for display\n    uint8 public decimals = 8; // Set the number of decimals for display\n    uint256 public INITIAL_SUPPLY = 1000000000 * 10 ** uint256(decimals); // 1 Billion TNT specified in Grains\n    uint256 public mintAmount = 333 * 10 ** uint256(decimals); // 333 TNT specified in Grains\n    \n    ///\n    /// Minting Parameters\n    ///\n    \n    /// @title Minting Interval (in # of blocks)\n    uint256 public mintingInterval = 5760; // 86,400 (seconds in 1 day) / 15 (average block time in seconds)\n    /// @title Last Token Minting timestamp\n    uint256 public lastMintedAt;\n    /// @title Last Token Minting block height\n    uint256 public lastMintedAtBlock;\n    \n    /// @title Chainpoint Registry\n    /// @notice Chainpoint Registry Contract\n    ChainpointRegistryInterface public chainpointRegistry;\n    \n    /// @title Chainpoint Quorum\n    /// @notice Chainpoint Quorum Contract\n    ChainpointQuorumInterface public chainpointQuorum;\n  \n    ///\n    /// MODIFIERS\n    ///\n    /// @notice only Staked Core Operators or Owner can call, otherwise throw\n    modifier onlyCoreOperator() {\n        require(chainpointRegistry.isHealthyCore(msg.sender), \"must be owner or an active core operator\");\n        _;\n    }\n\n  /**\n   * @dev TierionNetworkToken Constructor\n   * Runs only on initial contract creation.\n   */\n  constructor() public {\n    totalSupply = INITIAL_SUPPLY; // Set the total supply\n    balances[msg.sender] = INITIAL_SUPPLY; // Creator address is assigned all\n  }\n  \n  ///\n    /// EVENTS \n    ///\n    /// @notice emitted on successful token minting\n    /// @param _nodes number of Node Operators that were rewarded tokens\n    /// @param _mintAmount is the total number of tokens rewarded to each Node Operator\n    /// @param _blockHeight The block height in which token minting occurred\n    event Mint(\n        address[3] _nodes,\n        uint256 _mintAmount,\n        uint256 _blockHeight\n    );\n\n  /**\n   * @dev Transfer token for a specified address when not paused\n   * @param _to The address to transfer to.\n   * @param _value The amount to be transferred.\n   */\n  function transfer(address _to, uint256 _value) public whenNotPaused returns(bool) {\n    require(_to != address(0));\n    return super.transfer(_to, _value);\n  }\n\n  /**\n   * @dev Transfer tokens from one address to another when not paused\n   * @param _from address The address which you want to send tokens from\n   * @param _to address The address which you want to transfer to\n   * @param _value uint256 the amount of tokens to be transferred\n   */\n  function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns(bool) {\n    require(_to != address(0));\n    return super.transferFrom(_from, _to, _value);\n  }\n\n  /**\n   * @dev Aprove the passed address to spend the specified amount of tokens on behalf of msg.sender when not paused.\n   * @param _spender The address which will spend the funds.\n   * @param _value The amount of tokens to be spent.\n   */\n  function approve(address _spender, uint256 _value) public whenNotPaused returns(bool) {\n    return super.approve(_spender, _value);\n  }\n  \n  /**\n   * @dev Mint tokens and send to the address provided\n   * @param _nodes The addresses of Nodes which will receive the funds.\n   * @dev only Chainpoint Core Operators can invoke this method\n   * @dev this method is decorated with ChainpointQuorum\n   */\n  function mint(address[3] memory _nodes) public whenNotPaused onlyCoreOperator returns(bool) {\n      require(block.number >= lastMintedAtBlock.add(mintingInterval), \"minting occurs at the specified minting interval\");\n      require(_nodes.length == 3, \"list of 3 nodes is required\");\n      \n      \n      // Iterate through list of Nodes and award tokens\n      for(uint8 i=0; i < _nodes.length; i++) {\n          balances[_nodes[i]] = balances[_nodes[i]].add(mintAmount);\n          \n          // Increase totalSupply\n          totalSupply = totalSupply.add(mintAmount);\n      }\n      \n      emit Mint(_nodes, mintAmount, block.number);\n      \n      return true;\n  }\n\n  function getOwner() public view returns (address) {\n    return owner;\n  }\n  \n  function setChainpointRegistry(address _addr) public onlyOwner returns(bool) {\n      require(_addr != address(0));\n      \n      chainpointRegistry = ChainpointRegistryInterface(_addr);\n      \n      return true;\n  }\n  \n  function setChainpointQuorum(address _addr) public onlyOwner returns(bool) {\n      require(_addr != address(0));\n      \n      chainpointQuorum = ChainpointQuorumInterface(_addr);\n      \n      return true;\n  }\n}",
   "sourcePath": "/Users/michaeliglesias/zDevelopment/Tierion/Hydra/node-registration-research/v1/contracts/TierionNetworkToken.sol",
   "ast": {
@@ -24562,26 +24671,9 @@
   },
   "networks": {},
   "schemaVersion": "3.0.1",
-  "updatedAt": "2019-02-21T20:49:01.598Z",
+  "updatedAt": "2019-02-21T20:49:01.580Z",
   "devdoc": {
-    "details": "Basic version of StandardToken, with no allowances. ",
-    "methods": {
-      "balanceOf(address)": {
-        "details": "Gets the balance of the specified address.",
-        "params": {
-          "_owner": "The address to query the the balance of. "
-        },
-        "return": "An uint256 representing the amount owned by the passed address."
-      },
-      "transfer(address,uint256)": {
-        "details": "transfer token for a specified address",
-        "params": {
-          "_to": "The address to transfer to.",
-          "_value": "The amount to be transferred."
-        }
-      }
-    },
-    "title": "Basic token"
+    "methods": {}
   },
   "userdoc": {
     "methods": {}

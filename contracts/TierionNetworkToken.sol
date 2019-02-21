@@ -86,6 +86,31 @@ contract ChainpointRegistryInterface {
     function getCoreCount() public view returns (uint256);
 }
 
+contract ChainpointQuorumInterface {
+    event Voted(
+        address _voter,
+        bytes32 _method,
+        bytes32 _hash,
+        uint256 _blockHeight,
+        uint256 _votingRoundClosesAt
+    );
+    
+    event VotingRoundClosed(
+        bytes32 _method,
+        bytes32 _hash,
+        bool _hasConsensus,
+        uint256 _votes,
+        bool _expired,
+        bool _pruned
+    );
+    
+    function registerBallot(bytes32 _method, string memory _ballotType, uint256 _threshold, uint256 _votingWindow) public returns (bool);
+    function updateBallot(bytes32 _method, uint256 _threshold, uint256 _votingWindow) public returns (bool);
+    function deleteBallot(bytes32 _method) public returns (bool);
+    function vote(bytes32 _method, bytes32 _hash) public returns (bool, bool);
+    function pruneBallots() public returns (bool);
+}
+
 /**
  * @title ERC20Basic
  * @dev Simpler version of ERC20 interface
@@ -169,7 +194,7 @@ contract StandardToken is ERC20, BasicToken {
     // require (_value <= _allowance);
     
     balances[_from] = balances[_from].sub(_value);
-    // allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
+    allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
 
     emit Transfer(_from, _to, _value);
@@ -333,6 +358,10 @@ contract TierionNetworkToken is StandardToken, Pausable {
     /// @title Chainpoint Registry
     /// @notice Chainpoint Registry Contract
     ChainpointRegistryInterface public chainpointRegistry;
+    
+    /// @title Chainpoint Quorum
+    /// @notice Chainpoint Quorum Contract
+    ChainpointQuorumInterface public chainpointQuorum;
   
     ///
     /// MODIFIERS
@@ -430,5 +459,12 @@ contract TierionNetworkToken is StandardToken, Pausable {
       
       return true;
   }
-
+  
+  function setChainpointQuorum(address _addr) public onlyOwner returns(bool) {
+      require(_addr != address(0));
+      
+      chainpointQuorum = ChainpointQuorumInterface(_addr);
+      
+      return true;
+  }
 }
