@@ -2,6 +2,7 @@ const ethers = require('ethers');
 const R = require('ramda');
 const _ = require('lodash');
 const chalk = require('chalk');
+const tap = require('./lib/utils/tap');
 const cliHelloLogger = require('./lib/utils/cliHelloLogger');
 const resultsLogger = require('./lib/utils/resultsLogger');
 const titleLogger = require('./lib/utils/titleLogger');
@@ -10,30 +11,26 @@ const accounts = require('./lib/utils/accounts');
 const { creditAccounts, checkBalances, approveAllowances, checkAllowances} = require('./lib/1_accounts_scaffolding');
 const { stakeNodes, checkNodeStakings, updateStakesNodes, unStakeNodes } = require('./lib/2_staking_actions');
 
+// TNT Amounts
+const NODE_TNT_STAKE_AMOUNT = 500000000000;
+const CORE_TNT_STAKE_AMOUNT = 2500000000000;
+
 // Transfer TNT Tokens to Accounts
-let creditAccountsNodes = R.curry(creditAccounts)(500000000000);
-const creditAccountsCores = R.curry(creditAccounts)(2500000000000);
+let creditAccountsNodes = R.curry(creditAccounts)(NODE_TNT_STAKE_AMOUNT);
+const creditAccountsCores = R.curry(creditAccounts)(CORE_TNT_STAKE_AMOUNT - NODE_TNT_STAKE_AMOUNT);
 // Check that balances of Nodes and Cores match the default amount of TNT that has been tranferred to each
-const checkBalancesNodes = R.curry(checkBalances)(500000000000);
-const checkBalancesCores = R.curry(checkBalances)(2500000000000);
+const checkBalancesNodes = R.curry(checkBalances)(NODE_TNT_STAKE_AMOUNT);
+const checkBalancesCores = R.curry(checkBalances)(CORE_TNT_STAKE_AMOUNT);
 // Grant allowances to the ChainpointRegistry Contract on behalf of every Node or Core
-const approveAllowancesNodes = R.curry(approveAllowances)(500000000000);
-const approveAllowancesCores = R.curry(approveAllowances)(2500000000000);
+const approveAllowancesNodes = R.curry(approveAllowances)(NODE_TNT_STAKE_AMOUNT);
+const approveAllowancesCores = R.curry(approveAllowances)(CORE_TNT_STAKE_AMOUNT);
 // Check allowances granted to the ChainpointRegistry Contract
-const checkAllowancesNodes = R.curry(checkAllowances)(500000000000);
-const checkAllowancesCores = R.curry(checkAllowances)(2500000000000);
+const checkAllowancesNodes = R.curry(checkAllowances)(NODE_TNT_STAKE_AMOUNT);
+const checkAllowancesCores = R.curry(checkAllowances)(CORE_TNT_STAKE_AMOUNT);
 // Several actions will mutate the state of a Node Staking, check that each state mutation is applied correctly
 const _1checkNodeStakings = R.curry(checkNodeStakings)('CHECK_STAKE');
 const _2checkNodeStakings = R.curry(checkNodeStakings)('CHECK_STAKE_UPDATED');
 const _3checkNodeStakings = R.curry(checkNodeStakings)('CHECK_UN_STAKE');
-
-const tap = (fn1, fn2) => {
-  return function(...args) {
-    fn1();
-
-    return fn2(...args);
-  }
-}
 
 (async function() {
   // Chainpoint Hydra Smart Contract Testing Suite

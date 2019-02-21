@@ -323,7 +323,6 @@ contract ChainpointQuorum is Ownable, Pausable {
             
             return (consensus, votingRoundExpired);
         } // ***END {else}
-        
     }
     
     ///
