@@ -48,7 +48,7 @@ async function approveAllowances(tntAmount, accounts) {
     let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, accounts[i]);
 
     console.log(chalk.gray('-> Approving Allowance: ' + accounts[i].address))
-    let approval = await tokenContract.approve(process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`], 500000000000);
+    let approval = await tokenContract.approve(process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`], tntAmount);
     await approval.wait();
 
     _.set(accounts[i], 'e2eTesting.node.REGISTRY_ALLOWANCE_APPROVAL', true);

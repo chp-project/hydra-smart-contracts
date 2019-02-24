@@ -337,12 +337,11 @@ contract Pausable is Ownable {
  *
  */
 contract TierionNetworkToken is StandardToken, Pausable {
-
     string public name = 'Tierion Network Token'; // Set the token name for display
     string public symbol = 'TNT'; // Set the token symbol for display
     uint8 public decimals = 8; // Set the number of decimals for display
     uint256 public INITIAL_SUPPLY = 1000000000 * 10 ** uint256(decimals); // 1 Billion TNT specified in Grains
-    uint256 public mintAmount = 333 * 10 ** uint256(decimals); // 333 TNT specified in Grains
+    uint256 public mintAmount = 2000 * 10 ** uint256(decimals); // 2000 TNT specified in Grains
     
     ///
     /// Minting Parameters
@@ -354,6 +353,10 @@ contract TierionNetworkToken is StandardToken, Pausable {
     uint256 public lastMintedAt;
     /// @title Last Token Minting block height
     uint256 public lastMintedAtBlock;
+    // Hashes of methods decorated and registered with Chainpoint Quorum
+    bytes32[] public quorumRegisteredBallots;
+
+    address[] public foo = [address(this), address(this), address(this)];
     
     /// @title Chainpoint Registry
     /// @notice Chainpoint Registry Contract
@@ -381,7 +384,7 @@ contract TierionNetworkToken is StandardToken, Pausable {
     balances[msg.sender] = INITIAL_SUPPLY; // Creator address is assigned all
   }
   
-  ///
+    ///
     /// EVENTS 
     ///
     /// @notice emitted on successful token minting
@@ -433,7 +436,13 @@ contract TierionNetworkToken is StandardToken, Pausable {
   function mint(address[3] memory _nodes) public whenNotPaused onlyCoreOperator returns(bool) {
       require(block.number >= lastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
       require(_nodes.length == 3, "list of 3 nodes is required");
-      
+
+      // Register Vote for authorizing minting.
+      // If consensus has NOT been reached or the Voting Round has expired, short-circuit and return false.
+      // (bool consensus, bool votingRoundExpired) = chainpointQuorum.vote(keccak256(abi.encodePacked(address(this), 'mint')), keccak256(abi.encode(_nodes)));
+      // if (!consensus || votingRoundExpired) {
+      //     return false;
+      // }
       
       // Iterate through list of Nodes and award tokens
       for(uint8 i=0; i < _nodes.length; i++) {
@@ -447,11 +456,8 @@ contract TierionNetworkToken is StandardToken, Pausable {
       
       return true;
   }
-
-  function getOwner() public view returns (address) {
-    return owner;
-  }
   
+  /* */
   function setChainpointRegistry(address _addr) public onlyOwner returns(bool) {
       require(_addr != address(0));
       
@@ -460,11 +466,19 @@ contract TierionNetworkToken is StandardToken, Pausable {
       return true;
   }
   
-  function setChainpointQuorum(address _addr) public onlyOwner returns(bool) {
+  function setChpQuorumAndBootstrap(address _addr) public onlyOwner returns(bool) {
       require(_addr != address(0));
       
       chainpointQuorum = ChainpointQuorumInterface(_addr);
       
+      // Register Ballot for mint()
+      chainpointQuorum.registerBallot(keccak256(abi.encodePacked(address(this), 'mint')), "threshold", 1, 240);
+      quorumRegisteredBallots.push(keccak256(abi.encodePacked(address(this), 'mint')));
+      
       return true;
+  }
+
+  function bb() public view returns(bytes32, address) {
+    return (keccak256(abi.encode(foo)), address(this));
   }
 }

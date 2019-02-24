@@ -8,8 +8,7 @@ module.exports = function(deployer) {
   // deployment steps
   deployer.deploy(TierionNetworkToken).then(function() {
     return deployer.deploy(ChainpointRegistry, TierionNetworkToken.address);
+  }).then(function() {
+    return deployer.deploy(ChainpointQuorum, TierionNetworkToken.address, ChainpointRegistry.address);
   });
-  // .then(function() {
-  //   return deployer.deploy(ChainpointQuorum, TierionNetworkToken.address, ChainpointRegistry.address);
-  // });
 };

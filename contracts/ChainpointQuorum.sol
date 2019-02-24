@@ -12,7 +12,7 @@ contract ChainpointQuorum is Ownable, Pausable {
     using SafeMath for uint256;
   
     /// @title TNT Token Contract
-    string public name = "Chainpoint Registry";
+    string public name = "Chainpoint Quorum";
     
     /// @title TNT Token Contract
     /// @notice Standard ERC20 Token
@@ -27,9 +27,9 @@ contract ChainpointQuorum is Ownable, Pausable {
     ///
     /// @title Registered Ballots
     /// @notice Contains all registered ballots
-    /// @dev Key is hash representation of the method name
+    /// @dev Key is hash representation of the contract address + method name
     /// @dev Value is struct representing Ballot
-    mapping (bytes32 => Ballot) private registeredBallots;
+    mapping (bytes32 => Ballot) public registeredBallots;
     
     /// @title Methods Voting Rounds
     /// @notice Contains all of the Voting Rounds that have been triggered as a result of invoking vote() with a method hash and a unique arguments hash
@@ -42,7 +42,7 @@ contract ChainpointQuorum is Ownable, Pausable {
     ///
     /// @title List of Registered Ballots
     /// @notice Convenient list of registered ballots for iteration
-    bytes32[] registeredBallotsArr;
+    bytes32[] public registeredBallotsArr;
     
     ///
     /// TYPES 
@@ -70,6 +70,7 @@ contract ChainpointQuorum is Ownable, Pausable {
     struct VotingRound {
         uint256 startBlock;
         uint256 endBlock;
+        mapping(address => bool) voters;
         Vote[] votes;
     }
     
@@ -141,15 +142,15 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @return bool
     /// @dev msg.sender is expected to be the Core Operator
     /// @dev owner has ability to pause this operation indirectly
-    function registerBallot(bytes32 _method, string memory _ballotType, uint256 _threshold, uint256 _votingWindow) public onlyOwner returns (bool) {
-        require(registeredBallots[_method].isActive, 'method has a ballot registered already');
-        require(_method.length > 0, "smart contract method name is required");
+    function registerBallot(bytes32 _method, string memory _ballotType, uint256 _threshold, uint256 _votingWindow) public returns (bool) {
+        require(!registeredBallots[_method].isActive, 'method has a ballot registered already');
+        require(_method[0] != 0, "smart contract method name is required");
         require(_votingWindow > 0, "voting window must be greater than 0");
         
-        bool majorityBallot = keccak256(abi.encode(_ballotType)) == keccak256("majority");
-        bool thresholdBallot = keccak256(abi.encode(_ballotType)) == keccak256("majority");
+        bool majorityBallot = keccak256(abi.encode(_ballotType)) == keccak256(abi.encode("majority"));
+        bool thresholdBallot = keccak256(abi.encode(_ballotType)) == keccak256(abi.encode("threshold"));
         
-        require(!majorityBallot && !thresholdBallot, "method type must be one of the following values: 1) majority, 2) threshold");
+        require(majorityBallot || thresholdBallot, "method type must be one of the following values: 1) majority, 2) threshold");
         
         if(thresholdBallot) {
             require(_threshold > 0, "when Ballot Type is set to threshold, a value greater than 0 is required");
@@ -224,7 +225,7 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @return bool
     /// @dev msg.sender is expected to be the Core Operator
     /// @dev owner has ability to pause this operation indirectly
-    function vote(bytes32 _method, bytes32 _hash) public onlyOwnerOrCoreOperator returns (bool, bool) {
+    function vote(address _voter, bytes32 _method, bytes32 _hash) public onlyOwnerOrCoreOperator returns (bool, bool) {
         require(registeredBallots[_method].isActive, 'ballot has not been registered for the specified method');
         
         VotingRound storage vr = methodVotingRounds[_method][_hash];
@@ -233,20 +234,22 @@ contract ChainpointQuorum is Ownable, Pausable {
         if (vr.startBlock > 0) {
             // Voting Round exists, check to see if round is still open; if so, register the vote
             if (block.number <= vr.endBlock) {
-                vr.votes.push(Vote(msg.sender, block.number));
+                // If Voter has already votes, do not register a new vote
+                if (vr.voters[_voter] == false) {
+                    vr.votes.push(Vote(_voter, block.number));
+                }
                 
-                emit Voted(msg.sender, _method, _hash, block.number, vr.endBlock);
+                emit Voted(_voter, _method, _hash, block.number, vr.endBlock);
             }
         } else {
             // Voting Round does NOT exist, create a Voting Round and register a vote
             registeredBallots[_method].votingRoundHashes.push(_hash);
             vr.startBlock = block.number;
             vr.endBlock = block.number.add(registeredBallots[_method].votingWindow);
-            vr.votes.push(Vote(msg.sender, block.number));
+            vr.votes.push(Vote(_voter, block.number));
             
-            emit Voted(msg.sender, _method, _hash, block.number, vr.endBlock);
+            emit Voted(_voter, _method, _hash, block.number, vr.endBlock);
         }
-        
         return _hasConsensus(_method, _hash);
     }
     

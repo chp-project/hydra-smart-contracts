@@ -399,9 +399,9 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev tokens will be deducted from the Node Operator and added to the balance of the ChainpointRegistry Address
     /// @dev owner has ability to pause this operation
     function _addNodeToRegistry(bytes32 _nodeIp, bytes32 _nodePublicKey) internal returns (bool) {
-        // require(!nodes[msg.sender].isStaked, "node has already staked. invoke renewStake() method to renew");
-        // require(_nodeIp[0] != 0, "node IP address is required");
-        // require(_nodePublicKey[0] != 0, "node public key is required is required");
+        require(!nodes[msg.sender].isStaked, "node has already staked. invoke renewStake() method to renew");
+        require(_nodeIp[0] != 0, "node IP address is required");
+        require(_nodePublicKey[0] != 0, "node public key is required is required");
         
         uint256 stakeLockedUntil = now + NODE_STAKING_DURATION;
         
@@ -428,8 +428,8 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev owner has ability to pause this operation indirectly
     function _addCoreToRegistry(bytes32 _coreIp, bytes32 _corePublicKey) internal returns (bool) {
         require(!cores[msg.sender].isStaked, "core has already staked. invoke updateStake() method to update");
-        require(_coreIp != 0, "node IP address is required");
-        require(_corePublicKey != 0, "node public key is required is required");
+        require(_coreIp[0] != 0, "node IP address is required");
+        require(_corePublicKey[0] != 0, "node public key is required is required");
         
         uint256 stakeLockedUntil = now + CORE_STAKING_DURATION;
         
