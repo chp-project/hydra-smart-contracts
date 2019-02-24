@@ -22,7 +22,7 @@ const approveAllowancesCores = R.curry(approveAllowances)(CORE_TNT_STAKE_AMOUNT)
   cliHelloLogger();
 
   let actions = R.pipeP(
-    // tap(() => titleLogger('Set Chainpoint Quorum contract and bootstrap'), setChpQuorumAndBootstrap),
+    tap(() => titleLogger('Set Chainpoint Registry + Quorum contract addresses and bootstrap'), setChpQuorumAndBootstrap),
     tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
     tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
     tap(() => titleLogger('Cores Staking'), stakeCores),
@@ -31,7 +31,7 @@ const approveAllowancesCores = R.curry(approveAllowances)(CORE_TNT_STAKE_AMOUNT)
   )
   await actions({0: accounts[0], 1: accounts[1]});
 
-  for (let i = 0; i < Object.keys(accounts).length; i++) {
+  for (let i = 0; i < Object.keys({0: accounts[0], 1: accounts[1]}).length; i++) {
     console.log(accounts[i].address + ':');
     resultsLogger(accounts[i], 'SET_CHP_QUORUM_CONTRACT', 'quorum.token');
     resultsLogger(accounts[i], 'MINT_BALLOT_REGISTERED', 'quorum.token');

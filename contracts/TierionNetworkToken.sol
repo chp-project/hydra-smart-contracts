@@ -107,7 +107,7 @@ contract ChainpointQuorumInterface {
     function registerBallot(bytes32 _method, string memory _ballotType, uint256 _threshold, uint256 _votingWindow) public returns (bool);
     function updateBallot(bytes32 _method, uint256 _threshold, uint256 _votingWindow) public returns (bool);
     function deleteBallot(bytes32 _method) public returns (bool);
-    function vote(bytes32 _method, bytes32 _hash) public returns (bool, bool);
+    function vote(address _voter, bytes32 _method, bytes32 _hash) public returns (bool, bool);
     function pruneBallots() public returns (bool);
 }
 
@@ -439,10 +439,10 @@ contract TierionNetworkToken is StandardToken, Pausable {
 
       // Register Vote for authorizing minting.
       // If consensus has NOT been reached or the Voting Round has expired, short-circuit and return false.
-      // (bool consensus, bool votingRoundExpired) = chainpointQuorum.vote(keccak256(abi.encodePacked(address(this), 'mint')), keccak256(abi.encode(_nodes)));
-      // if (!consensus || votingRoundExpired) {
-      //     return false;
-      // }
+      (bool consensus, bool votingRoundExpired) = chainpointQuorum.vote(msg.sender, keccak256(abi.encodePacked(address(this), 'mint')), keccak256(abi.encode(_nodes)));
+      if (!consensus || votingRoundExpired) {
+          return false;
+      }
       
       // Iterate through list of Nodes and award tokens
       for(uint8 i=0; i < _nodes.length; i++) {
@@ -451,6 +451,7 @@ contract TierionNetworkToken is StandardToken, Pausable {
           // Increase totalSupply
           totalSupply = totalSupply.add(mintAmount);
       }
+      // TODO: Update lastMintedAtBlock = block.number; 
       
       emit Mint(_nodes, mintAmount, block.number);
       
