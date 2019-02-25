@@ -81,9 +81,9 @@ module.exports = {
     rinkeby: {
       provider: () => new HDWalletProvider(process.env.CHP_HYDRA_DEV_MNEMONIC, `https://rinkeby.infura.io/${process.env.ETH_INFURA_API_KEY}`),
       network_id: 4,       // Rinkeby's id
-      gas: 8000000,        // Rinkeby has a lower block limit than mainnet
+      gas: 6885636,        // Rinkeby has a lower block limit than mainnet
       confirmations: 0,    // # of confs to wait between deployments. (default: 0)
-      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      timeoutBlocks: 50,  // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
     },
 

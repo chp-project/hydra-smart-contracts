@@ -480,6 +480,6 @@ contract TierionNetworkToken is StandardToken, Pausable {
   }
 
   function bb() public view returns(bytes32, address) {
-    return (keccak256(abi.encode(foo)), address(this));
+    return (keccak256(abi.encodePacked(address(this), 'mint')), address(this));
   }
 }

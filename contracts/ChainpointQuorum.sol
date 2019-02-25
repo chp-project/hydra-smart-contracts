@@ -17,10 +17,12 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @title TNT Token Contract
     /// @notice Standard ERC20 Token
     ERC20 private token;
+    address tokenAddress;
     
     /// @title Chainpoint Registry
     /// @notice Chainpoint Registry Contract
     ChainpointRegistryInterface private chainpointRegistry;
+    address chainpointRegistryAddress;
     
     ///
     /// MAPPINGS
@@ -71,14 +73,14 @@ contract ChainpointQuorum is Ownable, Pausable {
         uint256 startBlock;
         uint256 endBlock;
         mapping(address => bool) voters;
-        Vote[] votes;
+        CapturedVote[] votes;
     }
     
     /// @title Vote
     /// @notice Ballot struct which contains all relevant ballot parameters
     /// @dev voter Address of the party submitting a vote
     /// @dev block Block height at which the vote was registered
-    struct Vote {
+    struct CapturedVote {
         address voter;
         uint256 blockHeight;
     }
@@ -92,10 +94,18 @@ contract ChainpointQuorum is Ownable, Pausable {
         _;
     }
     
+    /// @notice only Chainpoint Registory or Token contracts can call, otherwise throw
+    modifier onlyTokenOrRegistry() {
+        require(msg.sender == tokenAddress || msg.sender == chainpointRegistryAddress, "must be owner or an active core operator");
+        _;
+    }
+    
     constructor (address _token, address _registry) public {
         require(_token != address(0), "token address cannot be 0x0");
         token = ERC20(_token);
+        tokenAddress = _token;
         chainpointRegistry = ChainpointRegistryInterface(_registry);
+        chainpointRegistryAddress = _registry;
     }
     
     ///
@@ -142,7 +152,7 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @return bool
     /// @dev msg.sender is expected to be the Core Operator
     /// @dev owner has ability to pause this operation indirectly
-    function registerBallot(bytes32 _method, string memory _ballotType, uint256 _threshold, uint256 _votingWindow) public returns (bool) {
+    function registerBallot(bytes32 _method, string memory _ballotType, uint256 _threshold, uint256 _votingWindow) public onlyTokenOrRegistry returns (bool) {
         require(!registeredBallots[_method].isActive, 'method has a ballot registered already');
         require(_method[0] != 0, "smart contract method name is required");
         require(_votingWindow > 0, "voting window must be greater than 0");
@@ -225,32 +235,34 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @return bool
     /// @dev msg.sender is expected to be the Core Operator
     /// @dev owner has ability to pause this operation indirectly
-    function vote(address _voter, bytes32 _method, bytes32 _hash) public onlyOwnerOrCoreOperator returns (bool, bool) {
+    function vote(address _voter, bytes32 _method, bytes32 _hash) public onlyTokenOrRegistry returns (bool, bool) {
         require(registeredBallots[_method].isActive, 'ballot has not been registered for the specified method');
         
-        VotingRound storage vr = methodVotingRounds[_method][_hash];
+        // VotingRound storage vr = methodVotingRounds[_method][_hash];
         
         // Check Voting Round exists based on the value of _hash, if it doesn't create a VotingRound and register a vote
-        if (vr.startBlock > 0) {
-            // Voting Round exists, check to see if round is still open; if so, register the vote
-            if (block.number <= vr.endBlock) {
-                // If Voter has already votes, do not register a new vote
-                if (vr.voters[_voter] == false) {
-                    vr.votes.push(Vote(_voter, block.number));
-                }
+        // if (vr.startBlock > 0) {
+        //     // Voting Round exists, check to see if round is still open; if so, register the vote
+        //     if (block.number <= vr.endBlock) {
+        //         // If Voter has already votes, do not register a new vote
+        //         if (vr.voters[_voter] == false) {
+        //             vr.votes.push(CapturedVote(_voter, block.number));
+        //         }
                 
-                emit Voted(_voter, _method, _hash, block.number, vr.endBlock);
-            }
-        } else {
-            // Voting Round does NOT exist, create a Voting Round and register a vote
-            registeredBallots[_method].votingRoundHashes.push(_hash);
-            vr.startBlock = block.number;
-            vr.endBlock = block.number.add(registeredBallots[_method].votingWindow);
-            vr.votes.push(Vote(_voter, block.number));
+        //         emit Voted(_voter, _method, _hash, block.number, vr.endBlock);
+        //     }
+        // } else {
+        //     // Voting Round does NOT exist, create a Voting Round and register a vote
+        //     registeredBallots[_method].votingRoundHashes.push(_hash);
+        //     vr.startBlock = block.number;
+        //     vr.endBlock = block.number.add(registeredBallots[_method].votingWindow);
+        //     vr.endBlock = registeredBallots[_method].votingWindow + block.number;
+        //     vr.votes.push(CapturedVote(_voter, block.number));
             
-            emit Voted(_voter, _method, _hash, block.number, vr.endBlock);
-        }
-        return _hasConsensus(_method, _hash);
+        //     emit Voted(_voter, _method, _hash, block.number, vr.endBlock);
+        // }
+        // return _hasConsensus(_method, _hash);
+        return (true, false);
     }
     
     ///
@@ -284,7 +296,7 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @return (bool consensus, bool votingRoundExpired)
     /// @dev msg.sender is expected to be the Core Operator
     /// @dev owner has ability to pause this operation indirectly
-    function _hasConsensus(bytes32 _method, bytes32 _hash) private onlyOwnerOrCoreOperator returns (bool _consensus, bool _votingRoundExpired) {
+    function _hasConsensus(bytes32 _method, bytes32 _hash) private returns (bool _consensus, bool _votingRoundExpired) {
         VotingRound storage vr = methodVotingRounds[_method][_hash];
         // Check based on BallotType
         if (registeredBallots[_method].ballotType == BallotType.threshold) {
@@ -337,7 +349,7 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @return bool
     /// @dev msg.sender is expected to be the Core Operator
     /// @dev owner has ability to pause this operation indirectly
-    function _pruneBallot(bytes32 _method, bytes32 _hash) private onlyOwnerOrCoreOperator returns (bool) {
+    function _pruneBallot(bytes32 _method, bytes32 _hash) private returns (bool) {
         delete methodVotingRounds[_method][_hash];
         
         return true;
