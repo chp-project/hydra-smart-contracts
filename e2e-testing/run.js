@@ -44,7 +44,7 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
   let nodes = R.pipeP(
     tap(() => titleLogger('Transferring Tokens'), creditAccountsNodes),
     tap(() => titleLogger('Checking Token Balances'), checkBalancesNodes),
-    tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
+    tap(() => titleLogger('Approving Allowances'), approveAllowancesNodes),
     tap(() => titleLogger('Checking Allowances'), checkAllowancesNodes),
     tap(() => titleLogger('Nodes Staking'), stakeNodes),
     tap(() => titleLogger('Checking Nodes Stakings'), _1checkNodeStakings),
@@ -56,7 +56,7 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
   )
   await nodes(accounts);
 
-  console.log('\n' + chalk.pink('Cores:'));
+  console.log('\n' + chalk.magenta('CORE OPERATORS:'));
 
   let cores = R.pipeP(
     tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),

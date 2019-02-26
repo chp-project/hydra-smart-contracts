@@ -32,7 +32,7 @@ const approveAllowancesCores = R.curry(approveAllowances)(CORE_TNT_STAKE_AMOUNT)
   await actions({0: accounts[0], 1: accounts[1]});
 
   for (let i = 0; i < Object.keys({0: accounts[0], 1: accounts[1]}).length; i++) {
-    console.log(accounts[i].address + ':');
+    console.log('\n' + accounts[i].address + ':');
     resultsLogger(accounts[i], 'SET_CHP_QUORUM_CONTRACT', 'quorum.token');
     resultsLogger(accounts[i], 'MINT_BALLOT_REGISTERED', 'quorum.token');
     resultsLogger(accounts[i], 'MINT_INVOKED', 'quorum.token');

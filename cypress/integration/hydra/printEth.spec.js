@@ -11,6 +11,9 @@ context('Ropsten Faucet Refills', () => {
       cy.reload(true)
       cy.get('.input.is-primary').type(currVal.address);
       cy.get('.button.is-link').click();
+      cy.wait(1000);
+
+      return false; // Short-circuit here because https://faucet.ropsten.be/ is limiting submission based on eth address + IP
     });
   })
 })

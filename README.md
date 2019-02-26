@@ -4,11 +4,11 @@
 
 | Contract  | Address |
 | ------------- | ------------- |
-| TierionNetworkToken (TNT)  | [0x08fDc2a013C497103E44c0f3786c4209E27F0E78](https://ropsten.etherscan.io/address/0x08fDc2a013C497103E44c0f3786c4209E27F0E78) |
-| ChainpointRegistry | [0xe867371f85F259014C5c2f7CdD3DB349D5Fef67B](https://ropsten.etherscan.io/address/0xe867371f85F259014C5c2f7CdD3DB349D5Fef67B) |
-| ChainpointQuorum | [0xce70e2FbD34F4C60fbE9ebcBF8327b6Ea6ada979](https://ropsten.etherscan.io/address/0xce70e2FbD34F4C60fbE9ebcBF8327b6Ea6ada979) |
+| TierionNetworkToken (TNT)  | [0x471c811a7949859Cd748C890F10541cd332c640B](https://ropsten.etherscan.io/address/0x471c811a7949859Cd748C890F10541cd332c640B) |
+| ChainpointRegistry | [0x6Eb270a9a5D02112215359b0d2aaE93652526A66](https://ropsten.etherscan.io/address/0x6Eb270a9a5D02112215359b0d2aaE93652526A66) |
+| ChainpointQuorum | [0x8dB2c20b8DD65B808Ed2Cd4EBB7c5Fbae2f0182c](https://ropsten.etherscan.io/address/0x8dB2c20b8DD65B808Ed2Cd4EBB7c5Fbae2f0182c) |
 
-<!-- ### Kovan Chain (STAGING)
+<!-- ### Rinkeby Chain (STAGING)
 
 | Contract  | Address |
 | ------------- | ------------- |

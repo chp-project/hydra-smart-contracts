@@ -350,21 +350,19 @@ contract TierionNetworkToken is StandardToken, Pausable {
     /// @title Minting Interval (in # of blocks)
     uint256 public mintingInterval = 5760; // 86,400 (seconds in 1 day) / 15 (average block time in seconds)
     /// @title Last Token Minting timestamp
-    uint256 public lastMintedAt;
+    uint256 lastMintedAt;
     /// @title Last Token Minting block height
     uint256 public lastMintedAtBlock;
     // Hashes of methods decorated and registered with Chainpoint Quorum
     bytes32[] public quorumRegisteredBallots;
-
-    address[] public foo = [address(this), address(this), address(this)];
     
     /// @title Chainpoint Registry
     /// @notice Chainpoint Registry Contract
-    ChainpointRegistryInterface public chainpointRegistry;
+    ChainpointRegistryInterface chainpointRegistry;
     
     /// @title Chainpoint Quorum
     /// @notice Chainpoint Quorum Contract
-    ChainpointQuorumInterface public chainpointQuorum;
+    ChainpointQuorumInterface chainpointQuorum;
   
     ///
     /// MODIFIERS
@@ -433,7 +431,7 @@ contract TierionNetworkToken is StandardToken, Pausable {
    * @dev only Chainpoint Core Operators can invoke this method
    * @dev this method is decorated with ChainpointQuorum
    */
-  function mint(address[3] memory _nodes) public whenNotPaused onlyCoreOperator returns(bool) {
+  function mint(address[3] memory _nodes) public whenNotPaused onlyCoreOperator returns(bool _consensus, bool _votingRoundExpired) {
       require(block.number >= lastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
       require(_nodes.length == 3, "list of 3 nodes is required");
 
@@ -441,7 +439,7 @@ contract TierionNetworkToken is StandardToken, Pausable {
       // If consensus has NOT been reached or the Voting Round has expired, short-circuit and return false.
       (bool consensus, bool votingRoundExpired) = chainpointQuorum.vote(msg.sender, keccak256(abi.encodePacked(address(this), 'mint')), keccak256(abi.encode(_nodes)));
       if (!consensus || votingRoundExpired) {
-          return false;
+          return (consensus, votingRoundExpired);
       }
       
       // Iterate through list of Nodes and award tokens
@@ -456,7 +454,7 @@ contract TierionNetworkToken is StandardToken, Pausable {
       
       emit Mint(_nodes, mintAmount, block.number);
       
-      return true;
+      return (true, true);
   }
   
   /* */
@@ -478,9 +476,5 @@ contract TierionNetworkToken is StandardToken, Pausable {
       quorumRegisteredBallots.push(keccak256(abi.encodePacked(address(this), 'mint')));
       
       return true;
-  }
-
-  function bb() public view returns(bytes32, address) {
-    return (keccak256(abi.encodePacked(address(this), 'mint')), address(this));
   }
 }

@@ -37,7 +37,7 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @notice Contains all of the Voting Rounds that have been triggered as a result of invoking vote() with a method hash and a unique arguments hash
     /// @dev Key is hash representation of the method name
     /// @dev Value is struct representing VotingRound
-    mapping (bytes32 => mapping(bytes32 => VotingRound)) methodVotingRounds;
+    mapping (bytes32 => mapping(bytes32 => VotingRound)) public methodVotingRounds;
     
     ///
     /// ARRAYS
@@ -128,14 +128,14 @@ contract ChainpointQuorum is Ownable, Pausable {
     /// @notice emitted when a Voting Round is closed
     /// @param _method Hash of the smart contract method
     /// @param _hash Hash of the function arguments being voted on
-    /// @param _hasConsensus did vote pass as a result of consensus being achieved
+    /// @param _consensus did vote pass as a result of consensus being achieved
     /// @param _votes number of votes for particular method + hash combo
     /// @param _expired did the Voting Round expire
     /// @param _pruned did the Voting Round get pruned from storage
     event VotingRoundClosed(
         bytes32 _method,
         bytes32 _hash,
-        bool _hasConsensus,
+        bool _consensus,
         uint256 _votes,
         bool _expired,
         bool _pruned
@@ -238,31 +238,30 @@ contract ChainpointQuorum is Ownable, Pausable {
     function vote(address _voter, bytes32 _method, bytes32 _hash) public onlyTokenOrRegistry returns (bool, bool) {
         require(registeredBallots[_method].isActive, 'ballot has not been registered for the specified method');
         
-        // VotingRound storage vr = methodVotingRounds[_method][_hash];
+        VotingRound storage vr = methodVotingRounds[_method][_hash];
         
         // Check Voting Round exists based on the value of _hash, if it doesn't create a VotingRound and register a vote
-        // if (vr.startBlock > 0) {
-        //     // Voting Round exists, check to see if round is still open; if so, register the vote
-        //     if (block.number <= vr.endBlock) {
-        //         // If Voter has already votes, do not register a new vote
-        //         if (vr.voters[_voter] == false) {
-        //             vr.votes.push(CapturedVote(_voter, block.number));
-        //         }
+        if (vr.startBlock > 0) {
+            // Voting Round exists, check to see if round is still open; if so, register the vote
+            if (block.number <= vr.endBlock) {
+                // If Voter has already votes, do not register a new vote
+                if (vr.voters[_voter] == false) {
+                    vr.votes.push(CapturedVote(_voter, block.number));
+                }
                 
-        //         emit Voted(_voter, _method, _hash, block.number, vr.endBlock);
-        //     }
-        // } else {
-        //     // Voting Round does NOT exist, create a Voting Round and register a vote
-        //     registeredBallots[_method].votingRoundHashes.push(_hash);
-        //     vr.startBlock = block.number;
-        //     vr.endBlock = block.number.add(registeredBallots[_method].votingWindow);
-        //     vr.endBlock = registeredBallots[_method].votingWindow + block.number;
-        //     vr.votes.push(CapturedVote(_voter, block.number));
+                emit Voted(_voter, _method, _hash, block.number, vr.endBlock);
+            }
+        } else {
+            // Voting Round does NOT exist, create a Voting Round and register a vote
+            registeredBallots[_method].votingRoundHashes.push(_hash);
+            vr.startBlock = block.number;
+            vr.endBlock = block.number.add(registeredBallots[_method].votingWindow);
+            vr.endBlock = registeredBallots[_method].votingWindow + block.number;
+            vr.votes.push(CapturedVote(_voter, block.number));
             
-        //     emit Voted(_voter, _method, _hash, block.number, vr.endBlock);
-        // }
-        // return _hasConsensus(_method, _hash);
-        return (true, false);
+            emit Voted(_voter, _method, _hash, block.number, vr.endBlock);
+        }
+        return _hasConsensus(_method, _hash);
     }
     
     ///
@@ -301,7 +300,7 @@ contract ChainpointQuorum is Ownable, Pausable {
         // Check based on BallotType
         if (registeredBallots[_method].ballotType == BallotType.threshold) {
             bool consensus = (vr.votes.length >= registeredBallots[_method].threshold);
-            bool votingRoundExpired = (block.number <= vr.endBlock);
+            bool votingRoundExpired = (block.number > vr.endBlock);
             bool votingRoundPruned;
             uint256 votes = vr.votes.length;
             
@@ -353,5 +352,9 @@ contract ChainpointQuorum is Ownable, Pausable {
         delete methodVotingRounds[_method][_hash];
         
         return true;
+    }
+    
+    function votingRoundInfo(bytes32 _method, bytes32 _hash) public view returns(uint256) {
+        return methodVotingRounds[_method][_hash].votes.length;
     }
 }

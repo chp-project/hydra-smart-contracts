@@ -52,6 +52,10 @@ async function mint(accounts) {
   let mintResult = await tokenContract.mint(["0x0DCd2F752394c41875e259e00bb44fd505297caF", "0x0DCd2F752394c41875e259e00bb44fd505297caF", "0x0DCd2F752394c41875e259e00bb44fd505297caF"]);
   await mintResult.wait();
 
+  let hashResult = await tokenContract.bb(["0x0DCd2F752394c41875e259e00bb44fd505297caF", "0x0DCd2F752394c41875e259e00bb44fd505297caF", "0x0DCd2F752394c41875e259e00bb44fd505297caF"]);
+
+  debugger;
+
   _.set(owner, `e2eTesting.quorum.token.MINT_INVOKED`, true);
 
   return accounts;
