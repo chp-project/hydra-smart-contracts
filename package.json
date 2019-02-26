@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:e2e": "node e2e-testing/index.js"
+    "test:e2e": "node e2e-testing/run.js",
+    "test:cypress": "./node_modules/.bin/cypress run --spec 'cypress/integration/hydra/printEth.spec.js'",
+    "test:cypress:ui": "./node_modules/.bin/cypress open"
   },
   "author": "",
   "license": "ISC",
@@ -18,5 +20,8 @@
     "ramda": "^0.26.1",
     "truffle-hdwallet-provider": "^1.0.4",
     "web3": "^1.0.0-beta.46"
+  },
+  "devDependencies": {
+    "cypress": "^3.1.5"
   }
 }

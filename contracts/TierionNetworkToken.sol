@@ -451,7 +451,8 @@ contract TierionNetworkToken is StandardToken, Pausable {
           // Increase totalSupply
           totalSupply = totalSupply.add(mintAmount);
       }
-      // TODO: Update lastMintedAtBlock = block.number; 
+      // TODO: Update lastMintedAtBlock = block.number;
+      // TODO: Update lastMintedAt = now;
       
       emit Mint(_nodes, mintAmount, block.number);
       
