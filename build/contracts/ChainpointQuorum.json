@@ -23881,6 +23881,12 @@
       "address": "0x8dB2c20b8DD65B808Ed2Cd4EBB7c5Fbae2f0182c",
       "transactionHash": "0x7ac71a7d9f594c664f1907d726bdda08c621e612b496b85f9027147037ad8507"
     },
+    "4": {
+      "events": {},
+      "links": {},
+      "address": "0x4832562E484247cf1549edD2914417ef01c1e34f",
+      "transactionHash": "0x18dd470d88c1457575433c2ec614378e7c8a0a1f2607206f8fc771494b600b20"
+    },
     "5777": {
       "events": {
         "0x05987a2b626fa210628eb3170312f920ed716f57961b6865031faefe37ba86d7": {
@@ -24031,7 +24037,7 @@
     }
   },
   "schemaVersion": "3.0.1",
-  "updatedAt": "2019-02-26T21:28:46.110Z",
+  "updatedAt": "2019-02-27T21:54:18.948Z",
   "devdoc": {
     "methods": {
       "deleteBallot(bytes32)": {
