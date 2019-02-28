@@ -56,7 +56,7 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
   )
   await nodes(accounts);
 
-  console.log('\n' + chalk.magenta('CORE OPERATORS:'));
+  console.log('\n' + chalk.magenta('CORE ACTIONS:'));
 
   let cores = R.pipeP(
     tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
@@ -88,7 +88,7 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
     resultsLogger(accounts[i], 'UN_STAKE', 'node')
     resultsLogger(accounts[i], 'CHECK_UN_STAKE', 'node')
     
-    console.log('   ' + chalk.magenta('Core:'))
+    console.log('\n       ' + chalk.dim.magenta('Core Actions:'))
 
     resultsLogger(accounts[i], 'INITIAL_BALANCE_TRANSFER', 'core')
     resultsLogger(accounts[i], 'INITIAL_BALANCE_CHECK', 'core')

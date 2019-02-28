@@ -10,4 +10,5 @@ module.exports = function(deployer, network) {
       return Promise.resolve();
     });
   }
+  return Promise.resolve();
 };

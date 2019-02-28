@@ -262,13 +262,11 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @notice Allows a Core to update their metadata
     /// @param _coreIp is the new IP address of the staked Core Operator
     /// @param _corePublicKey the new Public Key of the staked Chainpoint Node
-    /// @param _isCore Core Operator
     /// @return true if successful, otherwise false
     /// @dev msg.sender is expected to be the Node Operator
     /// @dev tokens will be deducted from the Node Operator and added to the balance of the ChainpointRegistry Address
     /// @dev owner has ability to pause this operation
-    function updateStakeCore(bytes32 _coreIp, bytes32 _corePublicKey, bool _isCore) public whenNotPaused returns (bool) {
-        require(_isCore, "core parameter was not provided");
+    function updateStakeCore(bytes32 _coreIp, bytes32 _corePublicKey) public whenNotPaused returns (bool) {
         require(cores[msg.sender].isStaked, "core has not staked into the Chainpoint network");
         require(_coreIp != 0, "core IP address is required");
         require(_corePublicKey != 0, "core public key is required");

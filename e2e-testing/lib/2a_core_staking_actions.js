@@ -77,4 +77,4 @@ async function unStakeCores(accounts) {
 module.exports.stakeCores = stakeCores;
 module.exports.checkCoreStakings = checkCoreStakings;
 module.exports.updateStakesCores = updateStakesCores;
-module.exports.unStakeNodes = unStakeCores;
+module.exports.unStakeCores = unStakeCores;

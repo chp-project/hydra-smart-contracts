@@ -4,17 +4,17 @@
 
 | Contract  | Address |
 | ------------- | ------------- |
-| TierionNetworkToken (TNT)  | [0x471c811a7949859Cd748C890F10541cd332c640B](https://ropsten.etherscan.io/address/0x471c811a7949859Cd748C890F10541cd332c640B) |
-| ChainpointRegistry | [0x6Eb270a9a5D02112215359b0d2aaE93652526A66](https://ropsten.etherscan.io/address/0x6Eb270a9a5D02112215359b0d2aaE93652526A66) |
-| ChainpointQuorum | [0x8dB2c20b8DD65B808Ed2Cd4EBB7c5Fbae2f0182c](https://ropsten.etherscan.io/address/0x8dB2c20b8DD65B808Ed2Cd4EBB7c5Fbae2f0182c) |
+| TierionNetworkToken (TNT)  | [0x40096A2ebEc1DAeC071DA955E27dbC88DC274fb0](https://ropsten.etherscan.io/address/0x40096A2ebEc1DAeC071DA955E27dbC88DC274fb0) |
+| ChainpointRegistry | [0x55ff79503835D9bcFB737d87E7dBF336E9f8a4Ab](https://ropsten.etherscan.io/address/0x55ff79503835D9bcFB737d87E7dBF336E9f8a4Ab) |
+| ChainpointQuorum | [0x500ffff6ee59aab4bCA5Cae5F771795Aa5C786Dd](https://ropsten.etherscan.io/address/0x500ffff6ee59aab4bCA5Cae5F771795Aa5C786Dd) |
 
-<!-- ### Rinkeby Chain (STAGING)
+### Rinkeby Chain (STAGING)
 
 | Contract  | Address |
 | ------------- | ------------- |
-| TierionNetworkToken (TNT)  | [0xB0713EDb6Bb0c5b9156f97D129C7945362fBfE7D](https://rinkeby.etherscan.io/address/0xB0713EDb6Bb0c5b9156f97D129C7945362fBfE7D) |
-| ChainpointRegistry | [0x1AFDaF7eb8dA7Dd8E4aA62C2C75f835FD77cC270](https://rinkeby.etherscan.io/address/0x1AFDaF7eb8dA7Dd8E4aA62C2C75f835FD77cC270) |
-| ChainpointQuorum | [0x4C10314849b7e9efc19b9EBF324E6268d07F1D16](https://rinkeby.etherscan.io/address/0x4C10314849b7e9efc19b9EBF324E6268d07F1D16) | -->
+| TierionNetworkToken (TNT)  | [0x4Eb6b957cEaB790eA30667Ff85aB6199247147a6](https://rinkeby.etherscan.io/address/0x4Eb6b957cEaB790eA30667Ff85aB6199247147a6) |
+| ChainpointRegistry | [0xb759bce43567C6d202aD40f1E026cf6460aB6857](https://rinkeby.etherscan.io/address/0xb759bce43567C6d202aD40f1E026cf6460aB6857) |
+| ChainpointQuorum | [0x1f61DA415c68bf2593F4eb40f5ecaB9c514cf109](https://rinkeby.etherscan.io/address/0x1f61DA415c68bf2593F4eb40f5ecaB9c514cf109) |
 
 ### ChainpointRegistry Spec
 
@@ -33,4 +33,10 @@ export CHP_HYDRA_DEV_MNEMONIC_PATH="m/44'/60'/0'/0"
 export ETH_ENVIRONMENT=""
 export <ETH_ENVIRONMENT>_TOKEN_CONTRACT_ADDRESS=""
 export <ETH_ENVIRONMENT>_REGISTRY_CONTRACT_ADDRESS=""
+export <ETH_ENVIRONMENT>_QUORUM_CONTRACT_ADDRESS=""
 ```
+
+> NOTE: The `CHP_HYDRA_DEV_MNEMONIC` will be provided securely via Signal to any engineer working within this repo.
+
+
+
