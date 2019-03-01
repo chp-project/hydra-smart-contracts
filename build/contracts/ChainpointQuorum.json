@@ -23878,8 +23878,8 @@
         }
       },
       "links": {},
-      "address": "0x500ffff6ee59aab4bCA5Cae5F771795Aa5C786Dd",
-      "transactionHash": "0x4daff57f704346e43aff65a55c6c102bffae84d13edb0e0c17143d1a9b183462"
+      "address": "0x8c2A693D68e80E59bEA1959C8e08Ba4cc71e07c1",
+      "transactionHash": "0x3f37c3116c461e4b173987b8e6731f19ef380dfa7b8e2bce246498a90f8e5a20"
     },
     "4": {
       "events": {
@@ -24179,7 +24179,7 @@
     }
   },
   "schemaVersion": "3.0.1",
-  "updatedAt": "2019-02-28T01:15:19.684Z",
+  "updatedAt": "2019-03-01T03:21:48.523Z",
   "devdoc": {
     "methods": {
       "deleteBallot(bytes32)": {

@@ -84,6 +84,7 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
     resultsLogger(accounts[i], 'REGISTRY_ALLOWANCE_APPROVAL_CHECK', 'node')
     resultsLogger(accounts[i], 'STAKE', 'node')
     resultsLogger(accounts[i], 'CHECK_STAKE', 'node')
+    resultsLogger(accounts[i], 'UPDATED_STAKE', 'node')
     resultsLogger(accounts[i], 'CHECK_STAKE_UPDATED', 'node')
     resultsLogger(accounts[i], 'UN_STAKE', 'node')
     resultsLogger(accounts[i], 'CHECK_UN_STAKE', 'node')

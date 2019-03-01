@@ -16,7 +16,13 @@ async function stakeNodes(accounts) {
     let stakeResult = await registryContract.stake("0x48656c6c6f20576f726c64210000000000000000000000000000000000000000", "0x48656c6c6f20576f726c64210000000000000000000000000000000000000000");
     await stakeResult.wait();
 
-    _.set(accounts[i], 'e2eTesting.node.STAKE', true);
+    let txReceipt = await provider.getTransactionReceipt(stakeResult.hash);
+
+    _.set(
+      accounts[i], 
+      'e2eTesting.node.STAKE', 
+      _.merge(_.get(accounts[i], 'e2eTesting.node.STAKE', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+    );
   }
   return accounts;
 }
@@ -38,7 +44,7 @@ async function checkNodeStakings(checkType, accounts) {
     _.set(
       accounts[i],
       `e2eTesting.node.${checkType}`, 
-      (stakeResult.isStaked === expectedNodeValues[0] && _.isEqual(stakeResult.nodeIp, expectedNodeValues[1]) && _.isEqual(stakeResult.nodePublicKey, expectedNodeValues[1]))
+      _.merge(_.get(accounts[i], `e2eTesting.node.${checkType}`, {}), { passed: (stakeResult.isStaked === expectedNodeValues[0] && _.isEqual(stakeResult.nodeIp, expectedNodeValues[1]) && _.isEqual(stakeResult.nodePublicKey, expectedNodeValues[1])), gasUsed: 0 })
     );
   }
   return accounts;
@@ -54,7 +60,13 @@ async function updateStakesNodes(accounts) {
     let update = await registryContract.updateStake(ethers.utils.formatBytes32String(`${i}`), ethers.utils.formatBytes32String(`${i}`));
     await update.wait();
 
-    _.set(accounts[i], 'e2eTesting.node.UPDATED_STAKE', true);
+    let txReceipt = await provider.getTransactionReceipt(update.hash);
+
+    _.set(
+      accounts[i], 
+      'e2eTesting.node.UPDATED_STAKE', 
+      _.merge(_.get(accounts[i], 'e2eTesting.node.UPDATED_STAKE', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+    );
   }
   return accounts;
 }
@@ -66,10 +78,16 @@ async function unStakeNodes(accounts) {
     console.log(chalk.gray('-> Un-staking Node: ' + accounts[i].address));
     let registryContract = new ethers.Contract(REGISTRY_CONTRACT_ADDRESS, require('../../build/contracts/ChainpointRegistry.json').abi, accounts[i]);
 
-    let update = await registryContract.unStake();
-    await update.wait();
+    let unstake = await registryContract.unStake();
+    await unstake.wait();
 
-    _.set(accounts[i], 'e2eTesting.node.UN_STAKE', true);
+    let txReceipt = await provider.getTransactionReceipt(unstake.hash);
+
+    _.set(
+      accounts[i], 
+      'e2eTesting.node.UN_STAKE', 
+      _.merge(_.get(accounts[i], 'e2eTesting.node.UN_STAKE', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+    );
   }
   return accounts;
 }

@@ -19,7 +19,13 @@ async function creditAccounts(tntAmount, accounts) {
     let tx = await tokenContract.transfer(accounts[i].address, tntAmount);
     await tx.wait();
 
-    _.set(accounts[i], 'e2eTesting.node.INITIAL_BALANCE_TRANSFER', true);
+    let txReceipt = await provider.getTransactionReceipt(tx.hash);
+
+    _.set(
+      accounts[i], 
+      'e2eTesting.node.INITIAL_BALANCE_TRANSFER',
+      _.merge(_.get(accounts[i], 'e2eTesting.node.INITIAL_BALANCE_TRANSFER', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+    );
   }
   return accounts;
 }
@@ -29,7 +35,11 @@ async function checkBalances(tntAmount, accounts) {
   let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, accounts[0]);
   // Check Owner balance first. Should be 1B TNT - (5000TNT * 9 Nodes)
   let ownerBalance = await tokenContract.balanceOf(accounts[0].address);
-  _.set(accounts[0], 'e2eTesting.node.INITIAL_BALANCE_CHECK', parseInt(ownerBalance.toString(), 10) === (100000000000000000 - (tntAmount * 9)));
+  _.set(
+    accounts[0], 
+    'e2eTesting.node.INITIAL_BALANCE_CHECK',
+    _.merge(_.get(accounts[0], 'e2eTesting.node.INITIAL_BALANCE_CHECK', {}), { passed: parseInt(ownerBalance.toString(), 10) === (100000000000000000 - (tntAmount * 9)), gasUsed: 0 })
+  );
 
   for (let i = 0; i < Object.keys(accounts).length; i++) {
     if (i === 0) continue;
@@ -37,7 +47,11 @@ async function checkBalances(tntAmount, accounts) {
     console.log(chalk.gray('-> Checking balance: ' + accounts[i].address))
     let balance = await tokenContract.balanceOf(accounts[i].address);
     
-    _.set(accounts[i], 'e2eTesting.node.INITIAL_BALANCE_CHECK', parseInt(balance.toString(), 10) === tntAmount);
+    _.set(
+      accounts[i], 
+      'e2eTesting.node.INITIAL_BALANCE_CHECK', 
+      _.merge(_.get(accounts[i], 'e2eTesting.node.INITIAL_BALANCE_CHECK', {}), { passed: parseInt(balance.toString(), 10) === tntAmount, gasUsed: 0 })
+    );
   }
   return accounts;
 }
@@ -51,7 +65,13 @@ async function approveAllowances(tntAmount, accounts) {
     let approval = await tokenContract.approve(process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`], tntAmount);
     await approval.wait();
 
-    _.set(accounts[i], 'e2eTesting.node.REGISTRY_ALLOWANCE_APPROVAL', true);
+    let txReceipt = await provider.getTransactionReceipt(approval.hash);
+
+    _.set(
+      accounts[i], 
+      'e2eTesting.node.REGISTRY_ALLOWANCE_APPROVAL',
+      _.merge(_.get(accounts[i], 'e2eTesting.node.REGISTRY_ALLOWANCE_APPROVAL', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+    );
   }
   return accounts;
 }
@@ -69,7 +89,11 @@ async function checkAllowances(tntAmount, accounts) {
     console.log(chalk.gray('-> Checking Allowance: ' + accounts[i].address))
     let allowance = await tokenContract.allowance(accounts[i].address, REGISTRY_CONTRACT_ADDRESS);
     
-    _.set(accounts[i], 'e2eTesting.node.REGISTRY_ALLOWANCE_APPROVAL_CHECK', parseInt(allowance.toString(), 10) === tntAmount);
+    _.set(
+      accounts[i], 
+      'e2eTesting.node.REGISTRY_ALLOWANCE_APPROVAL_CHECK',
+      _.merge(_.get(accounts[i], 'e2eTesting.node.REGISTRY_ALLOWANCE_APPROVAL_CHECK', {}), { passed: parseInt(allowance.toString(), 10) === tntAmount, gasUsed: 0 })      
+    );
   }
   return accounts;
 }
