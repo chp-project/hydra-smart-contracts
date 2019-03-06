@@ -1,5 +1,7 @@
 pragma solidity >=0.4.22 <0.6.0;
 
+import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
+
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
@@ -337,6 +339,8 @@ contract Pausable is Ownable {
  *
  */
 contract TierionNetworkToken is StandardToken, Pausable {
+    using ECDSA for bytes32;
+    
     string public name = 'Tierion Network Token'; // Set the token name for display
     string public symbol = 'TNT'; // Set the token symbol for display
     uint8 public decimals = 8; // Set the number of decimals for display
@@ -390,7 +394,7 @@ contract TierionNetworkToken is StandardToken, Pausable {
     /// @param _mintAmount is the total number of tokens rewarded to each Node Operator
     /// @param _blockHeight The block height in which token minting occurred
     event Mint(
-        address[3] _nodes,
+        address[72] _nodes,
         uint256 _mintAmount,
         uint256 _blockHeight
     );
@@ -431,15 +435,18 @@ contract TierionNetworkToken is StandardToken, Pausable {
    * @dev only Chainpoint Core Operators can invoke this method
    * @dev this method is decorated with ChainpointQuorum
    */
-  function mint(address[3] memory _nodes) public whenNotPaused onlyCoreOperator returns(bool _consensus, bool _votingRoundExpired) {
-      require(block.number >= lastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
-      require(_nodes.length == 3, "list of 3 nodes is required");
-
-      // Register Vote for authorizing minting.
-      // If consensus has NOT been reached or the Voting Round has expired, short-circuit and return false.
-      (bool consensus, bool votingRoundExpired) = chainpointQuorum.vote(msg.sender, keccak256(abi.encodePacked(address(this), 'mint')), keccak256(abi.encode(_nodes)));
-      if (!consensus || votingRoundExpired) {
-          return (consensus, votingRoundExpired);
+  function mint(address[72] memory _nodes, bytes32 _hash, bytes memory signature1, bytes memory signature2, bytes memory signature3, bytes memory signature4, bytes memory signature5, bytes memory signature6) public whenNotPaused returns(bool) {
+      require(lastMintedAtBlock == 0 || block.number >= lastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
+      require(_nodes.length == 72, "list of 3 nodes is required");
+      
+      // Validate parameters provided
+      bytes32 nodesHash = keccak256(abi.encodePacked(_nodes));
+      require(nodesHash.toEthSignedMessageHash() == _hash, "supplied toEthSignedMessageHash does not equal value calculated");
+      
+      // Recover Signer addresses and verify they are staked Core Operators
+      bytes[6] memory signatures = [signature1, signature2, signature3, signature4, signature5, signature6];
+      for(uint8 i=0; i < signatures.length; i++) {
+          require(chainpointRegistry.isHealthyCore(_hash.recover(signatures[i])), "signer is not a staked core operator");
       }
       
       // Iterate through list of Nodes and award tokens
@@ -454,7 +461,7 @@ contract TierionNetworkToken is StandardToken, Pausable {
       
       emit Mint(_nodes, mintAmount, block.number);
       
-      return (true, true);
+      return true;
   }
   
   /* */
@@ -477,4 +484,14 @@ contract TierionNetworkToken is StandardToken, Pausable {
       
       return true;
   }
+  
+    function recover(bytes32 hash, bytes memory signature) public pure returns (address) {
+        return hash.recover(signature);
+    }
+
+    function toEthSignedMessageHash(bytes32 hash) public pure returns (bytes32) {
+        return hash.toEthSignedMessageHash();
+    }
+  
+  
 }
