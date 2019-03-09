@@ -1,0 +1,22 @@
+format_version: 3
+pipelines:
+  smart-contracts: # definition of mypipe1 pipeline
+    group: hydra # note that the group name can contain only of alphanumeric & underscore characters
+    label_template: "${mygit[:8]}"
+    lock_behavior: none
+    parameters: # list of parameters that can be configured for a pipeline
+      env: hydra
+    stages: # list of stages in order
+      - compile: # name of stage
+          clean_workspace: true
+          jobs:
+            truffle: # name of the job
+              tasks: # ordered list of tasks to execute in job csharp
+               - exec: # indicates type of task
+                   command: npm
+                   arguments:
+                    - "run compile"
+environments:
+  hydra:
+    pipelines:
+      - smart-contracts

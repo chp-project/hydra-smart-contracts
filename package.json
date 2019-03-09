@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "truffle compile",
+    "hello": "echo \"hello\" && exit 0",
     "test:e2e": "node e2e-testing/run.js",
     "test:cypress": "./node_modules/.bin/cypress run --spec 'cypress/integration/hydra/printEth.spec.js'",
     "test:cypress:ui": "./node_modules/.bin/cypress open"
