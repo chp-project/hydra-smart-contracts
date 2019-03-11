@@ -24174,12 +24174,12 @@
         }
       },
       "links": {},
-      "address": "0xb759bce43567C6d202aD40f1E026cf6460aB6857",
-      "transactionHash": "0xae70bb0f82c2925fa1aad00bd83f1e5b3893650a871b0c1bd166bef4b7bce772"
+      "address": "0x0ad941c5c25989e7cFECe3dba9aD9744452c01A7",
+      "transactionHash": "0x8e2df3c3e35c03fe93936b1c8d40551cb1d27c7e2e85b892c709c6c7381f8bfa"
     }
   },
   "schemaVersion": "3.0.1",
-  "updatedAt": "2019-03-06T01:04:32.584Z",
+  "updatedAt": "2019-03-11T18:51:46.083Z",
   "devdoc": {
     "methods": {
       "deleteBallot(bytes32)": {

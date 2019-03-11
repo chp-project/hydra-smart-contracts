@@ -1976,7 +1976,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.1",
-  "updatedAt": "2019-03-06T00:59:31.065Z",
+  "updatedAt": "2019-03-11T18:51:43.555Z",
   "devdoc": {
     "details": "Base contract which allows children to implement an emergency stop mechanism.",
     "methods": {
