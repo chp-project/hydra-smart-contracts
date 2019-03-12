@@ -38,9 +38,8 @@ pipelines:
                    arguments:
                     - develop&
                - exec: # Run Unit Tests
-                   command: npm
+                   command: truffle
                    arguments:
-                    - run
                     - test
       - compile: # Truffle Compile Stage
           clean_workspace: true
