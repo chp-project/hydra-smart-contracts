@@ -15,21 +15,35 @@ pipelines:
       - faucet: # Responsible for running Cypress to submit address[0] to receive ETH from Ropsten Faucet
           clean_workspace: true
           jobs:
-            subscribe:
+            subscribe: # Job: subscribe
               tasks: # ordered list of tasks to execute in job "faucet"
                - exec: # Install Cypress and other NPM packages
                    command: npm
                    arguments:
                     - install
-               - exec: # indicates type of task
+               - exec: # Run Cypress -> printEth.spec.js
                    command: npm
                    arguments:
                     - run
                     - test:cypress
-      - compile: # name of stage
+      - unit-test: # Run unit tests using Truffle Test
+          clean_workspace: false
+          jobs:
+            run-tests: # Job: run-tests
+              tasks: # ordered list of tasks to execute in job "run-tests"
+               - exec: # Run Truffle Develop in the background
+                   command: truffle
+                   arguments:
+                    - develop&
+               - exec: # Run Unit Tests
+                   command: npm
+                   arguments:
+                    - run
+                    - test
+      - compile: # Truffle Compile Stage
           clean_workspace: true
           jobs:
-            truffle: # name of the job
+            truffle: # Job: truffle
               artifacts:
                 - build:
                     source: build/**/*
