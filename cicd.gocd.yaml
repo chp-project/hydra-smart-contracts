@@ -33,10 +33,11 @@ pipelines:
           jobs:
             run-tests: # Job: run-tests
               tasks: # ordered list of tasks to execute in job "run-tests"
-               - exec: # Run Truffle Develop in the background
-                   command: truffle
-                   arguments:
-                    - develop&
+              #  - exec: # Run Truffle Develop in the background
+              #      command: truffle
+              #      arguments:
+              #       - develop&
+               - script: truffle develop &
                - exec: # Run Unit Tests
                    command: truffle
                    arguments:
