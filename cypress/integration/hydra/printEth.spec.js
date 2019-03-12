@@ -1,5 +1,5 @@
 /// <reference types="Cypress" />
-let wallets = require('../../../e2e-testing/artifacts/wallets.json');
+let wallets = require('../../../e2e-testing/lib/utils/accounts');
 wallets = [wallets[0]];
 
 context('Ropsten Faucet Refills', () => {
