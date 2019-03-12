@@ -20,7 +20,11 @@ pipelines:
                - exec: # Install Cypress and other NPM packages
                    command: npm
                    arguments:
-                    - install
+                    - ci
+               - exec: # Install Cypress and other NPM packages
+                   command: node
+                   arguments:
+                    - e2e-testing/lib/0_eth_donor_wallets.js
                - exec: # Run Cypress -> printEth.spec.js
                    command: npm
                    arguments:
@@ -52,7 +56,7 @@ pipelines:
                - exec: # indicates type of task
                    command: npm
                    arguments:
-                    - install
+                    - ci
                - exec: # indicates type of task
                    command: npm
                    arguments:
