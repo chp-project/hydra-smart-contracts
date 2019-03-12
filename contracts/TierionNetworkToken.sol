@@ -1,144 +1,12 @@
 pragma solidity >=0.4.22 <0.6.0;
 
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
-
-/**
- * @title SafeMath
- * @dev Math operations with safety checks that throw on error
- */
-library SafeMath {
-  function mul(uint256 a, uint256 b) internal pure returns(uint256) {
-    uint256 c = a * b;
-    assert(a == 0 || c / a == b);
-    return c;
-  }
-
-  function div(uint256 a, uint256 b) internal pure returns(uint256) {
-    // assert(b > 0); // Solidity automatically throws when dividing by 0
-    uint256 c = a / b;
-    // assert(a == b * c + a % b); // There is no case in which this doesn't hold 
-    return c;
-  }
-
-  function sub(uint256 a, uint256 b) internal pure returns(uint256) {
-    assert(b <= a);
-    return a - b;
-  }
-
-  function add(uint256 a, uint256 b) internal pure returns(uint256) {
-    uint256 c = a + b;
-    assert(c >= a);
-    return c;
-  }
-}
-
-/**
- * @title ChainpointRegistryInterface
- * @dev ChainpointRegistry interface
- * @dev see https://...
- */
-contract ChainpointRegistryInterface {
-    // EVENTS
-    event NodeStaked(
-        address indexed _sender,
-        bytes32 _nodeIp,
-        bytes32 _nodePublicKey,
-        uint256 _amountStaked,
-        uint256 _duration
-    );
-    
-    event NodeStakeUpdated(
-        address indexed _sender,
-        bytes32 _nodeIp,
-        bytes32 _publicKey,
-        uint256 _amountStaked,
-        uint256 _duration
-    );
-    
-    event CoreStaked(
-        address indexed _sender,
-        bytes32 _coreIp,
-        bytes32 _corePublicKey,
-        bool _isHealthy,
-        uint256 _amountStaked,
-        uint256 _duration
-    );
-    
-    event CoreStakeUpdated(
-        address indexed _sender,
-        bytes32 _coreIp,
-        bytes32 _corePublicKey,
-        bool _isHealthy,
-        uint256 _amountStaked,
-        uint256 _duration
-    );
-    
-    // Variables
-    address[] public coresArr;
-    
-    // Methods
-    function stake(bytes32 _nodeIp, bytes32 _nodePublicKey, uint256 _amount) public returns (bool);
-    function stakeCore(bytes32 _coreIp, bytes32 _corePublicKey, uint256 _amount) public returns (bool);
-    function updateStake(bytes32 _nodeIp, bytes32 _nodePublicKey) public returns (bool);
-    function updateStakeCore(bytes32 _coreIp, bytes32 _corePublicKey, bool _isCore) public returns (bool);
-    function unStake() public returns (bool);
-    function unStakeCore() public returns (bool);
-    function totalStakedFor(address addr) public view returns (uint256 amount, uint256 unlocks_at);
-    function isHealthyCore(address _address) public returns (bool);
-    function getCoreCount() public view returns (uint256);
-}
-
-contract ChainpointQuorumInterface {
-    event Voted(
-        address _voter,
-        bytes32 _method,
-        bytes32 _hash,
-        uint256 _blockHeight,
-        uint256 _votingRoundClosesAt
-    );
-    
-    event VotingRoundClosed(
-        bytes32 _method,
-        bytes32 _hash,
-        bool _hasConsensus,
-        uint256 _votes,
-        bool _expired,
-        bool _pruned
-    );
-    
-    function registerBallot(bytes32 _method, string memory _ballotType, uint256 _threshold, uint256 _votingWindow) public returns (bool);
-    function updateBallot(bytes32 _method, uint256 _threshold, uint256 _votingWindow) public returns (bool);
-    function deleteBallot(bytes32 _method) public returns (bool);
-    function vote(address _voter, bytes32 _method, bytes32 _hash) public returns (bool, bool);
-    function pruneBallots() public returns (bool);
-}
-
-/**
- * @title ERC20Basic
- * @dev Simpler version of ERC20 interface
- * @dev see https://github.com/ethereum/EIPs/issues/179
- */
-contract ERC20Basic {
-  uint256 public totalSupply;
-
-  function balanceOf(address who) public view returns(uint256);
-
-  function transfer(address to, uint256 value) public returns(bool);
-  event Transfer(address indexed from, address indexed to, uint256 value);
-}
-
-/**
- * @title ERC20 interface
- * @dev see https://github.com/ethereum/EIPs/issues/20
- */
-contract ERC20 is ERC20Basic {
-  function allowance(address owner, address spender) public view returns(uint256);
-
-  function transferFrom(address from, address to, uint256 value) public returns(bool);
-
-  function approve(address spender, uint256 value) public returns(bool);
-  event Approval(address indexed owner, address indexed spender, uint256 value);
-}
+import "./lib/ERC20.sol";
+import "./lib/ERC20Basic.sol";
+import "./lib/SafeMath.sol";
+import "./ChainpointRegistry.sol";
 
 /**
  * @title Basic token
@@ -235,91 +103,6 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 /**
- * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control
- * functions, this simplifies the implementation of "user permissions".
- */
-contract Ownable {
-  address public owner;
-
-
-  /**
-   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
-   * account.
-   */
-  constructor() public {
-    owner = msg.sender;
-  }
-
-
-  /**
-   * @dev Throws if called by any account other than the owner.
-   */
-  modifier onlyOwner() {
-    require(msg.sender == owner);
-    _;
-  }
-
-
-  /**
-   * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to.
-   */
-  function transferOwnership(address newOwner) public onlyOwner {
-    if (newOwner != address(0)) {
-      owner = newOwner;
-    }
-  }
-
-}
-
-/**
- * @title Pausable
- * @dev Base contract which allows children to implement an emergency stop mechanism.
- */
-contract Pausable is Ownable {
-  event Pause();
-  event Unpause();
-
-  bool public paused = false;
-
-
-  /**
-   * @dev modifier to allow actions only when the contract IS paused
-   */
-  modifier whenNotPaused() {
-    require(!paused);
-    _;
-  }
-
-  /**
-   * @dev modifier to allow actions only when the contract IS NOT paused
-   */
-  modifier whenPaused {
-    require(paused);
-    _;
-  }
-
-  /**
-   * @dev called by the owner to pause, triggers stopped state
-   */
-  function pause() public onlyOwner whenNotPaused returns(bool) {
-    paused = true;
-    emit Pause();
-    return true;
-  }
-
-  /**
-   * @dev called by the owner to unpause, returns to normal state
-   */
-  function unpause() public onlyOwner whenPaused returns(bool) {
-    paused = false;
-    emit Unpause();
-    return true;
-  }
-}
-
-/**
  * @title Tierion Network Token
  * @dev ERC20 Tierion Network Token (TNT)
  *
@@ -338,7 +121,7 @@ contract Pausable is Ownable {
  * this contract.
  *
  */
-contract TierionNetworkToken is StandardToken, Pausable {
+contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     using ECDSA for bytes32;
     
     string public name = 'Tierion Network Token'; // Set the token name for display
@@ -362,11 +145,7 @@ contract TierionNetworkToken is StandardToken, Pausable {
     
     /// @title Chainpoint Registry
     /// @notice Chainpoint Registry Contract
-    ChainpointRegistryInterface chainpointRegistry;
-    
-    /// @title Chainpoint Quorum
-    /// @notice Chainpoint Quorum Contract
-    ChainpointQuorumInterface chainpointQuorum;
+    ChainpointRegistry chainpointRegistry;
   
     ///
     /// MODIFIERS
@@ -433,7 +212,6 @@ contract TierionNetworkToken is StandardToken, Pausable {
    * @dev Mint tokens and send to the address provided
    * @param _nodes The addresses of Nodes which will receive the funds.
    * @dev only Chainpoint Core Operators can invoke this method
-   * @dev this method is decorated with ChainpointQuorum
    */
   function mint(address[72] memory _nodes, bytes32 _hash, bytes memory signature1, bytes memory signature2, bytes memory signature3, bytes memory signature4, bytes memory signature5, bytes memory signature6) public whenNotPaused returns(bool) {
       require(lastMintedAtBlock == 0 || block.number >= lastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
@@ -468,30 +246,17 @@ contract TierionNetworkToken is StandardToken, Pausable {
   function setChainpointRegistry(address _addr) public onlyOwner returns(bool) {
       require(_addr != address(0));
       
-      chainpointRegistry = ChainpointRegistryInterface(_addr);
+      chainpointRegistry = ChainpointRegistry(_addr);
       
       return true;
   }
   
-  function setChpQuorumAndBootstrap(address _addr) public onlyOwner returns(bool) {
-      require(_addr != address(0));
-      
-      chainpointQuorum = ChainpointQuorumInterface(_addr);
-      
-      // Register Ballot for mint()
-      chainpointQuorum.registerBallot(keccak256(abi.encodePacked(address(this), 'mint')), "threshold", 1, 240);
-      quorumRegisteredBallots.push(keccak256(abi.encodePacked(address(this), 'mint')));
-      
-      return true;
+  function recover(bytes32 hash, bytes memory signature) public pure returns (address) {
+      return hash.recover(signature);
   }
-  
-    function recover(bytes32 hash, bytes memory signature) public pure returns (address) {
-        return hash.recover(signature);
-    }
 
-    function toEthSignedMessageHash(bytes32 hash) public pure returns (bytes32) {
-        return hash.toEthSignedMessageHash();
-    }
-  
+  function toEthSignedMessageHash(bytes32 hash) public pure returns (bytes32) {
+      return hash.toEthSignedMessageHash();
+  }
   
 }

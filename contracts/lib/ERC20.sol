@@ -7,7 +7,6 @@ import "./ERC20Basic.sol";
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
 contract ERC20 is ERC20Basic {
-  uint256 public mintingInterval;
   function allowance(address owner, address spender) public view returns(uint256);
 
   function transferFrom(address from, address to, uint256 value) public returns(bool);
