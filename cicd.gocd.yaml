@@ -12,6 +12,16 @@ pipelines:
         git: https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/hydra-smart-contracts.git
         branch: master
     stages: # list of stages in order
+      - faucet: # Responsible for running Cypress to submit address[0] to receive ETH from Ropsten Faucet
+          clean_workspace: true
+          jobs:
+            subscribe:
+              tasks: # ordered list of tasks to execute in job "faucet"
+               - exec: # indicates type of task
+                   command: npm
+                   arguments:
+                    - run
+                    - test:cypress
       - compile: # name of stage
           clean_workspace: true
           jobs:
@@ -20,7 +30,7 @@ pipelines:
                 - build:
                     source: build/**/*
                     destination: dist
-              tasks: # ordered list of tasks to execute in job truffle
+              tasks: # ordered list of tasks to execute in job "truffle"
                - exec: # indicates type of task
                    command: npm
                    arguments:
