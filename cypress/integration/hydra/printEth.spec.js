@@ -2,6 +2,10 @@
 let wallets = require('../../../e2e-testing/lib/utils/accounts');
 wallets = [wallets[0]];
 
+console.log('====================================');
+console.log(JSON.stringify(wallets));
+console.log('====================================');
+
 context('Ropsten Faucet Refills', () => {
   beforeEach(() => {
     cy.visit('https://faucet.ropsten.be/')

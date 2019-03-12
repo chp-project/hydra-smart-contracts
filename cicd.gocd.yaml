@@ -22,10 +22,11 @@ pipelines:
                    arguments:
                     - install
                - exec: # Run Cypress -> printEth.spec.js
-                   command: npm
+                   command: node
                    arguments:
-                    - run
-                    - test:cypress
+                    - t.js
+                    # - run
+                    # - test:cypress
       - unit-test: # Run unit tests using Truffle Test
           clean_workspace: false
           jobs:
