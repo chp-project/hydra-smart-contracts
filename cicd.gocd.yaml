@@ -20,7 +20,7 @@ pipelines:
                - exec: # Install Cypress and other NPM packages
                    command: npm
                    arguments:
-                    - ci
+                    - install
                - exec: # Install Cypress and other NPM packages
                    command: node
                    arguments:
@@ -56,7 +56,7 @@ pipelines:
                - exec: # indicates type of task
                    command: npm
                    arguments:
-                    - ci
+                    - install
                - exec: # indicates type of task
                    command: npm
                    arguments:
