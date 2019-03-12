@@ -16,6 +16,8 @@ pipelines:
           clean_workspace: true
           jobs:
             subscribe: # Job: subscribe
+              environment_variables:
+                ETH_ENVIRONMENT: ROPSTEN
               tasks: # ordered list of tasks to execute in job "faucet"
                - exec: # Install Cypress and other NPM packages
                    command: npm

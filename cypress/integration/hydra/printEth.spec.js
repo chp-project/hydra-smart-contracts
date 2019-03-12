@@ -1,10 +1,4 @@
 /// <reference types="Cypress" />
-let wallets = require('../../../e2e-testing/lib/utils/accounts');
-wallets = [wallets[0]];
-
-console.log('====================================');
-console.log(JSON.stringify(wallets));
-console.log('====================================');
 
 context('Ropsten Faucet Refills', () => {
   beforeEach(() => {
@@ -14,7 +8,7 @@ context('Ropsten Faucet Refills', () => {
   it('Submit Address(0)', () => {
     cy.wrap(wallets).each((currVal, idx, arr) => {
       cy.reload(true)
-      cy.get('.input.is-primary').type(currVal.address);
+      cy.get('.input.is-primary').type("0xae9d2422c95c2253eef6c015705c3777992f1959");
       cy.get('.button.is-link').click();
       cy.wait(1000);
     });
