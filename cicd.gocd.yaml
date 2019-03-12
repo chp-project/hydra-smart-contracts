@@ -20,11 +20,12 @@ pipelines:
                - exec: # indicates type of task
                    command: npm
                    arguments:
-                    - "run compile"
+                    - run
+                    - compile
                - exec: # indicates type of task
                    command: node
                    arguments:
-                    - "environment.js"
+                    - environment.js
               
 environments:
   hydra:
