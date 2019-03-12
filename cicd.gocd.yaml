@@ -18,7 +18,7 @@ pipelines:
             truffle: # name of the job
               artifacts:
                 - build:
-                    source: build/
+                    source: build/**/*
                     destination: dist
               tasks: # ordered list of tasks to execute in job truffle
                - exec: # indicates type of task
