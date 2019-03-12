@@ -47,40 +47,22 @@ const REWARDS_LIST = [
   "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB"
 ];
 
-async function setChpQuorumAndBootstrap(accounts) {
+async function setChpRegistry(accounts) {
   const owner = accounts[0];
 
   let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, owner);
 
-  console.log(chalk.gray('-> Setting Chainpoint Registry + Quorum contract address'));
+  console.log(chalk.gray('-> Setting Chainpoint Registry contract address'));
   let registryInit = await tokenContract.setChainpointRegistry(REGISTRY_CONTRACT_ADDRESS);
   await registryInit.wait();
-  
-  let quorumInit = await tokenContract.setChpQuorumAndBootstrap(QUORUM_CONTRACT_ADDRESS);
-  await quorumInit.wait();
 
   let txReceipt = await provider.getTransactionReceipt(quorumInit.hash);
 
   _.set(
     owner, 
-    'e2eTesting.quorum.token.SET_CHP_QUORUM_CONTRACT', 
-    _.merge(_.get(owner, 'e2eTesting.quorum.token.SET_CHP_QUORUM_CONTRACT', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+    'e2eTesting.mint.token.SET_CHP_REGISTRY_CONTRACT', 
+    _.merge(_.get(owner, 'e2eTesting.mint.token.SET_CHP_REGISTRY_CONTRACT', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
   );
-
-  return accounts;
-}
-
-async function checkRegisteredBallots(accounts) {
-  const owner = accounts[0];
-
-  let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, owner);
-  let quorumContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_QUORUM_CONTRACT_ADDRESS`], require('../../build/contracts/ChainpointQuorum.json').abi, owner);
-
-  console.log(chalk.gray('-> Checking registered ballot for mint()'));
-  let registeredBallotsResult = await tokenContract.quorumRegisteredBallots(0);
-  let result = await quorumContract.registeredBallots(registeredBallotsResult);
-
-  _.set(owner, `e2eTesting.quorum.token.MINT_BALLOT_REGISTERED`, { passed: result.isActive, gasUsed: 0 });
 
   return accounts;
 }
@@ -112,13 +94,12 @@ async function mint(accounts) {
 
   _.set(
     leader, 
-    'e2eTesting.quorum.token.MINT_INVOKED', 
-    _.merge(_.get(leader, 'e2eTesting.quorum.token.MINT_INVOKED', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+    'e2eTesting.mint.token.MINT_INVOKED', 
+    _.merge(_.get(leader, 'e2eTesting.mint.token.MINT_INVOKED', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
   );
 
   return accounts;
 }
 
-module.exports.setChpQuorumAndBootstrap = setChpQuorumAndBootstrap;
-module.exports.checkRegisteredBallots = checkRegisteredBallots;
+module.exports.setChpRegistry = setChpRegistry;
 module.exports.mint = mint;

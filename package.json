@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "truffle compile",
-    "hello": "echo \"hello\" && exit 0",
+    "deploy:ganache": "truffle migrate --compile-all --reset --network ganache",
+    "deploy:ropsten": "truffle migrate --compile-all --reset --network ropsten",
+    "deploy:rinkeby": "truffle migrate --compile-all --reset --network rinkeby",
     "test:e2e": "node e2e-testing/run.js",
     "test:cypress": "./node_modules/.bin/cypress run --spec 'cypress/integration/hydra/printEth.spec.js'",
     "test:cypress:ui": "./node_modules/.bin/cypress open"

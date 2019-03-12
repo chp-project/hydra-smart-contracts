@@ -10,7 +10,7 @@ const provider = require('./lib/utils/provider');
 const accounts = require('./lib/utils/accounts');
 const { creditAccounts, approveAllowances} = require('./lib/1_accounts_scaffolding');
 const { stakeCores, unStakeCores } = require('./lib/2a_core_staking_actions');
-const { setChpQuorumAndBootstrap, checkRegisteredBallots, mint } = require('./lib/3_tnt_quorum');
+const { setChpRegistry, mint } = require('./lib/3_tnt_quorum');
 
 const CORE_TNT_STAKE_AMOUNT = 2500000000000;
 
@@ -22,20 +22,18 @@ const approveAllowancesCores = R.curry(approveAllowances)(CORE_TNT_STAKE_AMOUNT)
   cliHelloLogger();
 
   let actions = R.pipeP(
-    tap(() => titleLogger('Set Chainpoint Registry + Quorum contract addresses and bootstrap'), setChpQuorumAndBootstrap),
+    tap(() => titleLogger('Set Chainpoint Registry + Quorum contract addresses and bootstrap'), setChpRegistry),
     tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
     tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
     tap(() => titleLogger('Cores Staking'), stakeCores),
-    tap(() => titleLogger('Check Registered Ballot for mint()'), checkRegisteredBallots),
     tap(() => titleLogger('Invoke mint()'), mint)
   )
   await actions({0: accounts[0], 1: accounts[1]});
 
   for (let i = 0; i < Object.keys({0: accounts[0], 1: accounts[1]}).length; i++) {
     console.log('\n' + accounts[i].address + ':');
-    resultsLogger(accounts[i], 'SET_CHP_QUORUM_CONTRACT', 'quorum.token');
-    resultsLogger(accounts[i], 'MINT_BALLOT_REGISTERED', 'quorum.token');
-    resultsLogger(accounts[i], 'MINT_INVOKED', 'quorum.token');
+    resultsLogger(accounts[i], 'SET_CHP_REGISTRY_CONTRACT', 'mint.token');
+    resultsLogger(accounts[i], 'MINT_INVOKED', 'mint.token');
   }
   
 })();
