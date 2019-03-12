@@ -16,12 +16,16 @@ pipelines:
           clean_workspace: true
           jobs:
             truffle: # name of the job
-              tasks: # ordered list of tasks to execute in job csharp
-              #  - exec: # indicates type of task
-              #      command: npm
-              #      arguments:
-              #       - run
-              #       - compile
+              tasks: # ordered list of tasks to execute in job truffle
+               - exec: # indicates type of task
+                   command: npm
+                   arguments:
+                    - install
+               - exec: # indicates type of task
+                   command: npm
+                   arguments:
+                    - run
+                    - compile
                - exec: # indicates type of task
                    command: node
                    arguments:
