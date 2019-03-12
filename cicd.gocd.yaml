@@ -9,7 +9,7 @@ pipelines:
     materials:
       gitrepo: # this is the name of material, the name can contain only of alphanumeric & underscore characters
         # keyword git says about type of material and url at once
-        git: https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/hydra-smart-contracts.git
+        git: https://michael-iglesias:991a1535c8eb8cd7e1d8759e7e06912b8c90a302@github.com/chainpoint/hydra-smart-contracts.git
         branch: feature/interface-consolidation-quorum-removal
     stages: # list of stages in order
       - compile: # name of stage
