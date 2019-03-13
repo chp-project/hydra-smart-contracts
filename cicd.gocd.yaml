@@ -47,7 +47,7 @@ pipelines:
                 - build:
                     source: build/**/*
                     destination: dist
-                - ropsten-addreses:
+                - build:
                     source: e2e-testing/artifacts/**/*
                     destination: contract-addresses
               tasks: # ordered list of tasks to execute in job "truffle"
