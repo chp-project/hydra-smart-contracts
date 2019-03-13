@@ -8,9 +8,9 @@ const accounts = require('./utils/accounts');
 const web3 = new Web3(provider)
 const abiCoder = ethers.utils.defaultAbiCoder;
 
-const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(path.resolve(__dirname, `contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`), 'utf8');
-const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(path.resolve(__dirname, `contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`), 'utf8');
-const QUORUM_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_QUORUM_CONTRACT_ADDRESS`] || fs.readFileSync(path.resolve(__dirname, `contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_quorum.txt`), 'utf8');
+const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`, 'utf8');
+const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(`/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`, 'utf8');
+const QUORUM_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_QUORUM_CONTRACT_ADDRESS`] || fs.readFileSync(`/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_quorum.txt`, 'utf8');
 
 const REWARDS_LIST_KEY = [
   "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address",

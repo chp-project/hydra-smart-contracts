@@ -6,8 +6,8 @@ const _ = require('lodash');
 const chalk = require('chalk');
 const provider = require('./utils/provider');
 
-const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(path.resolve(__dirname, `contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`), 'utf8');
-const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(path.resolve(__dirname, `contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`), 'utf8');
+const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`, 'utf8');
+const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(`/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`, 'utf8');
 
 async function creditAccounts(tntAmount, accounts) {
   // Pull Contract Owner Address from accounts dictionary
