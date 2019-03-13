@@ -39,6 +39,7 @@ pipelines:
               tasks: # ordered list of tasks to execute in job "run-tests"
                - script: ./truffle-test.sh
       - deploy-ropsten: # Stage: (deploy-ropsten) Deploy contracts to Ropsten testnet
+          approval: manual
           clean_workspace: true
           environment_variables:
             ETH_ENVIRONMENT: ROPSTEN
@@ -101,12 +102,6 @@ pipelines:
                    job: truffle
                    source: contract-addresses/
                    destination: contract-addresses/
-               - exec: # indicates type of task
-                   command: npm
-                   arguments:
-                    - install
-                    - --silent
-                    - --quiet
                - exec: # indicates type of task
                    command: npm
                    arguments:
