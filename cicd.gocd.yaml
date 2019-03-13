@@ -34,6 +34,8 @@ pipelines:
             run-tests: # Job: run-tests
               tasks: # ordered list of tasks to execute in job "run-tests"
                - script: ./truffle-test.sh
+               - exec: 
+                   command: ./truffle-test.sh
       - compile: # Truffle Compile Stage
           clean_workspace: true
           jobs:
@@ -52,11 +54,6 @@ pipelines:
                    arguments:
                     - run
                     - compile
-               - exec: # indicates type of task
-                   command: node
-                   arguments:
-                    - environment.js
-              
 environments:
   hydra:
     pipelines:
