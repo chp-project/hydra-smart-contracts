@@ -1,0 +1,9 @@
+FROM trailofbits/eth-security-toolbox
+
+ADD . /share
+
+RUN sudo chmod 777 /share
+
+WORKDIR /share
+
+CMD ["slither", ". --json output.json"]
