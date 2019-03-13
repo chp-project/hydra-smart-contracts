@@ -24,6 +24,7 @@ pipelines:
                    arguments:
                     - install
                     - --silent
+                    - --quiet
                - exec: # Run Cypress -> printEth.spec.js
                    command: npm
                    arguments:
@@ -43,19 +44,20 @@ pipelines:
             ETH_ENVIRONMENT: ROPSTEN
           jobs:
             truffle: # Job: truffle
-              artifacts:
-                - build:
-                    source: build/**/*
-                    destination: dist
-                - build:
-                    source: e2e-testing/artifacts/**/*
-                    destination: contract-addresses
+              # artifacts:
+              #   - build:
+              #       source: build/**/*
+              #       destination: dist
+              #   - build:
+              #       source: e2e-testing/artifacts/**/*
+              #       destination: contract-addresses
               tasks: # ordered list of tasks to execute in job "truffle"
                - exec: # indicates type of task
                    command: npm
                    arguments:
                     - install
                     - --silent
+                    - --quiet
                - exec: # indicates type of task
                    command: npm
                    arguments:
@@ -79,6 +81,7 @@ pipelines:
                    arguments:
                     - install
                     - --silent
+                    - --quiet
                - exec: # indicates type of task
                    command: npm
                    arguments:
@@ -102,6 +105,7 @@ pipelines:
                    arguments:
                     - install
                     - --silent
+                    - --quiet
                - exec: # indicates type of task
                    command: npm
                    arguments:
