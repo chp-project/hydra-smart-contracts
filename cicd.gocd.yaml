@@ -12,10 +12,10 @@ pipelines:
         git: https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/hydra-smart-contracts.git
         branch: master
     stages: # list of stages in order
-      - faucet: # Responsible for running Cypress to submit address[0] to receive ETH from Ropsten Faucet
+      - faucet: # Stage: (faucet) Responsible for running Cypress to submit address[0] to receive ETH from Ropsten Faucet
           clean_workspace: true
           jobs:
-            subscribe: # Job: subscribe
+            refill: # Job: refill
               environment_variables:
                 ETH_ENVIRONMENT: ROPSTEN
               tasks: # ordered list of tasks to execute in job "faucet"
@@ -23,37 +23,90 @@ pipelines:
                    command: npm
                    arguments:
                     - install
+                    - --silent
                - exec: # Run Cypress -> printEth.spec.js
                    command: npm
                    arguments:
                     - run
                     - test:cypress
-      - unit-test: # Run unit tests using Truffle Test
+      - unit-test: # Stage: (unit-test) Run unit tests using Truffle Test
           clean_workspace: false
+          environment_variables:
+            ETH_ENVIRONMENT: GANACHE
           jobs:
             run-tests: # Job: run-tests
               tasks: # ordered list of tasks to execute in job "run-tests"
                - script: ./truffle-test.sh
-               - exec: 
-                   command: ./truffle-test.sh
-      - compile: # Truffle Compile Stage
+      - deploy-ropsten: # Stage: (deploy-ropsten) Deploy contracts to Ropsten testnet
           clean_workspace: true
+          environment_variables:
+            ETH_ENVIRONMENT: ROPSTEN
           jobs:
             truffle: # Job: truffle
               artifacts:
                 - build:
                     source: build/**/*
                     destination: dist
+                - ropsten-addreses:
+                    source: e2e-testing/artifacts/**/*
+                    destination: contract-addresses
               tasks: # ordered list of tasks to execute in job "truffle"
                - exec: # indicates type of task
                    command: npm
                    arguments:
                     - install
+                    - --silent
                - exec: # indicates type of task
                    command: npm
                    arguments:
                     - run
-                    - compile
+                    - deploy:ropsten
+      - e2etest-nodes-ropsten: # Stage: (e2etest-nodes-ropsten) Run E2E Test-suite for Nodes on Ropsten testnet
+          clean_workspace: true
+          environment_variables:
+            ETH_ENVIRONMENT: ROPSTEN
+          jobs:
+            hydra-testsuite: # Job: hydra-testsuite
+              tasks: # ordered list of tasks to execute in job "truffle"
+               - fetch:
+                   pipeline: smart-contracts
+                   stage: deploy-ropsten
+                   job: truffle
+                   source: contract-addresses/
+                   destination: contract-addresses/
+               - exec: # indicates type of task
+                   command: npm
+                   arguments:
+                    - install
+                    - --silent
+               - exec: # indicates type of task
+                   command: npm
+                   arguments:
+                    - run
+                    - test:e2e:nodes
+      - e2etest-cores-ropsten: # Stage: (e2etest-cores-ropsten) Run E2E Test-suite for Cores on Ropsten testnet
+          clean_workspace: false
+          environment_variables:
+            ETH_ENVIRONMENT: ROPSTEN
+          jobs:
+            hydra-testsuite: # Job: hydra-testsuite
+              tasks: # ordered list of tasks to execute in job "hydra-testsuite"
+               - fetch:
+                   pipeline: smart-contracts
+                   stage: deploy-ropsten
+                   job: truffle
+                   source: contract-addresses/
+                   destination: contract-addresses/
+               - exec: # indicates type of task
+                   command: npm
+                   arguments:
+                    - install
+                    - --silent
+               - exec: # indicates type of task
+                   command: npm
+                   arguments:
+                    - run
+                    - test:e2e:cores
 environments:
   hydra:
     pipelines:

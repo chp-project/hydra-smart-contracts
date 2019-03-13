@@ -22,7 +22,7 @@ const approveAllowancesCores = R.curry(approveAllowances)(CORE_TNT_STAKE_AMOUNT)
   cliHelloLogger();
 
   let actions = R.pipeP(
-    tap(() => titleLogger('Set Chainpoint Registry + Quorum contract addresses and bootstrap'), setChpRegistry),
+    tap(() => titleLogger('Set Chainpoint Registry contract addresses and bootstrap'), setChpRegistry),
     tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
     tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
     tap(() => titleLogger('Cores Staking'), stakeCores),

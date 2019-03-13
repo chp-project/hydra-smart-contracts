@@ -1,14 +1,20 @@
+
+const path = require('path');
+const fs = require('fs');
 const ethers = require('ethers');
 const _ = require('lodash');
 const chalk = require('chalk');
 const provider = require('./utils/provider');
+
+const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(path.resolve(__dirname, `contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`), 'utf8');
+const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(path.resolve(__dirname, `contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`), 'utf8');
 
 async function creditAccounts(tntAmount, accounts) {
   // Pull Contract Owner Address from accounts dictionary
   const owner = accounts[0];
 
   // Connect to Token Contract
-  let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, owner);
+  let tokenContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, require('../../build/contracts/TierionNetworkToken.json').abi, owner);
 
   for (let i = 0; i < Object.keys(accounts).length; i++) {
     if (i === 0) continue;
@@ -32,7 +38,7 @@ async function creditAccounts(tntAmount, accounts) {
 
 async function checkBalances(tntAmount, accounts) {
   // Connect to Token Contract
-  let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, accounts[0]);
+  let tokenContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, require('../../build/contracts/TierionNetworkToken.json').abi, accounts[0]);
   // Check Owner balance first. Should be 1B TNT - (5000TNT * 9 Nodes)
   let ownerBalance = await tokenContract.balanceOf(accounts[0].address);
   _.set(
@@ -59,10 +65,10 @@ async function checkBalances(tntAmount, accounts) {
 async function approveAllowances(tntAmount, accounts) {
   // Iterate through accounts (skip Owner at index=0) and approve an allowance for the ChainpointRegistry contract
   for (let i = 1; i < Object.keys(accounts).length; i++) {
-    let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, accounts[i]);
+    let tokenContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, require('../../build/contracts/TierionNetworkToken.json').abi, accounts[i]);
 
     console.log(chalk.gray('-> Approving Allowance: ' + accounts[i].address))
-    let approval = await tokenContract.approve(process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`], tntAmount);
+    let approval = await tokenContract.approve(REGISTRY_CONTRACT_ADDRESS, tntAmount);
     await approval.wait();
 
     let txReceipt = await provider.getTransactionReceipt(approval.hash);
@@ -77,9 +83,6 @@ async function approveAllowances(tntAmount, accounts) {
 }
 
 async function checkAllowances(tntAmount, accounts) {
-  const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`];
-  const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`];
-
   // Connect to Token Contract
   let tokenContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, require('../../build/contracts/TierionNetworkToken.json').abi, accounts[0]);
 

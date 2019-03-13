@@ -41,6 +41,8 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
   // Chainpoint Hydra Smart Contract Testing Suite
   cliHelloLogger();
 
+  const args = process.argv.slice(2);
+
   let nodes = R.pipeP(
     tap(() => titleLogger('Transferring Tokens'), creditAccountsNodes),
     tap(() => titleLogger('Checking Token Balances'), checkBalancesNodes),
@@ -54,9 +56,9 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
     tap(() => titleLogger('Un-Staking Nodes'), unStakeNodes),
     tap(() => titleLogger('Checking Nodes Un-stakings'), _3checkNodeStakings),
   )
-  await nodes(accounts);
+  if (args.includes('--nodes')) await nodes(accounts);
 
-  console.log('\n' + chalk.magenta('CORE ACTIONS:'));
+  if (args.includes('--cores')) console.log('\n' + chalk.magenta('CORE ACTIONS:'));
 
   let cores = R.pipeP(
     tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
@@ -71,34 +73,33 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
     tap(() => titleLogger('Un-Staking Cores'), unStakeCores),
     tap(() => titleLogger('Checking Cores Un-stakings'), _3checkCoreStakings),
   )
-  await cores(accounts);
+  if (args.includes('--cores')) await cores(accounts);
 
   // 
   // Log results of E2E tests to stdout
   // 
   for (let i = 0; i < Object.keys(accounts).length; i++) {
     console.log('\n' + 'Account: ' + accounts[i].address);
-    resultsLogger(accounts[i], 'INITIAL_BALANCE_TRANSFER', 'node')
-    resultsLogger(accounts[i], 'INITIAL_BALANCE_CHECK', 'node')
-    resultsLogger(accounts[i], 'REGISTRY_ALLOWANCE_APPROVAL', 'node')
-    resultsLogger(accounts[i], 'REGISTRY_ALLOWANCE_APPROVAL_CHECK', 'node')
-    resultsLogger(accounts[i], 'STAKE', 'node')
-    resultsLogger(accounts[i], 'CHECK_STAKE', 'node')
-    resultsLogger(accounts[i], 'UPDATED_STAKE', 'node')
-    resultsLogger(accounts[i], 'CHECK_STAKE_UPDATED', 'node')
-    resultsLogger(accounts[i], 'UN_STAKE', 'node')
-    resultsLogger(accounts[i], 'CHECK_UN_STAKE', 'node')
+    if (args.includes('--nodes')) {
+      resultsLogger(accounts[i], 'INITIAL_BALANCE_TRANSFER', 'node')
+      resultsLogger(accounts[i], 'INITIAL_BALANCE_CHECK', 'node')
+      resultsLogger(accounts[i], 'REGISTRY_ALLOWANCE_APPROVAL', 'node')
+      resultsLogger(accounts[i], 'REGISTRY_ALLOWANCE_APPROVAL_CHECK', 'node')
+      resultsLogger(accounts[i], 'STAKE', 'node')
+      resultsLogger(accounts[i], 'CHECK_STAKE', 'node')
+      resultsLogger(accounts[i], 'UPDATED_STAKE', 'node')
+      resultsLogger(accounts[i], 'CHECK_STAKE_UPDATED', 'node')
+      resultsLogger(accounts[i], 'UN_STAKE', 'node')
+      resultsLogger(accounts[i], 'CHECK_UN_STAKE', 'node')
+    }
     
-    console.log('\n       ' + chalk.dim.magenta('Core Actions:'))
-
-    resultsLogger(accounts[i], 'INITIAL_BALANCE_TRANSFER', 'core')
-    resultsLogger(accounts[i], 'INITIAL_BALANCE_CHECK', 'core')
-    resultsLogger(accounts[i], 'REGISTRY_ALLOWANCE_APPROVAL', 'core')
-    resultsLogger(accounts[i], 'REGISTRY_ALLOWANCE_APPROVAL_CHECK', 'core')
-    resultsLogger(accounts[i], 'STAKE', 'core')
-    resultsLogger(accounts[i], 'CHECK_STAKE', 'core')
-    resultsLogger(accounts[i], 'CHECK_STAKE_UPDATED', 'core')
-    resultsLogger(accounts[i], 'UN_STAKE', 'core')
-    resultsLogger(accounts[i], 'CHECK_UN_STAKE', 'core')
+    if (args.includes('--cores')) {
+      console.log('\n     ' + chalk.magenta('Core Actions:'))
+      resultsLogger(accounts[i], 'STAKE', 'core')
+      resultsLogger(accounts[i], 'CHECK_STAKE', 'core')
+      resultsLogger(accounts[i], 'CHECK_STAKE_UPDATED', 'core')
+      resultsLogger(accounts[i], 'UN_STAKE', 'core')
+      resultsLogger(accounts[i], 'CHECK_UN_STAKE', 'core')
+    }
   }
 })();
