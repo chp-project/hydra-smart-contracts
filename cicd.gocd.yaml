@@ -50,13 +50,7 @@ pipelines:
                     source: build/**/*
                     destination: dist
                 - build:
-                    source: /tmp/ropsten_token.txt
-                    destination: contract-addresses
-                - build:
-                    source: /tmp/ropsten_registry.txt
-                    destination: contract-addresses
-                - build:
-                    source: /tmp/ropsten_quorum.txt
+                    source: e2e-testing/artifacts/**/*
                     destination: contract-addresses
               tasks: # ordered list of tasks to execute in job "truffle"
                - exec: # indicates type of task
