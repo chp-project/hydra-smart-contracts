@@ -1,6 +1,4 @@
 #!/bin/bash
-truffle develop
+ganache-cli -p 9545 &
 
-sleep 3
-
-truffle test
+truffle test --network test
