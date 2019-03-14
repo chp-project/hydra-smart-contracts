@@ -8,3 +8,4 @@ services:
       dockerfile: Dockerfile.slither
     volumes:
       - ./:/share
+      - /var/run/docker.sock:/var/run/docker.sock
