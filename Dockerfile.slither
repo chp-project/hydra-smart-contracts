@@ -2,8 +2,8 @@ FROM trailofbits/eth-security-toolbox
 
 ADD . /share
 
-RUN sudo chmod 777 /share
+COPY slither-audit.sh /share/
 
 WORKDIR /share
 
-CMD ["slither", ". --json output.json"]
+ENTRYPOINT [ "sh", "-c", "./slither-audit.sh" ]

@@ -1,0 +1,10 @@
+version: '3'
+services:
+  chp-slither:
+    image: trailofbits/eth-security-toolbox
+    container_name: chp-slither
+    build:
+      context: .
+      dockerfile: Dockerfile.slither
+    volumes:
+      - ./:/share
