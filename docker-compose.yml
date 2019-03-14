@@ -9,3 +9,5 @@ services:
     volumes:
       - ./:/share
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      GO_SERVER_URL: https://34.73.213.45:8154/go
