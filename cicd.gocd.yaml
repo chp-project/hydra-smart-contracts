@@ -113,6 +113,11 @@ pipelines:
     lock_behavior: none
     parameters: # list of parameters that can be configured for a pipeline
       env: hydra
+    materials:
+      gitrepo: # this is the name of material, the name can contain only of alphanumeric & underscore characters
+        # keyword git says about type of material and url at once
+        git: https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/hydra-smart-contracts.git
+        branch: master
     stages: # list of stages in order
       - slither:
           clean_workspace: true
@@ -136,11 +141,6 @@ pipelines:
                - script: cat slither-output.json
 environments:
   hydra:
-    materials:
-      gitrepo: # this is the name of material, the name can contain only of alphanumeric & underscore characters
-        # keyword git says about type of material and url at once
-        git: https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/hydra-smart-contracts.git
-        branch: master # docker-compose run chp-slither /share/slither-audit.sh
     pipelines:
       - smart-contracts
       - smart-contract-audits
