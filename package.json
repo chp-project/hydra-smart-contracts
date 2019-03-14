@@ -12,7 +12,8 @@
     "test:e2e:nodes": "node e2e-testing/run.js --nodes",
     "test:e2e:cores": "node e2e-testing/run.js --cores",
     "test:cypress": "./node_modules/.bin/cypress run --spec 'cypress/integration/hydra/printEth.spec.js'",
-    "test:cypress:ui": "./node_modules/.bin/cypress open"
+    "test:cypress:ui": "./node_modules/.bin/cypress open",
+    "audit:mythx": "truffle run verify"
   },
   "author": "",
   "license": "ISC",
