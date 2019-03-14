@@ -137,7 +137,7 @@ pipelines:
                    arguments:
                     - run
                     - compile
-               - script: docker-compose run chp-slither /share/slither-audit.sh
+               - script: export DOCKER_HOST=tcp://10.142.0.6:2375 && docker-compose run chp-slither /share/slither-audit.sh
                - script: cat slither-output.json
 environments:
   hydra:
