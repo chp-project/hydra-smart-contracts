@@ -146,15 +146,13 @@ pipelines:
                    arguments:
                     - ./build/contracts/ChainpointRegistry.go
                - script: | # Git Push
-                  echo $(pwd)
                   mkdir tmp-git
-                  echo $(ls)
                   cp ./build/contracts/TierionNetworkToken.go tmp-git/
                   cp ./build/contracts/ChainpointRegistry.go tmp-git/
                   cd ./tmp-git
                   git init
                   git remote add origin https://github.com/chainpoint/go-hydra-smart-contract-files.git
-                  git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --all --force
+                  git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --all --force master
             # git-push-contract-files: # Job: git-push-contract-files
             #   tasks: # ordered list of tasks to execute in job "git-push-contract-files"
             #    - script: | # Git Push
