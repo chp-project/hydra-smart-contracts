@@ -107,6 +107,37 @@ pipelines:
                    arguments:
                     - run
                     - test:e2e:cores
+      - go-contract-compilation: # Stage: (go-contract-compilation) Generate Golang contract files to interact with Smart Contracts
+          clean_workspace: true
+          environment_variables:
+            ETH_ENVIRONMENT: GOLANG
+          jobs:
+            compile-token-contract: # Job: compile-token-contract
+              tasks: # ordered list of tasks to execute in job "compile-token-contract"
+               - exec: # Install NPM packages
+                   command: npm
+                   arguments:
+                    - install
+                    - --silent
+                    - --quiet
+               - exec: # Truffle Compile
+                   command: npm
+                   arguments:
+                    - run
+                    - compile
+               - exec: 
+                   command: node 
+                   arguments:
+                    - ./scripts/extractABI.js
+                    - --file
+                    - TierionNetworkToken
+               - script: | # Generate ABI for Token Contract & Go contract file
+                  node ./scripts/extractABI.js --file TierionNetworkToken
+                  abigen --abi=./build/contracts/TierionNetworkToken.abi --pkg=tnt --out=./build/contracts/TierionNetworkToken.go
+               - exec: 
+                   command: cat 
+                   arguments:
+                    - ./build/contracts/TierionNetworkToken.go
   smart-contract-audits:
     group: hydra # note that the group name can contain only of alphanumeric & underscore characters
     label_template: "audit ${gitrepo[:8]}"
