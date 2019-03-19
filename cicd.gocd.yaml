@@ -149,14 +149,14 @@ pipelines:
                   git clone https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git tmp-git
                   cp ./build/contracts/TierionNetworkToken.go tmp-git/
                   cp ./build/contracts/ChainpointRegistry.go tmp-git/
-                  gsutil cp ./build/contracts/TierionNetworkToken.go gs://go-hydra-contract-files
-                  gsutil cp ./build/contracts/ChainpointRegistry.go gs://go-hydra-contract-files
                   cd ./tmp-git
                   git add .
                   git commit -m "Pushing From GOCD (Hydra Smart Contracts) - Revision - $(echo $GO_PIPELINE_LABEL)"
                   git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --force -u master
-               - exec: 
-                   command: env
+               - script: | # Push to GCP Storage
+                  export BOTO_CONFIG=/dev/null
+                  gsutil cp ./build/contracts/TierionNetworkToken.go gs://go-hydra-contract-files
+                  gsutil cp ./build/contracts/ChainpointRegistry.go gs://go-hydra-contract-files
   smart-contract-audits:
     group: hydra # note that the group name can contain only of alphanumeric & underscore characters
     label_template: "audit ${gitrepo[:8]}"
