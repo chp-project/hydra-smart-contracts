@@ -152,7 +152,7 @@ pipelines:
                   cd ./tmp-git
                   git init
                   git add .
-                  git commit -m "From GOCD - Revision - $(echo $GO_REVISION)"
+                  git commit -m "From GOCD - Revision - $(echo $GO_PIPELINE_LABEL)"
                   git remote add origin https://github.com/chainpoint/go-hydra-smart-contract-files.git
                   git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --force -u master
   smart-contract-audits:
