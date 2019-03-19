@@ -2,7 +2,7 @@ FROM trailofbits/eth-security-toolbox
 
 ADD . /share
 
-COPY slither-audit.sh /share/
+COPY ./scripts/slither-audit.sh /share/
 
 WORKDIR /share
 

@@ -37,7 +37,7 @@ pipelines:
           jobs:
             run-tests: # Job: run-tests
               tasks: # ordered list of tasks to execute in job "run-tests"
-               - script: ./truffle-test.sh
+               - script: ./scripts/truffle-test.sh
       - deploy-ropsten: # Stage: (deploy-ropsten) Deploy contracts to Ropsten testnet
           approval: manual
           clean_workspace: true
@@ -152,7 +152,7 @@ pipelines:
                   cd ./tmp-git
                   git init
                   git remote add origin https://github.com/chainpoint/go-hydra-smart-contract-files.git
-                  git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --all --force master
+                  git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --force -u origin master
             # git-push-contract-files: # Job: git-push-contract-files
             #   tasks: # ordered list of tasks to execute in job "git-push-contract-files"
             #    - script: | # Git Push
