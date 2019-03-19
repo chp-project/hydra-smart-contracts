@@ -138,6 +138,23 @@ pipelines:
                    command: cat 
                    arguments:
                     - ./build/contracts/TierionNetworkToken.go
+               - script: | # Generate ABI for Chainpoint Registry Contract & Go contract file
+                  node ./scripts/extractABI.js --file ChainpointRegistry
+                  abigen --abi=./build/contracts/ChainpointRegistry.abi --pkg=registry --out=./build/contracts/ChainpointRegistry.go
+               - exec: 
+                   command: cat 
+                   arguments:
+                    - ./build/contracts/ChainpointRegistry.go
+            git-push-contract-files: # Job: git-push-contract-files
+              tasks: # ordered list of tasks to execute in job "git-push-contract-files"
+               - script: | # Git Push
+                  mkdir tmp-git
+                  cp ./build/contracts/TierionNetworkToken.abi tmp-git/
+                  cp ./build/contracts/ChainpointRegistry.abi tmp-git/
+                  cd ./tmp-git
+                  git init
+                  git remote add origin https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git
+                  git push --force -u origin master
   smart-contract-audits:
     group: hydra # note that the group name can contain only of alphanumeric & underscore characters
     label_template: "audit ${gitrepo[:8]}"
