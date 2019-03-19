@@ -151,20 +151,10 @@ pipelines:
                   cp ./build/contracts/ChainpointRegistry.go tmp-git/
                   cd ./tmp-git
                   git init
+                  git add .
+                  git commit -m "From GOCD - Revision - $(echo $GO_REVISION)"
                   git remote add origin https://github.com/chainpoint/go-hydra-smart-contract-files.git
-                  git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --force -u origin master
-            # git-push-contract-files: # Job: git-push-contract-files
-            #   tasks: # ordered list of tasks to execute in job "git-push-contract-files"
-            #    - script: | # Git Push
-            #       echo $(pwd)
-            #       mkdir tmp-git
-            #       echo $(ls)
-            #       cp ./build/contracts/TierionNetworkToken.go tmp-git/
-            #       cp ./build/contracts/ChainpointRegistry.go tmp-git/
-            #       cd ./tmp-git
-            #       git init
-            #       git remote add origin https://github.com/chainpoint/go-hydra-smart-contract-files.git
-            #       git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --all --force -u origin master
+                  git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --force -u master
   smart-contract-audits:
     group: hydra # note that the group name can contain only of alphanumeric & underscore characters
     label_template: "audit ${gitrepo[:8]}"
