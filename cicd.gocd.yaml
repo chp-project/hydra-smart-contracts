@@ -65,6 +65,15 @@ pipelines:
                    arguments:
                     - run
                     - deploy:ropsten
+               - script: | # Push Ropsten deployment artifacts to "go-hydra-smart-contract-files" repo
+                  git clone https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git tmp-git
+                  cp ./e2e-testing/artifacts/ropsten_token.txt tmp-git/
+                  cp ./e2e-testing/artifacts/ropsten_registry.txt tmp-git/
+                  cp ./e2e-testing/artifacts/ropsten_quorum.txt tmp-git/
+                  cd ./tmp-git
+                  git add .
+                  git commit -m "Pushing Ropsten Deployment Artififacts From GOCD (Hydra Smart Contracts) - Revision - $(echo $GO_PIPELINE_LABEL)"
+                  git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --force -u master
       - e2etest-nodes-ropsten: # Stage: (e2etest-nodes-ropsten) Run E2E Test-suite for Nodes on Ropsten testnet
           clean_workspace: true
           environment_variables:
