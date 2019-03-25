@@ -133,14 +133,14 @@ pipelines:
                     - TierionNetworkToken
                - script: | # Generate ABI for Token Contract & Go contract file
                   node ./scripts/extractABI.js --file TierionNetworkToken
-                  abigen --abi=./build/contracts/TierionNetworkToken.abi --pkg=eth-contracts --out=./build/contracts/TierionNetworkToken.go
+                  abigen --abi=./build/contracts/TierionNetworkToken.abi --pkg=ethcontracts --out=./build/contracts/TierionNetworkToken.go
                - exec: 
                    command: cat 
                    arguments:
                     - ./build/contracts/TierionNetworkToken.go
                - script: | # Generate ABI for Chainpoint Registry Contract & Go contract file
                   node ./scripts/extractABI.js --file ChainpointRegistry
-                  abigen --abi=./build/contracts/ChainpointRegistry.abi --pkg=eth-contracts --out=./build/contracts/ChainpointRegistry.go
+                  abigen --abi=./build/contracts/ChainpointRegistry.abi --pkg=ethcontracts --out=./build/contracts/ChainpointRegistry.go
                - exec: 
                    command: cat 
                    arguments:
