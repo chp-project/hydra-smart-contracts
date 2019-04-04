@@ -173,7 +173,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     /// @param _mintAmount is the total number of tokens rewarded to each Node Operator
     /// @param _blockHeight The block height in which token minting occurred
     event Mint(
-        address[72] _nodes,
+        address[] _nodes,
         uint256 _mintAmount,
         uint256 _blockHeight
     );
@@ -213,7 +213,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
    * @param _nodes The addresses of Nodes which will receive the funds.
    * @dev only Chainpoint Core Operators can invoke this method
    */
-  function mint(address[72] memory _nodes, bytes32 _hash, bytes memory signature1, bytes memory signature2, bytes memory signature3, bytes memory signature4, bytes memory signature5, bytes memory signature6) public whenNotPaused returns(bool) {
+  function mint(address[] memory _nodes, bytes32 _hash, bytes memory signature1, bytes memory signature2, bytes memory signature3, bytes memory signature4, bytes memory signature5, bytes memory signature6) public whenNotPaused returns(bool) {
       require(lastMintedAtBlock == 0 || block.number >= lastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
       require(_nodes.length <= 72, "list of 72 or fewer nodes is required");
       
