@@ -77,7 +77,7 @@ module.exports = {
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
     ropsten: {
-      provider: () => new HDWalletProvider(process.env.CHP_HYDRA_DEV_MNEMONIC, `https://ropsten.infura.io/${process.env.ETH_INFURA_API_KEY}`),
+      provider: () => new HDWalletProvider(process.env.CHP_HYDRA_DEV_MNEMONIC, `https://ropsten.infura.io/v3/${process.env.ETH_INFURA_API_KEY}`),
       network_id: 3,       // Ropsten's id
       gas: 8000000,        // Ropsten has a lower block limit than mainnet
       confirmations: 0,    // # of confs to wait between deployments. (default: 0)
@@ -86,7 +86,7 @@ module.exports = {
     },
 
     rinkeby: {
-      provider: () => new HDWalletProvider(process.env.CHP_HYDRA_DEV_MNEMONIC, `https://rinkeby.infura.io/${process.env.ETH_INFURA_API_KEY}`),
+      provider: () => new HDWalletProvider(process.env.CHP_HYDRA_DEV_MNEMONIC, `https://rinkeby.infura.io/v3/${process.env.ETH_INFURA_API_KEY}`),
       network_id: 4,       // Rinkeby's id
       gas: 6885636,        // Rinkeby has a lower block limit than mainnet
       confirmations: 0,    // # of confs to wait between deployments. (default: 0)
