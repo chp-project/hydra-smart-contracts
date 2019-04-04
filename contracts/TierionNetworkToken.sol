@@ -215,7 +215,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
    */
   function mint(address[72] memory _nodes, bytes32 _hash, bytes memory signature1, bytes memory signature2, bytes memory signature3, bytes memory signature4, bytes memory signature5, bytes memory signature6) public whenNotPaused returns(bool) {
       require(lastMintedAtBlock == 0 || block.number >= lastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
-      require(_nodes.length == 72, "list of 3 nodes is required");
+      require(_nodes.length <= 72, "list of 72 or fewer nodes is required");
       
       // Validate parameters provided
       bytes32 nodesHash = keccak256(abi.encodePacked(_nodes));
