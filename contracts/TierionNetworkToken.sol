@@ -213,10 +213,16 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
    * @param _nodes The addresses of Nodes which will receive the funds.
    * @dev only Chainpoint Core Operators can invoke this method
    */
-  function mint(address[] memory _nodes, bytes32 _hash, bytes memory signature1, bytes memory signature2, bytes memory signature3, bytes memory signature4, bytes memory signature5, bytes memory signature6) public whenNotPaused returns(bool) {
+  function mint(address[] memory _nodes, bytes32 _hash, bytes memory signature1, bytes memory signature2, bytes memory signature3, bytes memory signature4, bytes memory signature5, bytes memory signature6) public whenNotPaused onlyCoreOperator returns(bool) {
       require(lastMintedAtBlock == 0 || block.number >= lastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
       require(_nodes.length <= 72, "list of 72 or fewer nodes is required");
-      
+      // Check signature uniqueness
+      require(signature1 != signature2 && signature1 != signature3 && signature1 != signature4 && signature1 != signature5 && signature1 != signature6, 'Signatures must be signed by different Cores');
+      require(signature2 != signature3 && signature2 != signature4 && signature2 != signature5 && signature2 != signature6, 'Signatures must be signed by different Cores');
+      require(signature3 != signature4 && signature3 != signature5 && signature3 != signature6, 'Signatures must be signed by different Cores');
+      require(signature4 != signature5 && signature4 != signature6, 'Signatures must be signed by different Cores');
+      require(signature5 != signature6, 'Signatures must be signed by different Cores');
+
       // Validate parameters provided
       bytes32 nodesHash = keccak256(abi.encodePacked(_nodes));
       require(nodesHash.toEthSignedMessageHash() == _hash, "supplied toEthSignedMessageHash does not equal value calculated");
@@ -226,6 +232,9 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
       for(uint8 i=0; i < signatures.length; i++) {
           require(chainpointRegistry.isHealthyCore(_hash.recover(signatures[i])), "signer is not a staked core operator");
       }
+
+      // TODO: Update lastMintedAtBlock = block.number;
+      lastMintedAt = now;
       
       // Iterate through list of Nodes and award tokens
       for(uint8 i=0; i < _nodes.length; i++) {
@@ -234,8 +243,6 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
           // Increase totalSupply
           totalSupply = totalSupply.add(mintAmount);
       }
-      // TODO: Update lastMintedAtBlock = block.number;
-      // TODO: Update lastMintedAt = now;
       
       emit Mint(_nodes, mintAmount, block.number);
       
