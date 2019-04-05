@@ -224,11 +224,11 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
       require(nodeLastMintedAtBlock == 0 || block.number >= nodeLastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
       require(_nodes.length <= 72, "list of 72 or fewer nodes is required");
       // Check signature uniqueness
-      require(!equal(signature1, signature2) && !equal(signature1, signature3) && !equal(signature1, signature4) && !equal(signature1, signature5) && equal(signature1, signature6), 'Signatures must be signed by different Cores');
-      require(!equal(signature2, signature3) && !equal(signature2, signature4) && !equal(signature2, signature5) && equal(signature2, signature6), 'Signatures must be signed by different Cores');
-      require(!equal(signature3, signature4) && !equal(signature3, signature5) && equal(signature3, signature6), 'Signatures must be signed by different Cores');
-      require(!equal(signature4, signature5) && equal(signature4, signature6), 'Signatures must be signed by different Cores');
-      require(!equal(signature5, signature6), 'Signatures must be signed by different Cores');
+      require(!signature1.equal(signature2) && !signature1.equal(signature3) && !signature1.equal(signature4) && !signature1.equal(signature5) && !signature1.equal(signature6), 'Signatures must be signed by different Cores');
+      require(!signature2.equal(signature3) && !signature2.equal(signature4) && !signature2.equal(signature5) && !signature2.equal(signature6), 'Signatures must be signed by different Cores');
+      require(!signature3.equal(signature4) && !signature3.equal(signature5) && !signature3.equal(signature6), 'Signatures must be signed by different Cores');
+      require(!signature4.equal(signature5) && !signature4.equal(signature6), 'Signatures must be signed by different Cores');
+      require(!signature5.equal(signature6), 'Signatures must be signed by different Cores');
 
       // Validate parameters provided
       bytes32 nodesHash = keccak256(abi.encodePacked(_nodes));
