@@ -3,10 +3,12 @@ pragma solidity >=0.4.22 <0.6.0;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
+import "bytes/BytesLib.sol";
 import "./lib/ERC20.sol";
 import "./lib/ERC20Basic.sol";
 import "./lib/SafeMath.sol";
 import "./ChainpointRegistry.sol";
+
 
 /**
  * @title Basic token
@@ -221,11 +223,11 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
       require(nodeLastMintedAtBlock == 0 || block.number >= nodeLastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
       require(_nodes.length <= 72, "list of 72 or fewer nodes is required");
       // Check signature uniqueness
-      require(signature1 != signature2 && signature1 != signature3 && signature1 != signature4 && signature1 != signature5 && signature1 != signature6, 'Signatures must be signed by different Cores');
-      require(signature2 != signature3 && signature2 != signature4 && signature2 != signature5 && signature2 != signature6, 'Signatures must be signed by different Cores');
-      require(signature3 != signature4 && signature3 != signature5 && signature3 != signature6, 'Signatures must be signed by different Cores');
-      require(signature4 != signature5 && signature4 != signature6, 'Signatures must be signed by different Cores');
-      require(signature5 != signature6, 'Signatures must be signed by different Cores');
+      require(!equal(signature1, signature2) && !equal(signature1, signature3) && !equal(signature1, signature4) && !equal(signature1, signature5) && equal(signature1, signature6), 'Signatures must be signed by different Cores');
+      require(!equal(signature2, signature3) && !equal(signature2, signature4) && !equal(signature2, signature5) && equal(signature2, signature6), 'Signatures must be signed by different Cores');
+      require(!equal(signature3, signature4) && !equal(signature3, signature5) && equal(signature3, signature6), 'Signatures must be signed by different Cores');
+      require(!equal(signature4, signature5) && equal(signature4, signature6), 'Signatures must be signed by different Cores');
+      require(!equal(signature5, signature6), 'Signatures must be signed by different Cores');
 
       // Validate parameters provided
       bytes32 nodesHash = keccak256(abi.encodePacked(_nodes));
