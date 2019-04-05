@@ -3,6 +3,7 @@ const fs = require('fs');
 const ethers = require('ethers');
 const _ = require('lodash');
 const chalk = require('chalk');
+const ipToInt = require("ip-to-int")
 const provider = require('./utils/provider');
 
 const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`, 'utf8');
@@ -15,7 +16,7 @@ async function stakeNodes(accounts) {
     console.log(chalk.gray('-> Staking Node: ' + accounts[i].address));
     let registryContract = new ethers.Contract(REGISTRY_CONTRACT_ADDRESS, require('../../build/contracts/ChainpointRegistry.json').abi, accounts[i]);
     
-    let stakeResult = await registryContract.stake("0x48656c6c6f20576f726c64210000000000000000000000000000000000000000", "0x48656c6c6f20576f726c64210000000000000000000000000000000000000000");
+    let stakeResult = await registryContract.stake(ipToInt(`192.168.0.${i}`).toInt(), "0x48656c6c6f20576f726c64210000000000000000000000000000000000000000");
     await stakeResult.wait();
 
     let txReceipt = await provider.getTransactionReceipt(stakeResult.hash);
@@ -38,8 +39,8 @@ async function checkNodeStakings(checkType, accounts) {
     console.log(chalk.gray('-> Checking Staked Node: ' + accounts[i].address));
     let stakeResult = await registryContract.nodes(accounts[i].address);
     let expectedNodeValues = (function() {
-      if (checkType === 'CHECK_STAKE') return [true, '0x48656c6c6f20576f726c64210000000000000000000000000000000000000000'];
-      else if (checkType === 'CHECK_STAKE_UPDATED') return [true, ethers.utils.formatBytes32String(`${i}`)];
+      if (checkType === 'CHECK_STAKE') return [true, ipToInt(`192.168.0.${i}`).toInt()]; // i === 192.168.0.x
+      else if (checkType === 'CHECK_STAKE_UPDATED') return [true, ipToInt(`10.0.0.${i}`).toInt()]; // i === 10.0.0.x
       else return [false, "0x0000000000000000000000000000000000000000000000000000000000000000"]
     })();
 
@@ -59,7 +60,7 @@ async function updateStakesNodes(accounts) {
     console.log(chalk.gray('-> Updating Node Stake: ' + accounts[i].address));
     let registryContract = new ethers.Contract(REGISTRY_CONTRACT_ADDRESS, require('../../build/contracts/ChainpointRegistry.json').abi, accounts[i]);
 
-    let update = await registryContract.updateStake(ethers.utils.formatBytes32String(`${i}`), ethers.utils.formatBytes32String(`${i}`));
+    let update = await registryContract.updateStake(ipToInt(`10.0.0.${i}`).toInt()); // i === 10.0.0.x
     await update.wait();
 
     let txReceipt = await provider.getTransactionReceipt(update.hash);
