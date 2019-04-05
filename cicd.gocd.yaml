@@ -31,12 +31,18 @@ pipelines:
                     - run
                     - test:cypress
       - unit-test: # Stage: (unit-test) Run unit tests using Truffle Test
-          clean_workspace: false
+          clean_workspace: true
           environment_variables:
             ETH_ENVIRONMENT: GANACHE
           jobs:
             run-tests: # Job: run-tests
               tasks: # ordered list of tasks to execute in job "run-tests"
+               - exec: # Install Cypress and other NPM packages
+                   command: npm
+                   arguments:
+                    - install
+                    - --silent
+                    - --quiet
                - script: ./scripts/truffle-test.sh
       - deploy-ropsten: # Stage: (deploy-ropsten) Deploy contracts to Ropsten testnet
           approval: manual
