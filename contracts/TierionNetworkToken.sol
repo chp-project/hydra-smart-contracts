@@ -136,10 +136,14 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     
     /// @title Minting Interval (in # of blocks)
     uint256 public mintingInterval = 5760; // 86,400 (seconds in 1 day) / 15 (average block time in seconds)
-    /// @title Last Token Minting timestamp
-    uint256 lastMintedAt;
-    /// @title Last Token Minting block height
-    uint256 public lastMintedAtBlock;
+    /// @title Nodes Last Token Minting timestamp
+    uint256 nodeLastMintedAt;
+    /// @title Nodes Last Token Minting block height
+    uint256 public nodeLastMintedAtBlock;
+    /// @title Cores Last Token Minting timestamp
+    uint256 coreLastMintedAt;
+    /// @title Cores Last Token Minting block height
+    uint256 public coreLastMintedAtBlock;
     // Hashes of methods decorated and registered with Chainpoint Quorum
     bytes32[] public quorumRegisteredBallots;
     
@@ -214,7 +218,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
    * @dev only Chainpoint Core Operators can invoke this method
    */
   function mint(address[] memory _nodes, bytes32 _hash, bytes memory signature1, bytes memory signature2, bytes memory signature3, bytes memory signature4, bytes memory signature5, bytes memory signature6) public whenNotPaused onlyCoreOperator returns(bool) {
-      require(lastMintedAtBlock == 0 || block.number >= lastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
+      require(nodeLastMintedAtBlock == 0 || block.number >= nodeLastMintedAtBlock.add(mintingInterval), "minting occurs at the specified minting interval");
       require(_nodes.length <= 72, "list of 72 or fewer nodes is required");
       // Check signature uniqueness
       require(signature1 != signature2 && signature1 != signature3 && signature1 != signature4 && signature1 != signature5 && signature1 != signature6, 'Signatures must be signed by different Cores');
@@ -233,8 +237,8 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
           require(chainpointRegistry.isHealthyCore(_hash.recover(signatures[i])), "signer is not a staked core operator");
       }
 
-      // TODO: Update lastMintedAtBlock = block.number;
-      lastMintedAt = now;
+      // TODO: Update nodeLastMintedAtBlock = block.number;
+      nodeLastMintedAt = now;
       
       // Iterate through list of Nodes and award tokens
       for(uint8 i=0; i < _nodes.length; i++) {
