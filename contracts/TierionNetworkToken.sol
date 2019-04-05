@@ -272,9 +272,5 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
   function toEthSignedMessageHash(bytes32 hash) public pure returns (bytes32) {
       return hash.toEthSignedMessageHash();
   }
-
-  function checkPubKey(bytes memory pubkey) public view returns (bool){
-    return (uint(keccak256(pubkey)) & 0x00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF) == uint(msg.sender);
-  }
   
 }

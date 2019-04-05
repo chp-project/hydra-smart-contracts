@@ -58,7 +58,7 @@ async function setChpRegistry(accounts) {
   let registryInit = await tokenContract.setChainpointRegistry(REGISTRY_CONTRACT_ADDRESS);
   await registryInit.wait();
 
-  let txReceipt = await provider.getTransactionReceipt(quorumInit.hash);
+  let txReceipt = await provider.getTransactionReceipt(registryInit.hash);
 
   _.set(
     owner, 

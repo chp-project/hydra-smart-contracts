@@ -300,9 +300,11 @@ contract ChainpointRegistry is Ownable, Pausable {
     function unStake() public whenNotPaused returns (bool) {
         require(nodes[msg.sender].isStaked == true, "node has not staked into the Chainpoint network");
         require(now >= nodes[msg.sender].stakeLockedUntil, "tokens are timelocked");
+
+        delete nodes[nodes[msg.sender].nodeIp];
+        delete allocatedIps[nodeIp];
         
         require(token.transfer(msg.sender, nodes[msg.sender].amountStaked), "transferFrom failed");
-        delete nodes[msg.sender];
         
         return true;
     }
@@ -319,8 +321,10 @@ contract ChainpointRegistry is Ownable, Pausable {
         require(cores[msg.sender].isStaked, "core has not staked into the Chainpoint network");
         require(now >= cores[msg.sender].stakeLockedUntil, "tokens are timelocked");
         
-        require(token.transfer(msg.sender, cores[msg.sender].amountStaked), "transferFrom failed");
         delete cores[msg.sender];
+        delete cores[cores[msg.sender].coreIp];
+
+        require(token.transfer(msg.sender, cores[msg.sender].amountStaked), "transferFrom failed");
         
         return true;
     }
