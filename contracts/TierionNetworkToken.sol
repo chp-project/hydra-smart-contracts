@@ -125,6 +125,7 @@ contract StandardToken is ERC20, BasicToken {
  */
 contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     using ECDSA for bytes32;
+    using BytesLib for bytes;
     
     string public name = 'Tierion Network Token'; // Set the token name for display
     string public symbol = 'TNT'; // Set the token symbol for display
