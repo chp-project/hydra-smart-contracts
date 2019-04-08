@@ -83,12 +83,15 @@ pipelines:
                   git commit -m "Pushing Ropsten Deployment Artififacts From GOCD (Hydra Smart Contracts) - Revision - $(echo $GO_PIPELINE_LABEL)"
                   git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --force -u master
                - script: | # Push Ropsten deployment artifacts to "preprod" branch -> "go-hydra-smart-contract-files" repo
-                  git clone https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git tmp-git
+                  pwd
+                  ls
                   cp ./e2e-testing/artifacts/ropsten_token.txt tmp-git/token.txt
                   cp ./e2e-testing/artifacts/ropsten_registry.txt tmp-git/registry.txt
                   cd ./tmp-git
                   git checkout preprod
-                  echo 3 > tmp-git/chainId.txt
+                  git branch
+                  echo 3 > chainId.txt
+                  cat chainId.txt
                   git add .
                   git commit -m "Pushing Ropsten Deployment Artififacts From GOCD (Hydra Smart Contracts) - Revision - $(echo $GO_PIPELINE_LABEL)"
                   git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --force
