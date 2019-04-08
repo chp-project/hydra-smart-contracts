@@ -10,7 +10,7 @@ const provider = require('./lib/utils/provider');
 const accounts = require('./lib/utils/accounts');
 const { creditAccounts, approveAllowances} = require('./lib/1_accounts_scaffolding');
 const { stakeCores, unStakeCores } = require('./lib/2a_core_staking_actions');
-const { setChpRegistry, mint } = require('./lib/3_tnt_quorum');
+const { setChpRegistry, mint, mintThrow } = require('./lib/3_tnt_quorum');
 
 const CORE_TNT_STAKE_AMOUNT = 2500000000000;
 
@@ -26,13 +26,15 @@ const approveAllowancesCores = R.curry(approveAllowances)(CORE_TNT_STAKE_AMOUNT)
     tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
     tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
     tap(() => titleLogger('Cores Staking'), stakeCores),
+    tap(() => titleLogger('Invoke mint() THROW'), mintThrow),
     tap(() => titleLogger('Invoke mint()'), mint)
   )
-  await actions({0: accounts[0], 1: accounts[1]});
+  await actions(accounts);
 
   for (let i = 0; i < Object.keys({0: accounts[0], 1: accounts[1]}).length; i++) {
     console.log('\n' + accounts[i].address + ':');
     resultsLogger(accounts[i], 'SET_CHP_REGISTRY_CONTRACT', 'mint.token');
+    resultsLogger(accounts[i], 'MINT_THROW_INVOKED', 'mint.token');
     resultsLogger(accounts[i], 'MINT_INVOKED', 'mint.token');
   }
   

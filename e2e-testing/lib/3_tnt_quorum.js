@@ -12,7 +12,6 @@ const abiCoder = ethers.utils.defaultAbiCoder;
 
 const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`, 'utf8');
 const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`, 'utf8');
-const QUORUM_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_QUORUM_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_quorum.txt`, 'utf8');
 
 const REWARDS_LIST_KEY = [
   "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address",
@@ -73,22 +72,25 @@ async function mint(accounts) {
   const owner = accounts[0];
   const leader = accounts[1];
 
-  let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, owner);
-
+  let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, leader);
   let rewardsListHash = ethers.utils.keccak256(abiCoder.encode(REWARDS_LIST_KEY, REWARDS_LIST));
-  let web3Owner = web3.eth.accounts.privateKeyToAccount(leader.privateKey);
-  
-  let signature = await web3Owner.sign(rewardsListHash);
+
+  let sigs = [];
+  let messageHash;
+  for (let i = 0; i < 6; i++) {
+    const element = accounts[i];
+    
+    let web3Owner = web3.eth.accounts.privateKeyToAccount(accounts[i].privateKey);
+    let signature = await web3Owner.sign(rewardsListHash);
+    if (!messageHash) { messageHash = signature.messageHash }
+
+    sigs.push(signature.signature);
+  }
 
   let mintResult = await tokenContract.mint(
     REWARDS_LIST,
-    signature.messageHash,
-    signature.signature,
-    signature.signature,
-    signature.signature,
-    signature.signature,
-    signature.signature,
-    signature.signature
+    messageHash,
+    ...sigs
   );
   await mintResult.wait();
 
@@ -103,5 +105,40 @@ async function mint(accounts) {
   return accounts;
 }
 
+async function mintThrow(accounts) {
+  const owner = accounts[0];
+  const leader = accounts[1];
+
+  let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, leader);
+
+  let rewardsListHash = ethers.utils.keccak256(abiCoder.encode(REWARDS_LIST_KEY, REWARDS_LIST));
+  let web3Owner = web3.eth.accounts.privateKeyToAccount(leader.privateKey);
+  
+  let signature = await web3Owner.sign(rewardsListHash);
+
+  try {
+    let mintResult = await tokenContract.mint(
+      REWARDS_LIST,
+      signature.messageHash,
+      signature.signature,
+      signature.signature,
+      signature.signature,
+      signature.signature,
+      signature.signature,
+      signature.signature
+    );
+    await mintResult.wait();
+  } catch (__) {
+    _.set(
+      leader, 
+      'e2eTesting.mint.token.MINT_THROW_INVOKED', 
+      _.merge(_.get(leader, 'e2eTesting.mint.token.MINT_THROW_INVOKED', {}), { passed: true, gasUsed: 0 })
+    );
+  }
+
+  return accounts;
+}
+
 module.exports.setChpRegistry = setChpRegistry;
 module.exports.mint = mint;
+module.exports.mintThrow = mintThrow;

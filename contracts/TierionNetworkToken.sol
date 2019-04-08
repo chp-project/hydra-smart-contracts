@@ -184,6 +184,14 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
         uint256 _mintAmount,
         uint256 _blockHeight
     );
+    
+    /// @notice emitted on successful purchasing of usage
+    /// @param _buyer node operator that is purchasing network usage
+    /// @param _value amount of TNT being spent on future network usage
+    event UsagePurchased(
+        address _buyer,
+        uint256 _value
+    );
 
   /**
    * @dev Transfer token for a specified address when not paused
@@ -271,6 +279,15 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
 
   function toEthSignedMessageHash(bytes32 hash) public pure returns (bytes32) {
       return hash.toEthSignedMessageHash();
+  }
+  
+  function puchaseUsage(uint256 _value) public returns (bool) {
+      balances[msg.sender] = balances[msg.sender].sub(_value);
+      balances[address(0)] = balances[address(0)].add(_value);
+      
+      emit UsagePurchased(msg.sender, _value);
+      
+      return true;
   }
   
 }
