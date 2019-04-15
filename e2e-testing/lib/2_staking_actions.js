@@ -3,7 +3,7 @@ const fs = require('fs');
 const ethers = require('ethers');
 const _ = require('lodash');
 const chalk = require('chalk');
-const ipToInt = require("ip-to-int")
+const ipToInt = require('ip-to-int')
 const provider = require('./utils/provider');
 
 const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`, 'utf8');

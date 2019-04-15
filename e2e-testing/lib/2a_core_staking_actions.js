@@ -16,7 +16,7 @@ async function stakeCores(accounts) {
     console.log(chalk.gray('-> Staking Core: ' + accounts[i].address));
     let registryContract = new ethers.Contract(REGISTRY_CONTRACT_ADDRESS, require('../../build/contracts/ChainpointRegistry.json').abi, accounts[i]);
     
-    let stakeResult = await registryContract.stakeCore(ipToInt(`172.168.0.${i}`).toInt(), "0x48656c6c6f20576f726c64210000000000000000000000000000000000000000");
+    let stakeResult = await registryContract.stakeCore(ipToInt(`56.0.0.${i}`).toInt(), "0x48656c6c6f20576f726c64210000000000000000000000000000000000000000");
     await stakeResult.wait();
 
     let txReceipt = await provider.getTransactionReceipt(stakeResult.hash);

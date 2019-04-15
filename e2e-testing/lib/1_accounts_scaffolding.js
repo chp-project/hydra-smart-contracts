@@ -2,9 +2,11 @@
 const path = require('path');
 const fs = require('fs');
 const ethers = require('ethers');
+const Web3 = require('web3')
 const _ = require('lodash');
 const chalk = require('chalk');
 const provider = require('./utils/provider');
+const accounts = require('./utils/accounts')
 
 const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`, 'utf8');
 const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`, 'utf8');
