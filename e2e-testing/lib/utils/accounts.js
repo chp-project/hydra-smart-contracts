@@ -1,16 +1,16 @@
 const ethers = require('ethers');
 const provider = require('./provider');
 
-module.exports = (function() {
-  const accounts = {};
+function accounts() {
+  const accts = {};
 
   for (let i = 0; i <= 9; i++) {
-    accounts[i] = ethers.Wallet.fromMnemonic(process.env.CHP_HYDRA_DEV_MNEMONIC, `${process.env.CHP_HYDRA_DEV_MNEMONIC_PATH}/${i}`);
-    accounts[i] = accounts[i].connect(provider);
+    accts[i] = ethers.Wallet.fromMnemonic(process.env.CHP_HYDRA_DEV_MNEMONIC, `${process.env.CHP_HYDRA_DEV_MNEMONIC_PATH}/${i}`);
+    accts[i] = accts[i].connect(provider);
   }
 
-  return accounts;
-})();
+  return accts;
+}
 
 function accountsFromPrivKey(privKeys = []) {
   const accounts = {};
@@ -28,4 +28,5 @@ function accountsFromPrivKey(privKeys = []) {
   return accounts;
 }
 
+module.exports.accounts = accounts()
 module.exports.accountsFromPrivKey = accountsFromPrivKey

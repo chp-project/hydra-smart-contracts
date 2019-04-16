@@ -7,7 +7,7 @@ const cliHelloLogger = require('./lib/utils/cliHelloLogger');
 const resultsLogger = require('./lib/utils/resultsLogger');
 const titleLogger = require('./lib/utils/titleLogger');
 const provider = require('./lib/utils/provider');
-const defaultAccounts = require('./lib/utils/accounts');
+const defaultAccounts = require('./lib/utils/accounts').accounts;
 const {accountsFromPrivKey} = require('./lib/utils/accounts');
 const { creditAccounts, checkBalances, approveAllowances, checkAllowances} = require('./lib/1_accounts_scaffolding');
 const { stakeNodes, checkNodeStakings, updateStakesNodes, unStakeNodes } = require('./lib/2_staking_actions');
@@ -15,8 +15,6 @@ const { stakeCores, checkCoreStakings, updateStakesCores, unStakeCores } = requi
 
 const privKeysArr = []
 const accounts = (privKeysArr.length) ? accountsFromPrivKey(privKeysArr) : defaultAccounts
-
-debugger;
 
 // TNT Amounts
 const NODE_TNT_STAKE_AMOUNT = 500000000000;

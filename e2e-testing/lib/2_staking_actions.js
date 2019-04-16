@@ -16,7 +16,7 @@ async function stakeNodes(accounts) {
     console.log(chalk.gray('-> Staking Node: ' + accounts[i].address));
     let registryContract = new ethers.Contract(REGISTRY_CONTRACT_ADDRESS, require('../../build/contracts/ChainpointRegistry.json').abi, accounts[i]);
     
-    let stakeResult = await registryContract.stake(ipToInt(`192.168.0.${i}`).toInt(), "0x48656c6c6f20576f726c64210000000000000000000000000000000000000000");
+    let stakeResult = await registryContract.stake(ipToInt(`192.168.0.${i}`).toInt());
     await stakeResult.wait();
 
     let txReceipt = await provider.getTransactionReceipt(stakeResult.hash);
@@ -41,14 +41,16 @@ async function checkNodeStakings(checkType, accounts) {
     let expectedNodeValues = (function() {
       if (checkType === 'CHECK_STAKE') return [true, ipToInt(`192.168.0.${i}`).toInt()]; // i === 192.168.0.x
       else if (checkType === 'CHECK_STAKE_UPDATED') return [true, ipToInt(`10.0.0.${i}`).toInt()]; // i === 10.0.0.x
-      else return [false, "0x0000000000000000000000000000000000000000000000000000000000000000"]
+      else return [false, 0]
     })();
 
     _.set(
       accounts[i],
       `e2eTesting.node.${checkType}`, 
-      _.merge(_.get(accounts[i], `e2eTesting.node.${checkType}`, {}), { passed: (stakeResult.isStaked === expectedNodeValues[0] && _.isEqual(stakeResult.nodeIp, expectedNodeValues[1]) && _.isEqual(stakeResult.nodePublicKey, expectedNodeValues[1])), gasUsed: 0 })
+      _.merge(_.get(accounts[i], `e2eTesting.node.${checkType}`, {}), { passed: (stakeResult.isStaked === expectedNodeValues[0] && _.isEqual(stakeResult.nodeIp, expectedNodeValues[1])), gasUsed: 0 })
     );
+
+    debugger;
   }
   return accounts;
 }
