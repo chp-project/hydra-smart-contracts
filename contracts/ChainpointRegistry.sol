@@ -65,9 +65,11 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @title Chainpoint Node
     /// @notice Contains the Node state on the Chainpoint network
     /// @dev nodeIp is the IPV4 address of the Node
+    /// @dev rewardsAddr is the ETH Address in which rewards will be sent to
     /// @dev amountStaked is the amount of TNT the node has staked
     struct Node {
       uint32 nodeIp;
+      address rewardsAddr;
       bool isStaked;
       uint256 amountStaked;
       uint256 stakeLockedUntil;
@@ -125,6 +127,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     event NodeStaked(
         address indexed _sender,
         uint32 _nodeIp,
+        address _rewardsAddr,
         uint256 _amountStaked,
         uint256 _duration
     );
@@ -194,13 +197,15 @@ contract ChainpointRegistry is Ownable, Pausable {
     ///
     /// @notice Allows a Node to stake into the Chainpoint Network
     /// @param _nodeIp is the IPV4 address of the Node
+    /// @param _rewardsAddr is ETH Address in which rewards will be sent to
     /// @return true if successful, otherwise false
-    function stake(uint32 _nodeIp) public whenNotPaused returns (bool) {
-        require(_addNodeToRegistry(_nodeIp), "node did not stake into the chainpoint network");
+    function stake(uint32 _nodeIp, address _rewardsAddr) public whenNotPaused returns (bool) {
+        require(_addNodeToRegistry(_nodeIp, _rewardsAddr), "node did not stake into the chainpoint network");
         
         emit NodeStaked(
             msg.sender,
             _nodeIp,
+            _rewardsAddr,
             NODE_STAKING_AMOUNT,
             NODE_STAKING_DURATION
         );
@@ -305,16 +310,18 @@ contract ChainpointRegistry is Ownable, Pausable {
         require(now >= nodes[msg.sender].stakeLockedUntil, "tokens are timelocked");
 
         Node storage n = nodes[msg.sender];
+        uint32 nodeIp = n.nodeIp;
+        uint256 amountStaked = n.amountStaked;
 
-        delete allocatedIps[nodes[msg.sender].nodeIp];
+        delete allocatedIps[nodeIp];
         delete nodes[msg.sender];
         
-        require(token.transfer(msg.sender, nodes[msg.sender].amountStaked), "transferFrom failed");
+        require(token.transfer(msg.sender, amountStaked), "transfer failed");
 
         emit NodeUnStaked(
             msg.sender,
-            n.nodeIp,
-            n.amountStaked
+            nodeIp,
+            amountStaked
         );
         
         return true;
@@ -402,11 +409,12 @@ contract ChainpointRegistry is Ownable, Pausable {
     ///
     /// @notice Adds a Node to the staking registry
     /// @param _nodeIp is the IPV4 address of the Node
+    /// @param _rewardsAddr is the ETH Address in which rewards will be sent to
     /// @return Node
     /// @dev msg.sender is expected to be the Node Operator
     /// @dev tokens will be deducted from the Node Operator and added to the balance of the ChainpointRegistry Address
     /// @dev owner has ability to pause this operation
-    function _addNodeToRegistry(uint32 _nodeIp) internal returns (bool) {
+    function _addNodeToRegistry(uint32 _nodeIp, address _rewardsAddr) internal returns (bool) {
         require(!nodes[msg.sender].isStaked, "node has already staked. invoke renewStake() method to renew");
         require(_nodeIp != 0 && allocatedIps[_nodeIp] == false, "node IP address is required");
         
@@ -415,6 +423,7 @@ contract ChainpointRegistry is Ownable, Pausable {
         Node storage n = nodes[msg.sender];
         
         n.nodeIp = _nodeIp;
+        n.rewardsAddr = _rewardsAddr;
         n.isStaked = true;
         n.amountStaked = NODE_STAKING_AMOUNT;
         n.stakeLockedUntil = stakeLockedUntil;

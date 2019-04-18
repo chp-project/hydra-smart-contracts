@@ -2,8 +2,10 @@ const path = require('path');
 const fs = require('fs');
 const ethers = require('ethers');
 const _ = require('lodash');
+const R = require('ramda')
 const chalk = require('chalk');
 const ipToInt = require('ip-to-int')
+const validator = require('validator')
 const provider = require('./utils/provider');
 
 const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`, 'utf8');
@@ -16,7 +18,10 @@ async function stakeNodes(accounts) {
     console.log(chalk.gray('-> Staking Node: ' + accounts[i].address));
     let registryContract = new ethers.Contract(REGISTRY_CONTRACT_ADDRESS, require('../../build/contracts/ChainpointRegistry.json').abi, accounts[i]);
     
-    let stakeResult = await registryContract.stake(ipToInt(`${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}`).toInt());
+    let stakeResult = await registryContract.stake(
+      ipToInt(`${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}`).toInt(),
+      accounts[i].address
+    );
     await stakeResult.wait();
 
     let txReceipt = await provider.getTransactionReceipt(stakeResult.hash);
@@ -38,16 +43,21 @@ async function checkNodeStakings(checkType, accounts) {
     
     console.log(chalk.gray('-> Checking Staked Node: ' + accounts[i].address));
     let stakeResult = await registryContract.nodes(accounts[i].address);
-    let expectedNodeValues = (function() {
-      if (checkType === 'CHECK_STAKE') return [true, ipToInt(`192.168.0.${i}`).toInt()]; // i === 192.168.0.x
-      else if (checkType === 'CHECK_STAKE_UPDATED') return [true, ipToInt(`10.0.0.${i}`).toInt()]; // i === 10.0.0.x
-      else return [false, 0]
+    let expectedNodeValues = (() => {
+      return {
+        isStaked: (checkType === 'CHECK_STAKE' || checkType === 'CHECK_STAKE_UPDATED') ? R.thunkify(R.identity)(true) : R.thunkify(R.identity)(false),
+        ip: (checkType === 'CHECK_STAKE' || checkType === 'CHECK_STAKE_UPDATED') ? R.pipe((i) => ipToInt(i).toIP(), (i) => validator.isIP(i)) : R.thunkify(R.identity)(0),
+        rewardsAddr: (checkType === 'CHECK_STAKE' || checkType === 'CHECK_STAKE_UPDATED') ? R.thunkify(R.identity)(accounts[i].address) : R.thunkify(R.identity)("0x0000000000000000000000000000000000000000000000000000000000000000")
+      }
     })();
 
     _.set(
       accounts[i],
       `e2eTesting.node.${checkType}`, 
-      _.merge(_.get(accounts[i], `e2eTesting.node.${checkType}`, {}), { passed: (stakeResult.isStaked === expectedNodeValues[0] && _.isEqual(stakeResult.nodeIp, expectedNodeValues[1])), gasUsed: 0 })
+      _.merge(
+        _.get(accounts[i], `e2eTesting.node.${checkType}`, {}),
+        { passed: (stakeResult.isStaked === expectedNodeValues.isStaked() && expectedNodeValues.ip(stakeResult.nodeIp) === true, gasUsed: 0 }
+      )
     );
 
     debugger;
@@ -62,7 +72,9 @@ async function updateStakesNodes(accounts) {
     console.log(chalk.gray('-> Updating Node Stake: ' + accounts[i].address));
     let registryContract = new ethers.Contract(REGISTRY_CONTRACT_ADDRESS, require('../../build/contracts/ChainpointRegistry.json').abi, accounts[i]);
 
-    let update = await registryContract.updateStake(ipToInt(`10.0.0.${i}`).toInt()); // i === 10.0.0.x
+    let update = await registryContract.updateStake(
+      ipToInt(`${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}`).toInt()
+    );
     await update.wait();
 
     let txReceipt = await provider.getTransactionReceipt(update.hash);
