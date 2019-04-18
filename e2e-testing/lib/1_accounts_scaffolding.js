@@ -38,6 +38,43 @@ async function creditAccounts(tntAmount, accounts) {
   return accounts;
 }
 
+async function creditAccountsEth(amount, accounts) {
+  // Pull Contract Owner Address from accounts dictionary
+  const owner = accounts[0];
+
+  let gasPrice = await provider.getGasPrice();
+  let gasLimit = 21000; // The exact cost (in gas) to send to an Externally Owned Account (EOA)
+  let value = ethers.utils.parseEther(amount)
+
+  debugger;
+
+  for (let i = 0; i < Object.keys(accounts).length; i++) {
+    if (i === 0) continue;
+
+    let nonce = provider.getTransactionCount(owner.address)
+    
+    // Owner will transfer ETH to account[i]
+    console.log(chalk.gray('-> Transfering ETH to: ' + accounts[i].address))
+    let tx = await owner.sendTransaction({
+        gasLimit: gasLimit,
+        gasPrice: gasPrice,
+        to: accounts[i].address,
+        nonce,
+        chainId: 3,
+        value: value
+    });
+    await provider.waitForTransaction(tx.hash)
+
+    _.set(
+      accounts[i], 
+      'e2eTesting.node.INITIAL_BALANCE_TRANSFER_ETH',
+      _.merge(_.get(accounts[i], 'e2eTesting.node.INITIAL_BALANCE_TRANSFER_ETH', {}), { passed: true, gasUsed: gasLimit })
+    );
+  }
+
+  return accounts;
+}
+
 async function checkBalances(tntAmount, accounts) {
   // Connect to Token Contract
   let tokenContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, require('../../build/contracts/TierionNetworkToken.json').abi, accounts[0]);
@@ -104,6 +141,7 @@ async function checkAllowances(tntAmount, accounts) {
 }
 
 module.exports.creditAccounts = creditAccounts;
+module.exports.creditAccountsEth = creditAccountsEth;
 module.exports.checkBalances = checkBalances;
 module.exports.approveAllowances = approveAllowances;
 module.exports.checkAllowances = checkAllowances;
