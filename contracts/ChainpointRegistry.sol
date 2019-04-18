@@ -340,16 +340,18 @@ contract ChainpointRegistry is Ownable, Pausable {
         require(now >= cores[msg.sender].stakeLockedUntil, "tokens are timelocked");
 
         Core storage c = cores[msg.sender];
+        uint32 coreIp = c.coreIp;
+        uint256 amountStaked = c.amountStaked;
         
-        delete allocatedIps[cores[msg.sender].coreIp];
+        delete allocatedIps[coreIp];
         delete cores[msg.sender];
         
-        require(token.transfer(msg.sender, cores[msg.sender].amountStaked), "transferFrom failed");
+        require(token.transfer(msg.sender, amountStaked), "transfer failed");
         
         emit CoreUnStaked(
             msg.sender,
-            c.coreIp,
-            c.amountStaked
+            coreIp,
+            amountStaked
         );
 
         return true;
