@@ -56,7 +56,7 @@ async function checkNodeStakings(checkType, accounts) {
       `e2eTesting.node.${checkType}`, 
       _.merge(
         _.get(accounts[i], `e2eTesting.node.${checkType}`, {}),
-        { passed: (stakeResult.isStaked === expectedNodeValues.isStaked() && expectedNodeValues.ip(stakeResult.nodeIp) === true, gasUsed: 0 }
+        { passed: (stakeResult.isStaked === expectedNodeValues.isStaked() && expectedNodeValues.ip(stakeResult.nodeIp) === true), gasUsed: 0 }
       )
     );
 
