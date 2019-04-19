@@ -2,6 +2,7 @@ pragma solidity >=0.4.22 <0.6.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
 import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 import "bytes/BytesLib.sol";
 import "./lib/ERC20.sol";
@@ -123,7 +124,7 @@ contract StandardToken is ERC20, BasicToken {
  * this contract.
  *
  */
-contract TierionNetworkToken is StandardToken, Ownable, Pausable {
+contract TierionNetworkToken is StandardToken, Ownable, Pausable, ERC20Burnable {
     using ECDSA for bytes32;
     using BytesLib for bytes;
     
@@ -136,19 +137,16 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     ///
     /// Minting Parameters
     ///
-    
     /// @title Minting Interval (in # of blocks)
     uint256 public mintingInterval = 5760; // 86,400 (seconds in 1 day) / 15 (average block time in seconds)
     /// @title Nodes Last Token Minting timestamp
-    uint256 nodeLastMintedAt;
+    uint256 nodeLastMintedAt = 0;
     /// @title Nodes Last Token Minting block height
-    uint256 public nodeLastMintedAtBlock;
+    uint256 public nodeLastMintedAtBlock = 0;
     /// @title Cores Last Token Minting timestamp
-    uint256 coreLastMintedAt;
+    uint256 coreLastMintedAt = 0;
     /// @title Cores Last Token Minting block height
-    uint256 public coreLastMintedAtBlock;
-    // Hashes of methods decorated and registered with Chainpoint Quorum
-    bytes32[] public quorumRegisteredBallots;
+    uint256 public coreLastMintedAtBlock = 0;
     
     /// @title Chainpoint Registry
     /// @notice Chainpoint Registry Contract
@@ -248,23 +246,40 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
           require(chainpointRegistry.isHealthyCore(_hash.recover(signatures[i])), "signer is not a staked core operator");
       }
 
-      // TODO: Update nodeLastMintedAtBlock = block.number;
+      // Update LastMintedAt block & time
+      nodeLastMintedAtBlock = block.number;
       nodeLastMintedAt = now;
       
       // Iterate through list of Nodes and award tokens
       for(uint8 i=0; i < _nodes.length; i++) {
-          balances[_nodes[i]] = balances[_nodes[i]].add(mintAmount);
-          
-          // Increase totalSupply
-          totalSupply = totalSupply.add(mintAmount);
+          _mint(_nodes[i], mintAmount);
       }
       
       emit Mint(_nodes, mintAmount, block.number);
       
       return true;
   }
-  
-  /* */
+
+  /**
+   * @dev Purchase Usage tokens, will burn tokens and emit a UsagePurchased & Transfer event
+   * @param _value The amount of tokens to be spent.
+   * @dev Chainpoint Nodes will be invoking this method to purchase access to the Network
+   * @return Boolean indicating result of method execution
+   */
+  function puchaseUsage(uint256 _value) public returns (bool) {
+      _burn(msg.sender, _value);
+      
+      emit UsagePurchased(msg.sender, _value);
+      
+      return true;
+  }
+
+  /**
+   * @dev Sets the contract address for the Chainpoint Registry
+   * @param _addr The contract address of the Chainpoint Registry
+   * @dev Can only be invoked by contract owner
+   * @return Boolean indicating result of method execution
+   */
   function setChainpointRegistry(address _addr) public onlyOwner returns(bool) {
       require(_addr != address(0));
       
@@ -272,22 +287,39 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
       
       return true;
   }
+
+  /**
+   * @dev Gets the balance of the specified address.
+   * @param _owner The address to query the the balance of.
+   * @dev Internal function that is called within - purchaseUsage()
+   */
+  function _burn(address _account, uint256 _value) internal {
+    require(_account != address(0));
+
+    totalSupply = totalSupply.sub(_value);
+    balances[_account] = balances[_account].sub(_value);
+    
+    emit Transfer(_account, address(0), _value);
+  }
+
+  /**
+    * @dev Internal function that mints an amount of the token and credits the account provided
+    * @param _account The account that will receive the created tokens.
+    * @param _value The amount of tokens minted
+    */
+  function _mint(address _account, uint256 _value) internal {
+    require(_account != address(0));
+
+    totalSupply = totalSupply.add(_value);
+    balances[_account] = balances[_account].add(_value);
+    emit Transfer(address(0), _account, _value);
+  }
   
   function recover(bytes32 hash, bytes memory signature) public pure returns (address) {
-      return hash.recover(signature);
+    return hash.recover(signature);
   }
 
   function toEthSignedMessageHash(bytes32 hash) public pure returns (bytes32) {
-      return hash.toEthSignedMessageHash();
+    return hash.toEthSignedMessageHash();
   }
-  
-  function puchaseUsage(uint256 _value) public returns (bool) {
-      balances[msg.sender] = balances[msg.sender].sub(_value);
-      balances[address(0)] = balances[address(0)].add(_value);
-      
-      emit UsagePurchased(msg.sender, _value);
-      
-      return true;
-  }
-  
 }
