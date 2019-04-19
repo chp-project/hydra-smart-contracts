@@ -2,7 +2,6 @@ const path = require('path');
 const fs = require('fs');
 var TierionNetworkToken = artifacts.require("TierionNetworkToken");
 var ChainpointRegistry = artifacts.require("ChainpointRegistry");
-var ChainpointQuorum = artifacts.require("ChainpointQuorum");
 
 module.exports = function(deployer, network) {
   // deployment steps

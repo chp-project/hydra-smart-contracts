@@ -13,14 +13,9 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @title TNT Token Contract
     string public name = "Chainpoint Registry";
     
-    address public registryAddress = address(this);
-    
     /// @title TNT Token Contract
     /// @notice Standard ERC20 Token
-    ERC20 public token;
-    
-    // @title Chainpoint Quorum Smart Contract address
-    address quorumContractAddress;
+    ERC20 private token;
 
     uint256 public NODE_STAKING_AMOUNT = 500000000000; // 5000 TNT specified in grains
     uint256 public NODE_STAKING_DURATION = 120; // 2mins specified in seconds TODO: fix for PROD
@@ -98,11 +93,6 @@ contract ChainpointRegistry is Ownable, Pausable {
         require(msg.sender == owner() || cores[msg.sender].isHealthy, "must be owner or an active core operator");
         _;
     }
-    
-    modifier onlyOwnerOrQuorum() {
-        require(msg.sender == owner() || msg.sender == quorumContractAddress, "must be owner or quorum contract");
-        _;
-    }
 
     /// @notice only Core Operators can call, otherwise throw
     modifier onlyCoreOperator() {
@@ -111,7 +101,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     }
     
     /// @notice Constructor sets the ERC Token contract and initial values for network fees
-    /// @param _token is the Atonomi Token contract address (must be ERC20)
+    /// @param _token is the TNT Token contract address (must be ERC20)
     constructor (address _token) public {
         require(_token != address(0), "token address cannot be 0x0");
         token = ERC20(_token);
