@@ -2,7 +2,6 @@ pragma solidity >=0.4.22 <0.6.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
 import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 import "bytes/BytesLib.sol";
 import "./lib/ERC20.sol";
@@ -124,7 +123,7 @@ contract StandardToken is ERC20, BasicToken {
  * this contract.
  *
  */
-contract TierionNetworkToken is StandardToken, Ownable, Pausable, ERC20Burnable {
+contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     using ECDSA for bytes32;
     using BytesLib for bytes;
     
@@ -290,7 +289,8 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable, ERC20Burnable 
 
   /**
    * @dev Gets the balance of the specified address.
-   * @param _owner The address to query the the balance of.
+   * @param _account The account which is burning tokens
+   * @param _value The number of tokens to burn
    * @dev Internal function that is called within - purchaseUsage()
    */
   function _burn(address _account, uint256 _value) internal {
