@@ -5,11 +5,18 @@ const ethers = require('ethers');
 const Web3 = require('web3')
 const _ = require('lodash');
 const chalk = require('chalk');
+const async = require('async')
 const provider = require('./utils/provider');
-const accounts = require('./utils/accounts')
+const accounts = require('./utils/accounts').accounts;
 
 const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`, 'utf8');
 const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`, 'utf8');
+const TierionNetworkTokenABI = require('../../build/contracts/TierionNetworkToken.json').abi
+
+const web3 = new Web3(new Web3.providers.HttpProvider(`https://ropsten.infura.io/v3/foobar`))
+const tokenContract = web3.eth.Contract(TierionNetworkTokenABI, TOKEN_CONTRACT_ADDRESS)
+
+let ETH_TRANSFER_NONCE_COUNTER = 0
 
 async function creditAccounts(tntAmount, accounts) {
   // Pull Contract Owner Address from accounts dictionary
@@ -38,6 +45,54 @@ async function creditAccounts(tntAmount, accounts) {
   return accounts;
 }
 
+async function creditAccountsAsync(tntAmount, accounts) {
+  const owner = accounts[0]
+  const txs = []
+  const gasPrice = await provider.getGasPrice();
+  const gasLimit = 185000;
+  let nonce = await provider.getTransactionCount(owner.address)
+
+  for (let i = 0; i < Object.keys(accounts).length; i++) {
+    if (i === 0) continue;
+
+    console.log(chalk.gray('-> Transfering to: ' + accounts[i].address))
+
+    const funcSigEncoded = tokenContract.methods.transfer(accounts[i].address, tntAmount).encodeABI()
+    let txData = {
+      gasLimit: gasLimit,
+      gasPrice: (gasPrice * 2) - ETH_TRANSFER_NONCE_COUNTER,
+      to: TOKEN_CONTRACT_ADDRESS,
+      data: funcSigEncoded,
+      nonce: nonce + ETH_TRANSFER_NONCE_COUNTER,
+      chainId: 3,
+    }
+    txs.push(txData)
+
+    debugger
+    
+    // Increment ETH_TRANSFER_NONCE_COUNTER to get fresh nonce
+    ETH_TRANSFER_NONCE_COUNTER++
+  }
+
+  return new Promise((resolve, reject) => {
+    async.parallel(
+      txs.map(currVal => {
+        return (cb) => {
+          owner.sendTransaction(currVal).then(res => {
+            provider.waitForTransaction(res.hash)
+              .then(() => cb(null, res))
+              .catch(err => cb(err, null))
+          })
+        }
+      }),
+      function (err, results) {
+        if(err) reject(err)
+        else resolve(results)
+      }
+    )
+  })
+}
+
 async function creditAccountsEth(amount, accounts) {
   // Pull Contract Owner Address from accounts dictionary
   const owner = accounts[0];
@@ -46,15 +101,16 @@ async function creditAccountsEth(amount, accounts) {
   let gasLimit = 21000; // The exact cost (in gas) to send to an Externally Owned Account (EOA)
   let value = ethers.utils.parseEther(amount)
 
-  debugger;
-
   for (let i = 0; i < Object.keys(accounts).length; i++) {
     if (i === 0) continue;
 
-    let nonce = provider.getTransactionCount(owner.address)
-    
+    let nonce = await provider.getTransactionCount(owner.address)
+    nonce += ETH_TRANSFER_NONCE_COUNTER
+    // Increment ETH_TRANSFER_NONCE_COUNTER to get fresh nonce
+    ETH_TRANSFER_NONCE_COUNTER++
+
     // Owner will transfer ETH to account[i]
-    console.log(chalk.gray('-> Transfering ETH to: ' + accounts[i].address))
+    console.log(chalk.gray('-> Transfering ETH to: ' + accounts[i].address), `nonce=${nonce}`)
     let tx = await owner.sendTransaction({
         gasLimit: gasLimit,
         gasPrice: gasPrice,
@@ -73,6 +129,55 @@ async function creditAccountsEth(amount, accounts) {
   }
 
   return accounts;
+}
+
+async function creditAccountsEthAsync(amount, accounts) {
+  const owner = accounts[0]
+  const txs = []
+
+  let gasPrice = await provider.getGasPrice();
+  let gasLimit = 21000; // The exact cost (in gas) to send to an Externally Owned Account (EOA)
+  let nonce = await provider.getTransactionCount(owner.address)
+  let value = ethers.utils.parseEther(amount)
+
+  for (let i = 0; i < Object.keys(accounts).length; i++) {
+    if (i === 0) continue;
+
+    console.log(chalk.gray('-> Transfering ETH to: ' + accounts[i].address))
+
+    let txData = {
+      gasLimit: gasLimit,
+      gasPrice: (gasPrice * 2) - ETH_TRANSFER_NONCE_COUNTER,
+      to: accounts[i].address,
+      nonce: nonce + ETH_TRANSFER_NONCE_COUNTER,
+      value,
+      chainId: 3
+    }
+    txs.push(txData)
+
+    debugger
+    
+    // Increment ETH_TRANSFER_NONCE_COUNTER to get fresh nonce
+    ETH_TRANSFER_NONCE_COUNTER++
+  }
+
+  return new Promise((resolve, reject) => {
+    async.parallel(
+      txs.map(currVal => {
+        return (cb) => {
+          owner.sendTransaction(currVal).then(res => {
+            provider.waitForTransaction(res.hash)
+              .then(() => cb(null, res))
+              .catch(err => cb(err, null))
+          })
+        }
+      }),
+      function (err, results) {
+        if(err) reject(err)
+        else resolve(results)
+      }
+    )
+  })
 }
 
 async function checkBalances(tntAmount, accounts) {
@@ -141,7 +246,9 @@ async function checkAllowances(tntAmount, accounts) {
 }
 
 module.exports.creditAccounts = creditAccounts;
+module.exports.creditAccountsAsync = creditAccountsAsync;
 module.exports.creditAccountsEth = creditAccountsEth;
+module.exports.creditAccountsEthAsync = creditAccountsEthAsync;
 module.exports.checkBalances = checkBalances;
 module.exports.approveAllowances = approveAllowances;
 module.exports.checkAllowances = checkAllowances;
