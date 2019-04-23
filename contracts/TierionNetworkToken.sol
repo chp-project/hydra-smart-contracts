@@ -265,7 +265,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
    * @dev Chainpoint Nodes will be invoking this method to purchase access to the Network
    * @return Boolean indicating result of method execution
    */
-  function puchaseUsage(uint256 _value) public returns (bool) {
+  function purchaseUsage(uint256 _value) public returns (bool) {
       _burn(msg.sender, _value);
       
       emit UsagePurchased(msg.sender, _value);

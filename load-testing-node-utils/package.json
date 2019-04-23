@@ -1,0 +1,42 @@
+{
+  "name": "load-testing-node-utils",
+  "version": "1.0.0",
+  "description": "Development only package",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "bin": {
+    "hydra-chp-node-utils": "./dist/main.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.6.2",
+    "chalk": "^2.4.2",
+    "ethers": "^4.0.25",
+    "executive": "^1.6.3",
+    "ip-to-int": "^0.3.1",
+    "lodash": "^4.17.11",
+    "log-symbols": "^2.2.0",
+    "lowdb": "^1.0.0",
+    "openzeppelin-solidity": "^2.1.2",
+    "ramda": "^0.26.1",
+    "truffle-hdwallet-provider": "^1.0.4",
+    "truffle-security": "git+https://git@github.com/ConsenSys/truffle-security.git",
+    "validator": "^10.11.0",
+    "web3": "^1.0.0-beta.46"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.3",
+    "@babel/plugin-transform-async-to-generator": "^7.4.0",
+    "@babel/polyfill": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
+    "babel-loader": "^8.0.5",
+    "babel-plugin-shebang": "^1.0.0",
+    "shebang-loader": "0.0.1",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1"
+  }
+}
