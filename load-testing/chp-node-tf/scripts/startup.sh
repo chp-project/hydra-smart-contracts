@@ -9,15 +9,15 @@ else
     sudo usermod -aG docker $USER
 fi
 
-sudo apt-get -qq install -y docker-compose git make jq nodejs openssl
+sudo apt-get -qq install -y docker-compose git make jq nodejs npm openssl build-essential g++
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 if ! [ -x "$(command -v yarn)" ]; then
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
     sudo apt-get update -y && sudo apt-get install -y --no-install-recommends yarn
 fi
 
-git checkout https://github.com/chainpoint/chainpoint-node-src.git
-git checkout v2
+git clone https://github.com/chainpoint/chainpoint-node-src.git && cd ./chainpoint-node-src
+git checkout -b v2 origin/v2
 
 curl "http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip" -H "Metadata-Flavor: Google" > /eip.txt
 
