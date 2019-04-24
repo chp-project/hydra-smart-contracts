@@ -6,11 +6,12 @@ const path = require('path')
 const ethers = require('ethers');
 const R = require('ramda');
 const _ = require('lodash');
+const chalk = require('chalk')
 
 const TierionNetworkTokenABI = require('../build/contracts/TierionNetworkToken.json').abi
 const infuraProvider = new ethers.providers.InfuraProvider('ropsten', process.env.ETH_INFURA_API_KEY)
-const ethAddress = fs.readFileSync('/eth-address.txt', 'utf8')
-const publicIP = fs.readFileSync('/eip.txt', 'utf8')
+const ethAddress = fs.readFileSync('./eth-address.txt', 'utf8').replace(/(\r\n|\n|\r)/gm, "")
+const publicIP = fs.readFileSync('./eip.txt', 'utf8').replace(/(\r\n|\n|\r)/gm, "")
 
 // TNT Amounts
 const NODE_TNT_STAKE_AMOUNT = 500000000000;
@@ -19,7 +20,7 @@ const wait = (ms) => new Promise(resolve => { setTimeout(() => resolve(), ms) })
 
 async function main() {
   let owner = ethers.Wallet.createRandom({ extraEntropy: ethers.utils.formatBytes32String(`${Date.now()}`) });
-  owner.connect(provider);
+  owner = owner.connect(infuraProvider);
   // Connect to Token Contract
   let tokenContract = new ethers.Contract(process.env.ROPSTEN_TOKEN_CONTRACT_ADDRESS, TierionNetworkTokenABI, owner);
   
@@ -27,9 +28,10 @@ async function main() {
   while (!positiveTokenBalance) {
     let balance = await tokenContract.balanceOf(ethAddress);
 
+    console.log(chalk.gray('Node Balance: ', balance))
     if (balance == NODE_TNT_STAKE_AMOUNT) positiveTokenBalance = true;
 
-    await wait(60000)
+    await wait(20000)
   }
 
   let result = await exec([

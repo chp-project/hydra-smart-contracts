@@ -1,11 +1,12 @@
 {
   "name": "load-testing-node-utils",
-  "version": "1.0.0",
+  "version": "1.0.10",
   "description": "Development only package",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
+    "build": "webpack",
+    "pub": "npm run build && npm version patch && npm publish && exit 0"
   },
   "bin": {
     "hydra-chp-node-utils": "./dist/main.js"

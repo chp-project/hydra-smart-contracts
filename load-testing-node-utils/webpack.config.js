@@ -5,6 +5,7 @@ const webpack = require('webpack')
 module.exports = {
   entry: ['@babel/polyfill', './index.js'],
   target: 'node',
+  devtool: "eval-source-map",
   output: {
     filename: 'main.js',
     path: path.resolve(__dirname, 'dist')

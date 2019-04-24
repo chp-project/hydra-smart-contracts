@@ -73,26 +73,12 @@ pipelines:
                     - deploy:ropsten
                - script: | # Push Ropsten deployment artifacts to "go-hydra-smart-contract-files" repo
                   git clone https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git tmp-git
-                  cp ./e2e-testing/artifacts/ropsten_token.txt tmp-git/
-                  cp ./e2e-testing/artifacts/ropsten_registry.txt tmp-git/
-                  cp ./e2e-testing/artifacts/ropsten_token.txt tmp-git/token.txt
-                  cp ./e2e-testing/artifacts/ropsten_registry.txt tmp-git/registry.txt
-                  echo 1 > tmp-git/chainId.txt
+                  cp ./build/contracts/TierionNetworkToken.json tmp-git/
+                  cp ./build/contracts/ChainpointRegistry.json tmp-git/
                   cd ./tmp-git
                   git add .
                   git commit -m "Pushing Ropsten Deployment Artififacts From GOCD (Hydra Smart Contracts) - Revision - $(echo $GO_PIPELINE_LABEL)"
                   git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --force -u master
-               - script: | # Push Ropsten deployment artifacts to "preprod" branch -> "go-hydra-smart-contract-files" repo
-                  pwd
-                  ls
-                  cp ./e2e-testing/artifacts/ropsten_token.txt tmp-git/token.txt
-                  cp ./e2e-testing/artifacts/ropsten_registry.txt tmp-git/registry.txt
-                  cd ./tmp-git
-                  git checkout -b preprod origin/preprod
-                  echo 3 > chainId.txt
-                  git add .
-                  git commit -m "Pushing Ropsten Deployment Artififacts From GOCD (Hydra Smart Contracts) - Revision - $(echo $GO_PIPELINE_LABEL)"
-                  git push https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git --force
       - e2etest-nodes-ropsten: # Stage: (e2etest-nodes-ropsten) Run E2E Test-suite for Nodes on Ropsten testnet
           clean_workspace: true
           environment_variables:
@@ -177,8 +163,6 @@ pipelines:
                   git clone https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git tmp-git
                   cp ./build/contracts/TierionNetworkToken.go tmp-git/
                   cp ./build/contracts/ChainpointRegistry.go tmp-git/
-                  cp ./build/contracts/TierionNetworkToken.json tmp-git/
-                  cp ./build/contracts/ChainpointRegistry.json tmp-git/
                   cd ./tmp-git
                   git add .
                   git commit -m "Pushing From GOCD (Hydra Smart Contracts) - Revision - $(echo $GO_PIPELINE_LABEL)"
