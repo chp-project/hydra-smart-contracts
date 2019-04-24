@@ -26,7 +26,7 @@ sudo chmod 775 chainpoint-node-src
 cd ./chainpoint-node-src
 git checkout -b v2 origin/v2
 
-sudo git clone --single-branch --branch preprod https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git artifacts/ethcontracts
+sudo git clone https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git artifacts/ethcontracts
 
 curl "http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip" -H "Metadata-Flavor: Google" > eip.txt
 

@@ -1,6 +1,12 @@
 const fs = require('fs')
 const path = require('path');
+const _ = require('lodash')
 const webpack = require('webpack')
+
+const TierionNetworkToken = require(path.resolve('../build/contracts/TierionNetworkToken.json'))
+const ChainpointRegistry = require(path.resolve('../build/contracts/ChainpointRegistry.json'))
+
+const chainId = process.env.ETH_ENVIRONMENT === 'ROPSTEN' ? 3 : 3
 
 module.exports = {
   entry: ['@babel/polyfill', './index.js'],
@@ -28,8 +34,8 @@ module.exports = {
     new webpack.BannerPlugin({banner: '#!/usr/bin/env node', raw: true}),
     new webpack.EnvironmentPlugin({
       ETH_ENVIRONMENT: 'ROPSTEN', // use 'development' unless process.env.NODE_ENV is defined
-      ROPSTEN_TOKEN_CONTRACT_ADDRESS: fs.readFileSync(path.resolve('../artifacts/ethcontracts/token.txt'), 'utf8'),
-      ROPSTEN_REGISTRY_CONTRACT_ADDRESS: fs.readFileSync(path.resolve('../artifacts/ethcontracts/registry.txt'), 'utf8')
+      ROPSTEN_TOKEN_CONTRACT_ADDRESS: _.get(TierionNetworkToken, `networks.${chainId}.address`),
+      ROPSTEN_REGISTRY_CONTRACT_ADDRESS: _.get(ChainpointRegistry, `networks.${chainId}.address`)
     })
   ]
 };
