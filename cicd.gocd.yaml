@@ -128,23 +128,17 @@ pipelines:
           jobs:
             compile-token-contract: # Job: compile-token-contract
               tasks: # ordered list of tasks to execute in job "compile-token-contract"
-               - fetch:
-                   pipeline: smart-contracts
-                   stage: deploy-ropsten
-                   job: truffle
-                   source: dist/
-                   destination: .
                - exec: # Install NPM packages
                    command: npm
                    arguments:
                     - install
                     - --silent
                     - --quiet
-              #  - exec: # Truffle Compile
-              #      command: npm
-              #      arguments:
-              #       - run
-              #       - compile
+               - exec: # Truffle Compile
+                   command: npm
+                   arguments:
+                    - run
+                    - compile
                - exec: 
                    command: node 
                    arguments:
@@ -153,14 +147,14 @@ pipelines:
                     - TierionNetworkToken
                - script: | # Generate ABI for Token Contract & Go contract file
                   node ./scripts/extractABI.js --file TierionNetworkToken
-                  abigen --abi=./dist/contracts/TierionNetworkToken.abi --pkg=ethcontracts --type=TNT --out=./build/contracts/TierionNetworkToken.go
+                  abigen --abi=./build/contracts/TierionNetworkToken.abi --pkg=ethcontracts --type=TNT --out=./build/contracts/TierionNetworkToken.go
                - exec: 
                    command: cat 
                    arguments:
                     - ./build/contracts/TierionNetworkToken.go
                - script: | # Generate ABI for Chainpoint Registry Contract & Go contract file
                   node ./scripts/extractABI.js --file ChainpointRegistry
-                  abigen --abi=./dist/contracts/ChainpointRegistry.abi --pkg=ethcontracts --type=ChpRegistry --out=./build/contracts/ChainpointRegistry.go
+                  abigen --abi=./build/contracts/ChainpointRegistry.abi --pkg=ethcontracts --type=ChpRegistry --out=./build/contracts/ChainpointRegistry.go
                - exec: 
                    command: cat 
                    arguments:
