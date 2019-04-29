@@ -3,10 +3,12 @@ const path = require('path');
 const _ = require('lodash')
 const webpack = require('webpack')
 
-const TierionNetworkToken = require(path.resolve('../build/contracts/TierionNetworkToken.json'))
-const ChainpointRegistry = require(path.resolve('../build/contracts/ChainpointRegistry.json'))
+const TierionNetworkToken = require(path.resolve('../artifacts/ethcontracts/TierionNetworkToken.json'))
+const ChainpointRegistry = require(path.resolve('../artifacts/ethcontracts/ChainpointRegistry.json'))
 
 const chainId = process.env.ETH_ENVIRONMENT === 'ROPSTEN' ? 3 : 3
+
+console.log(_.get(TierionNetworkToken, `networks.${chainId}.address`), 'A')
 
 module.exports = {
   entry: ['@babel/polyfill', './index.js'],

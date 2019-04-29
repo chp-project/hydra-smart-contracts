@@ -9,9 +9,6 @@ resource "google_compute_instance" "chp-node" {
   machine_type = "n1-standard-1"
   zone         = "us-central1-a"
   count = "${var.node_count}"
-
-  tags = ["chainpoint", "hydra"]
-
   boot_disk {
     initialize_params {
       image = "ubuntu-os-cloud/ubuntu-1804-lts"
@@ -35,6 +32,24 @@ resource "google_compute_instance" "chp-node" {
   }
 
   metadata_startup_script = "${data.template_file.init.rendered}"
+  
+  tags = ["http", "web-sg"]
+}
+
+resource "google_compute_firewall" "web-sg" {
+  name    = "web-sg"
+  network = "default"
+
+  allow {
+    protocol = "icmp"
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["80", "443", "8080"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
 }
 
 data "template_file" "init" {

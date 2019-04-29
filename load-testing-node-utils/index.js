@@ -33,12 +33,6 @@ async function main() {
 
     await wait(20000)
   }
-
-  let result = await exec([
-    `make register NODE_ETH_REWARDS_ADDRESS=${ethAddress} NODE_PUBLIC_IP_ADDRESS=${publicIP} AUTO_REFILL_ENABLED=true AUTO_REFILL_AMOUNT=720`
-  ])
-
-  return result
 }
 
 main()

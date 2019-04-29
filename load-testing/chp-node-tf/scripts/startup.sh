@@ -38,8 +38,19 @@ make build-rocksdb
 
 make deploy
 
+curl -X POST \
+  https://us-central1-tierion-iglesias.cloudfunctions.net/eth-address-init-stream-processor \
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: 127b5e92-b8fd-4fd0-b6f9-3a58f9d0c0d9' \
+  -H 'cache-control: no-cache' \
+  -d "{
+	\"ethAddress\": \"$(<eth-address.txt)\"
+}"
+
 # Start Hydra Utils to poll for a positive $TKN balance before it invokes `make register` on behalf of the Node
 npm install -g load-testing-node-utils
-export ETH_INFURA_API_KEY="ad8f210998704f9e89a37a4791d4702e" && hydra-chp-node-utils&
+export ETH_INFURA_API_KEY="ad8f210998704f9e89a37a4791d4702e" && hydra-chp-node-utils
 
-# make register NODE_ETH_REWARDS_ADDRESS=$(</eth-address.txt) NODE_PUBLIC_IP_ADDRESS=$(</eip.txt) AUTO_REFILL_ENABLED=true AUTO_REFILL_AMOUNT=720
+# make register NODE_ETH_REWARDS_ADDRESS=$(<eth-address.txt) NODE_PUBLIC_IP_ADDRESS=$(<eip.txt) AUTO_REFILL_ENABLED=true AUTO_REFILL_AMOUNT=720
+
+export COMPOSE_INTERACTIVE_NO_CLI=1 && docker exec `docker ps -q` bash -c "source cli/scripts/env_secrets_expand.sh && node cli/register.js NODE_ETH_REWARDS_ADDRESS=$(<eth-address.txt) NODE_PUBLIC_IP_ADDRESS=$(<eip.txt) AUTO_REFILL_ENABLED=true AUTO_REFILL_AMOUNT=720"
