@@ -1,0 +1,9 @@
+[Unit]
+Description=CHP Shutdown Node Service
+
+[Service]
+Type=simple
+ExecStop=/etc/init.d/shutdown.sh
+
+[Install]
+WantedBy=multi-user.target

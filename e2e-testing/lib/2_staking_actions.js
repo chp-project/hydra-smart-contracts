@@ -42,7 +42,7 @@ async function checkNodeStakings(checkType, accounts) {
     if (i === 0) continue;
     
     console.log(chalk.gray('-> Checking Staked Node: ' + accounts[i].address));
-    let stakeResult = await registryContract.nodes(accounts[i].address);
+  let stakeResult = await registryContract.nodes(accounts[i].address);
     let expectedNodeValues = (() => {
       return {
         isStaked: (checkType === 'CHECK_STAKE' || checkType === 'CHECK_STAKE_UPDATED') ? R.thunkify(R.identity)(true) : R.thunkify(R.identity)(false),

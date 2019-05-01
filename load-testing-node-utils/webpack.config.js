@@ -8,8 +8,6 @@ const ChainpointRegistry = require(path.resolve('../artifacts/ethcontracts/Chain
 
 const chainId = process.env.ETH_ENVIRONMENT === 'ROPSTEN' ? 3 : 3
 
-console.log(_.get(TierionNetworkToken, `networks.${chainId}.address`), 'A')
-
 module.exports = {
   entry: ['@babel/polyfill', './index.js'],
   target: 'node',

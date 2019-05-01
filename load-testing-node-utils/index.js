@@ -29,7 +29,7 @@ async function main() {
     let balance = await tokenContract.balanceOf(ethAddress);
 
     console.log(chalk.gray('Node Balance: ', balance))
-    if (balance == NODE_TNT_STAKE_AMOUNT) positiveTokenBalance = true;
+    if (balance >= NODE_TNT_STAKE_AMOUNT) positiveTokenBalance = true;
 
     await wait(20000)
   }
