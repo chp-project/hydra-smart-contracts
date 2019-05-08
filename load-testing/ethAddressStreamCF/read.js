@@ -9,7 +9,7 @@ const defaultAccounts = require('../../e2e-testing/lib/utils/accounts').accounts
 const { creditAccounts, creditAccountsEth, creditAccountsAsync, creditAccountsEthAsync, checkBalances } = require('../../e2e-testing/lib/1_accounts_scaffolding');
 
 // TNT Amounts
-const NODE_TNT_STAKE_AMOUNT = 500000000000;
+const NODE_TNT_STAKE_AMOUNT = 600000000000;
 const NODE_ETH_AMOUNT = '0.02';
 
 // Transfer TNT Tokens to Accounts

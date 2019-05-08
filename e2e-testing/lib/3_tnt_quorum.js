@@ -13,40 +13,8 @@ const abiCoder = ethers.utils.defaultAbiCoder;
 const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`, 'utf8');
 const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`, 'utf8');
 
-const REWARDS_LIST_KEY = [
-  "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address",
-  "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address",
-  "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address",
-  "address", "address", "address", "address", "address", "address", "address", "address", "address",
-  "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address", "address"
-];
-
-const REWARDS_LIST = [
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB",
-  "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB", "0xb10a489Cd65790280aA8342De840047E9C98FfcB"
-];
+const REWARDS_LIST_KEY = (new Array(1)).fill("address")
+const REWARDS_LIST = (new Array(1)).fill("2ff39aa5ee4f19168894af67f3eff25266376b23")
 
 async function setChpRegistry(accounts) {
   const owner = accounts[0];
@@ -77,31 +45,37 @@ async function mint(accounts) {
 
   let sigs = [];
   let messageHash;
-  for (let i = 0; i < 6; i++) {
+  for (let i = 2; i < Object.keys(accounts).length; i++) { // Starting at i=2 because accounts[0] is contract owner & accounts[1] is elected leader
     const element = accounts[i];
     
     let web3Owner = web3.eth.accounts.privateKeyToAccount(accounts[i].privateKey);
     let signature = await web3Owner.sign(rewardsListHash);
+
     if (!messageHash) { messageHash = signature.messageHash }
 
     sigs.push(signature.signature);
   }
 
-  let mintResult = await tokenContract.mint(
-    REWARDS_LIST,
-    messageHash,
-    ...sigs
-  );
-  await mintResult.wait();
+  try {
+    let mintResult = await tokenContract.mint(
+      REWARDS_LIST,
+      messageHash,
+      ...sigs
+    );
 
-  let txReceipt = await provider.getTransactionReceipt(mintResult.hash);
-
-  _.set(
-    leader, 
-    'e2eTesting.mint.token.MINT_INVOKED', 
-    _.merge(_.get(leader, 'e2eTesting.mint.token.MINT_INVOKED', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
-  );
-
+    await mintResult.wait();
+  
+    let txReceipt = await provider.getTransactionReceipt(mintResult.hash);
+  
+    _.set(
+      owner, 
+      'e2eTesting.mint.token.MINT_INVOKED', 
+      _.merge(_.get(owner, 'e2eTesting.mint.token.MINT_INVOKED', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+    );
+  } catch (error) {
+    console.error(error)
+  }
+  
   return accounts;
 }
 
@@ -131,8 +105,8 @@ async function mintThrow(accounts) {
   } catch (__) {
     _.set(
       leader, 
-      'e2eTesting.mint.token.MINT_THROW_INVOKED', 
-      _.merge(_.get(leader, 'e2eTesting.mint.token.MINT_THROW_INVOKED', {}), { passed: true, gasUsed: 0 })
+      'e2eTesting.mint.token.MINT_SAME_SIG_THROW', 
+      _.merge(_.get(leader, 'e2eTesting.mint.token.MINT_SAME_SIG_THROW', {}), { passed: true, gasUsed: 0 })
     );
   }
 

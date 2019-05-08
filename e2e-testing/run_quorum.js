@@ -7,7 +7,8 @@ const cliHelloLogger = require('./lib/utils/cliHelloLogger');
 const resultsLogger = require('./lib/utils/resultsLogger');
 const titleLogger = require('./lib/utils/titleLogger');
 const provider = require('./lib/utils/provider');
-const accounts = require('./lib/utils/accounts').accounts;
+const defaultAccounts = require('./lib/utils/accounts').accounts;
+const {accountsFromPrivKey} = require('./lib/utils/accounts');
 const { creditAccounts, approveAllowances} = require('./lib/1_accounts_scaffolding');
 const { stakeCores, unStakeCores } = require('./lib/2a_core_staking_actions');
 const { setChpRegistry, mint, mintThrow } = require('./lib/3_tnt_quorum');
@@ -17,16 +18,28 @@ const CORE_TNT_STAKE_AMOUNT = 2500000000000;
 const creditAccountsCores = R.curry(creditAccounts)(CORE_TNT_STAKE_AMOUNT);
 const approveAllowancesCores = R.curry(approveAllowances)(CORE_TNT_STAKE_AMOUNT);
 
-(async function () {
+// These PrivKeys are those being used by testnet Cores
+const privKeysArr = [
+  "0xd74408108dea58b9a7c5157ca13f9168644fbbffda08a4ce0346640cafcfafb3",
+  "0xdddab7b4ec19893c86cddaa4eef5915907778e1a41764f9e90e5ef9a7603b30b",
+  "0xf7e39d12945311c58091f59c41a0842a1b874941a7c6a9b403379384115a33dd",
+  "0x4a9c3c814b485a6b9925b6ed4f72acafd036d2a84af568b2f35f123ec64ccdc2",
+  "0x0a0ecaef321662b73acd0a59123ff595dc95e838a4ccb1a2c335e2b7da1db6e1",
+  "0x1efb256136d6e50a46e53c14445cf8a59e970d754343731a71832a8803e92a16",
+  "0x284dedd0857f79114cd5c1a276b56783b8ef905be9f4eceb981fa26f49014a28",
+]
+const accounts = (privKeysArr.length) ? accountsFromPrivKey(privKeysArr) : defaultAccounts
+
+async function main() {
   // Chainpoint Hydra Smart Contract Testing Suite
   cliHelloLogger();
 
   let actions = R.pipeP(
-    tap(() => titleLogger('Set Chainpoint Registry contract addresses and bootstrap'), setChpRegistry),
-    tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
-    tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
-    tap(() => titleLogger('Cores Staking'), stakeCores),
-    tap(() => titleLogger('Invoke mint() THROW'), mintThrow),
+    // tap(() => titleLogger('Set Chainpoint Registry contract addresses and bootstrap'), setChpRegistry),
+    // tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
+    // tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
+    // tap(() => titleLogger('Cores Staking'), stakeCores),
+    tap(() => titleLogger('Invoke mint() MINT_SAME_SIG_THROW'), mintThrow),
     tap(() => titleLogger('Invoke mint()'), mint)
   )
   await actions(accounts);
@@ -34,8 +47,22 @@ const approveAllowancesCores = R.curry(approveAllowances)(CORE_TNT_STAKE_AMOUNT)
   for (let i = 0; i < Object.keys({0: accounts[0], 1: accounts[1]}).length; i++) {
     console.log('\n' + accounts[i].address + ':');
     resultsLogger(accounts[i], 'SET_CHP_REGISTRY_CONTRACT', 'mint.token');
-    resultsLogger(accounts[i], 'MINT_THROW_INVOKED', 'mint.token');
+    resultsLogger(accounts[i], 'MINT_SAME_SIG_THROW', 'mint.token');
     resultsLogger(accounts[i], 'MINT_INVOKED', 'mint.token');
   }
   
-})();
+}
+
+main()
+  .then(res => {
+    console.log('====================================');
+    console.log(res, 'res');
+    console.log('====================================');
+    process.exit(0)
+  })
+  .catch(err => {
+    console.log('====================================');
+    console.log(err, 'err');
+    console.log('====================================');
+    process.exit(1)
+  })

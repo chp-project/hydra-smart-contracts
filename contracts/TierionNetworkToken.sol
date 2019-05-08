@@ -139,7 +139,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     /// @title Minting Interval (in # of blocks)
     uint256 public mintingInterval = 5760; // 86,400 (seconds in 1 day) / 15 (average block time in seconds)
     /// @title Nodes Last Token Minting timestamp
-    uint256 nodeLastMintedAt = 0;
+    uint256 public nodeLastMintedAt = 0;
     /// @title Nodes Last Token Minting block height
     uint256 public nodeLastMintedAtBlock = 0;
     /// @title Cores Last Token Minting timestamp
@@ -149,7 +149,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     
     /// @title Chainpoint Registry
     /// @notice Chainpoint Registry Contract
-    ChainpointRegistry chainpointRegistry;
+    ChainpointRegistry public chainpointRegistry;
   
     ///
     /// MODIFIERS
