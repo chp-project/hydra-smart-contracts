@@ -6,7 +6,6 @@ import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "./lib/ERC20.sol";
 import "./lib/SafeMath.sol";
 
-
 contract ChainpointRegistry is Ownable, Pausable {
     using SafeMath for uint256;
     
@@ -44,16 +43,6 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev Value is a boolean (defaults to false) which informs whether or not the IP address is being used
     mapping (uint32 => bool) public allocatedIps;
     
-    /// @title Registered Chainpoint Cores Array
-    /// @notice Convenient iterable data structure containing a list of Core Operators
-    /// @dev Value Address of the registered Core
-    address[] public coresArr;
-    
-    /// @title White-listed Chainpoint Cores Array
-    /// @notice List of white-listed Cores that are able to stake, but have not done so
-    /// @dev Value Address of the white-listed Core
-    address[] public whitelistedCoresArr;
-    
     ///
     /// TYPES 
     ///
@@ -90,13 +79,13 @@ contract ChainpointRegistry is Ownable, Pausable {
     ///
     /// @notice only Staked Core Operators or Owner can call, otherwise throw
     modifier onlyOwnerOrCoreOperator() {
-        require(msg.sender == owner() || cores[msg.sender].isHealthy, "must be owner or an active core operator");
+        require(msg.sender == owner() || cores[msg.sender].isStaked, "must be owner or an active core operator");
         _;
     }
 
     /// @notice only Core Operators can call, otherwise throw
     modifier onlyCoreOperator() {
-        require(cores[msg.sender].isHealthy, "must be core operator");
+        require(cores[msg.sender].isStaked, "must be core operator");
         _;
     }
     
@@ -348,29 +337,6 @@ contract ChainpointRegistry is Ownable, Pausable {
     }
     
     ///
-    /// Get tokens staked
-    ///
-    /// @param addr Address of Node Operator
-    /// @notice Returns the amount of tokens that a Node Operator has staked and the timestamp as to when the tokens are locked
-    /// @return true if successful, otherwise false
-    /// @dev msg.sender is expected to be the Node Operator
-    /// @dev owner has ability to pause this operation
-    function totalStakedFor(address addr) public view returns (uint256 amount, uint256 unlocks_at) {
-        require(nodes[addr].isStaked, "node has not staked into the Chainpoint network");
-        
-        return (nodes[addr].amountStaked, nodes[addr].stakeLockedUntil);
-    }
-    
-    ///
-    /// Get Count of staked Core Operators
-    ///
-    /// @notice Returns length of coresArr
-    /// @return uint256 of the length of coresArr
-    function getCoreCount() public view returns (uint256) {
-        return coresArr.length;
-    }
-    
-    ///
     /// Is Core healthy?
     ///
     /// @notice Returns whether or not a Core is healthy
@@ -379,21 +345,6 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev owner has ability to pause this operation
     function isHealthyCore(address _address) public view returns (bool) {
         return cores[_address].isHealthy;
-    }
-    
-    ///
-    /// Get White-listed Core Operators
-    ///
-    /// @notice Will return true if _address is pushed to whitelistedCoresArr, else if the _address is already included in the list return false
-    /// @return bool if successful, otherwise false
-    /// @dev msg.sender is expected to be the Node Operator
-    /// @dev owner has ability to pause this operation
-    function whitelistCore(address _address) public onlyOwnerOrCoreOperator returns (bool) {
-        require(_address != address(0));
-        
-        whitelistedCoresArr.push(_address);
-        
-        return true;
     }
     
     ///
