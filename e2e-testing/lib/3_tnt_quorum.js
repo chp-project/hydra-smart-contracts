@@ -14,7 +14,7 @@ const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN
 const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`, 'utf8');
 
 const REWARDS_LIST_KEY = (new Array(1)).fill("address")
-const REWARDS_LIST = (new Array(1)).fill("2ff39aa5ee4f19168894af67f3eff25266376b23")
+const REWARDS_LIST = (new Array(1)).fill("0x2ff39aa5ee4f19168894af67f3eff25266376b23")
 
 async function setChpRegistry(accounts) {
   const owner = accounts[0];
@@ -179,10 +179,6 @@ async function mintThrowWrongSig(accounts) {
 
     sigs.push(signature.signature);
   }
-
-  console.log('====================================');
-  console.log(sigs.length);
-  console.log('====================================');
 
   try {
     // Should throw as first signature signed the wrong rewardsListHash
