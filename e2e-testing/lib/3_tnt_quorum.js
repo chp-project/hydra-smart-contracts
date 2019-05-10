@@ -46,8 +46,7 @@ async function mint(accounts) {
   let sigs = [];
   let messageHash;
   for (let i = 2; i < Object.keys(accounts).length; i++) { // Starting at i=2 because accounts[0] is contract owner & accounts[1] is elected leader
-    const element = accounts[i];
-    
+  
     let web3Owner = web3.eth.accounts.privateKeyToAccount(accounts[i].privateKey);
     let signature = await web3Owner.sign(rewardsListHash);
 
@@ -79,7 +78,7 @@ async function mint(accounts) {
   return accounts;
 }
 
-async function mintThrow(accounts) {
+async function mintThrowSameSig(accounts) {
   const owner = accounts[0];
   const leader = accounts[1];
 
@@ -105,8 +104,98 @@ async function mintThrow(accounts) {
   } catch (__) {
     _.set(
       leader, 
-      'e2eTesting.mint.token.MINT_SAME_SIG_THROW', 
-      _.merge(_.get(leader, 'e2eTesting.mint.token.MINT_SAME_SIG_THROW', {}), { passed: true, gasUsed: 0 })
+      'e2eTesting.mint.token.MINT_THROW_SAME_SIG', 
+      _.merge(_.get(leader, 'e2eTesting.mint.token.MINT_THROW_SAME_SIG', {}), { passed: true, gasUsed: 0 })
+    );
+  }
+
+  return accounts;
+}
+
+async function mintThrowMissingSig(accounts) {
+  const owner = accounts[0];
+  const leader = accounts[1];
+
+  let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, leader);
+
+  let rewardsListHash = ethers.utils.keccak256(abiCoder.encode(REWARDS_LIST_KEY, REWARDS_LIST));
+  let web3Owner = web3.eth.accounts.privateKeyToAccount(leader.privateKey);
+  
+  let signature = await web3Owner.sign(rewardsListHash);
+
+  try {
+    // Missing Signatures 5 & 6 - Should throw
+    let mintResult = await tokenContract.mint(
+      REWARDS_LIST,
+      signature.messageHash,
+      signature.signature,
+      signature.signature,
+      signature.signature,
+      signature.signature
+    );
+    await mintResult.wait();
+  } catch (__) {
+    _.set(
+      leader, 
+      'e2eTesting.mint.token.MINT_MISSING_SIG', 
+      _.merge(_.get(leader, 'e2eTesting.mint.token.MINT_MISSING_SIG', {}), { passed: true, gasUsed: 0 })
+    );
+  }
+
+  return accounts;
+}
+
+async function mintThrowWrongSig(accounts) {
+  const owner = accounts[0];
+  const leader = accounts[1];
+
+  let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, leader);
+  let rewardsListHash = ethers.utils.keccak256(abiCoder.encode(REWARDS_LIST_KEY, REWARDS_LIST));
+  
+  let sigs = [];
+  let messageHash;
+  
+  // Let's push a wrong signature (signing different rewardsListHash) to sigs[]
+  let web3Owner = web3.eth.accounts.privateKeyToAccount(accounts[2].privateKey);
+  let signature = await web3Owner.sign(
+    ethers.utils.keccak256(abiCoder.encode(
+      REWARDS_LIST_KEY.concat(["address"]), 
+      REWARDS_LIST.concat(["2ff39aa5ee4f19168894af67f3eff25266376b23"])
+    ))
+  );
+
+  let wrongSig = await web3Owner.sign(rewardsListHash);
+  sigs.push(wrongSig.signature);
+
+  // Pushing Correct Signatures to sigs[]
+  // Starting at i=2 because accounts[0] is contract owner & accounts[1] is elected leader
+  // & accounts[2] is "wrong signature"
+  for (let i = 3; i < Object.keys(accounts).length; i++) { 
+  
+    let web3Owner = web3.eth.accounts.privateKeyToAccount(accounts[i].privateKey);
+    let signature = await web3Owner.sign(rewardsListHash);
+
+    if (!messageHash) { messageHash = signature.messageHash }
+
+    sigs.push(signature.signature);
+  }
+
+  console.log('====================================');
+  console.log(sigs.length);
+  console.log('====================================');
+
+  try {
+    // Should throw as first signature signed the wrong rewardsListHash
+    let mintResult = await tokenContract.mint(
+      REWARDS_LIST,
+      ...sigs
+    );
+    await mintResult.wait();
+  } catch (__) {
+    _.set(
+      leader, 
+      'e2eTesting.mint.token.MINT_THROW_WRONG_SIG', 
+      _.merge(_.get(leader, 'e2eTesting.mint.token.MINT_THROW_WRONG_SIG', {}), { passed: true, gasUsed: 0 })
     );
   }
 
@@ -115,4 +204,6 @@ async function mintThrow(accounts) {
 
 module.exports.setChpRegistry = setChpRegistry;
 module.exports.mint = mint;
-module.exports.mintThrow = mintThrow;
+module.exports.mintThrowSameSig = mintThrowSameSig;
+module.exports.mintThrowMissingSig = mintThrowMissingSig;
+module.exports.mintThrowWrongSig = mintThrowWrongSig;

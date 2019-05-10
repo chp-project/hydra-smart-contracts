@@ -11,7 +11,7 @@ const defaultAccounts = require('./lib/utils/accounts').accounts;
 const {accountsFromPrivKey} = require('./lib/utils/accounts');
 const { creditAccounts, approveAllowances} = require('./lib/1_accounts_scaffolding');
 const { stakeCores, unStakeCores } = require('./lib/2a_core_staking_actions');
-const { setChpRegistry, mint, mintThrow } = require('./lib/3_tnt_quorum');
+const { setChpRegistry, mint, mintThrowSameSig, mintThrowMissingSig, mintThrowWrongSig } = require('./lib/3_tnt_quorum');
 
 const CORE_TNT_STAKE_AMOUNT = 2500000000000;
 
@@ -35,11 +35,13 @@ async function main() {
   cliHelloLogger();
 
   let actions = R.pipeP(
-    // tap(() => titleLogger('Set Chainpoint Registry contract addresses and bootstrap'), setChpRegistry),
+    tap(() => titleLogger('Set Chainpoint Registry contract addresses and bootstrap'), setChpRegistry),
     // tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
     // tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
     // tap(() => titleLogger('Cores Staking'), stakeCores),
-    tap(() => titleLogger('Invoke mint() MINT_SAME_SIG_THROW'), mintThrow),
+    tap(() => titleLogger('Invoke mint() MINT_THROW_SAME_SIG'), mintThrowSameSig),
+    tap(() => titleLogger('Invoke mint() MINT_MISSING_SIG'), mintThrowMissingSig),
+    tap(() => titleLogger('Invoke mint() MINT_THROW_WRONG_SIG'), mintThrowWrongSig),
     tap(() => titleLogger('Invoke mint()'), mint)
   )
   await actions(accounts);
@@ -47,7 +49,9 @@ async function main() {
   for (let i = 0; i < Object.keys({0: accounts[0], 1: accounts[1]}).length; i++) {
     console.log('\n' + accounts[i].address + ':');
     resultsLogger(accounts[i], 'SET_CHP_REGISTRY_CONTRACT', 'mint.token');
-    resultsLogger(accounts[i], 'MINT_SAME_SIG_THROW', 'mint.token');
+    resultsLogger(accounts[i], 'MINT_THROW_SAME_SIG', 'mint.token');
+    resultsLogger(accounts[i], 'MINT_MISSING_SIG', 'mint.token');
+    resultsLogger(accounts[i], 'MINT_THROW_WRONG_SIG', 'mint.token');
     resultsLogger(accounts[i], 'MINT_INVOKED', 'mint.token');
   }
   
