@@ -1,21 +1,26 @@
+const ChainpointFaucet = artifacts.require("ChainpointFaucet");
 const TierionNetworkToken = artifacts.require("TierionNetworkToken");
 const ChainpointRegistry = artifacts.require("ChainpointRegistry");
 const ethers = require('ethers');
 const web3 = require('web3');
 
 contract("TierionNetworkToken", async (accounts) => {
-  it("should put 100000000000000000 Grains in the first account", async () => {
+  it("should put 1000000 * (10 ** 8) Grains in the first account", async () => {
+    let faucetContract = await ChainpointFaucet.deployed();
     let tokenContract = await TierionNetworkToken.deployed();
-    let balance = await tokenContract.balanceOf.call(accounts[0]);
+    
+    let balance = await tokenContract.balanceOf.call(faucetContract.address);
+    let balance1 = await tokenContract.balanceOf.call(accounts[0]);
 
-    assert.equal(balance.valueOf(), 100000000000000000);
+    assert.equal(balance.valueOf(), 1000000 * (10 ** 8));
+    assert.equal(balance1.valueOf(), 1000000 * (10 ** 8));
   });
 
-  it("should return 100000000000000000 Grains as totalSupply", async () => {
+  it("should return 1000000 * (10 ** 8) Grains as totalSupply", async () => {
     let tokenContract = await TierionNetworkToken.deployed();
     let balance = await tokenContract.totalSupply.call();
 
-    assert.equal(balance.valueOf(), 100000000000000000);
+    assert.equal(balance.valueOf(), 2000000 * (10 ** 8));
   });
 
   it("should transfer 500000000000 Grains from Account #0 -> Account #1", async () => {
@@ -42,7 +47,7 @@ contract("TierionNetworkToken", async (accounts) => {
     await tokenContract.transferFrom(accounts[1], accounts[0], 500000000000, { from: accounts[0] })
     let balance = await tokenContract.balanceOf.call(accounts[0]);
 
-    assert.equal(balance.valueOf(), 100000000000000000);
+    assert.equal(balance.valueOf(), 1000000 * (10 ** 8));
   });
 
 });

@@ -9,7 +9,6 @@ import "./lib/ERC20Basic.sol";
 import "./lib/SafeMath.sol";
 import "./ChainpointRegistry.sol";
 
-
 /**
  * @title Basic token
  * @dev Basic version of StandardToken, with no allowances. 
@@ -165,8 +164,9 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
    * Runs only on initial contract creation.
    */
   constructor(address _faucetAddr) public {
-    totalSupply = INITIAL_SUPPLY; // Set the total supply
-    balances[_faucetAddr] = INITIAL_SUPPLY; // INITIAL_SUPPLY is minted to Chainpoint Faucet
+    totalSupply = INITIAL_SUPPLY.mul(2); // Set the total supply
+    balances[_faucetAddr] = INITIAL_SUPPLY; // 1M $TKNs is minted to Chainpoint Faucet
+    balances[msg.sender] = INITIAL_SUPPLY; // 1M 1M $TKNs is minted to Chainpoint/Tierion for bootstrapping Network
   }
   
   ///
