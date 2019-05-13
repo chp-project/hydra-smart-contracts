@@ -130,7 +130,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     string public name = 'Tierion Network Token'; // Set the token name for display
     string public symbol = 'TNT'; // Set the token symbol for display
     uint8 public decimals = 8; // Set the number of decimals for display
-    uint256 public INITIAL_SUPPLY = 1000000000 * 10 ** uint256(decimals); // 1 Billion TNT specified in Grains
+    uint256 public INITIAL_SUPPLY = 1000000 * 10 ** uint256(decimals); // 1M TNT specified in Grains
     uint256 public mintAmount = 2000 * 10 ** uint256(decimals); // 2000 TNT specified in Grains
     
     ///
@@ -164,31 +164,31 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
    * @dev TierionNetworkToken Constructor
    * Runs only on initial contract creation.
    */
-  constructor() public {
+  constructor(address _faucetAddr) public {
     totalSupply = INITIAL_SUPPLY; // Set the total supply
-    balances[msg.sender] = INITIAL_SUPPLY; // Creator address is assigned all
+    balances[_faucetAddr] = INITIAL_SUPPLY; // INITIAL_SUPPLY is minted to Chainpoint Faucet
   }
   
-    ///
-    /// EVENTS 
-    ///
-    /// @notice emitted on successful token minting
-    /// @param _nodes number of Node Operators that were rewarded tokens
-    /// @param _mintAmount is the total number of tokens rewarded to each Node Operator
-    /// @param _blockHeight The block height in which token minting occurred
-    event Mint(
-        address[] _nodes,
-        uint256 _mintAmount,
-        uint256 _blockHeight
-    );
-    
-    /// @notice emitted on successful purchasing of usage
-    /// @param _buyer node operator that is purchasing network usage
-    /// @param _value amount of TNT being spent on future network usage
-    event UsagePurchased(
-        address _buyer,
-        uint256 _value
-    );
+  ///
+  /// EVENTS 
+  ///
+  /// @notice emitted on successful token minting
+  /// @param _nodes number of Node Operators that were rewarded tokens
+  /// @param _mintAmount is the total number of tokens rewarded to each Node Operator
+  /// @param _blockHeight The block height in which token minting occurred
+  event Mint(
+      address[] _nodes,
+      uint256 _mintAmount,
+      uint256 _blockHeight
+  );
+  
+  /// @notice emitted on successful purchasing of usage
+  /// @param _buyer node operator that is purchasing network usage
+  /// @param _value amount of TNT being spent on future network usage
+  event UsagePurchased(
+      address _buyer,
+      uint256 _value
+  );
 
   /**
    * @dev Transfer token for a specified address when not paused
