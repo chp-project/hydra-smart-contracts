@@ -8,6 +8,7 @@ import "./lib/ERC20.sol";
 import "./lib/ERC20Basic.sol";
 import "./lib/SafeMath.sol";
 import "./ChainpointRegistry.sol";
+import "./ChainpointMigration.sol";
 
 /**
  * @title Basic token
@@ -149,24 +150,36 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     /// @title Chainpoint Registry
     /// @notice Chainpoint Registry Contract
     ChainpointRegistry public chainpointRegistry;
+
+    /// @title Chainpoint Migration
+    /// @notice Chainpoint Migration Contract
+    ChainpointMigration public migrationContract;
   
     ///
     /// MODIFIERS
     ///
     /// @notice only Staked Core Operators or Owner can call, otherwise throw
     modifier onlyCoreOperator() {
-        require(chainpointRegistry.isHealthyCore(msg.sender), "must be owner or an active core operator");
-        _;
+      require(chainpointRegistry.isHealthyCore(msg.sender), "must be owner or an active core operator");
+      _;
+    }
+
+    /// @notice only Staked Core Operators or Owner can call, otherwise throw
+    modifier onlyChainpointMigrationContract() {
+      require(msg.sender == address(migrationContract), "only Migration Contract can invoke this method");
+      _;
     }
 
   /**
    * @dev TierionNetworkToken Constructor
    * Runs only on initial contract creation.
    */
-  constructor(address _faucetAddr) public {
+  constructor(address _faucetAddr, address _migrationAddr) public {
     totalSupply = INITIAL_SUPPLY.mul(2); // Set the total supply
     balances[_faucetAddr] = INITIAL_SUPPLY; // 1M $TKNs is minted to Chainpoint Faucet
     balances[msg.sender] = INITIAL_SUPPLY; // 1M 1M $TKNs is minted to Chainpoint/Tierion for bootstrapping Network
+
+    migrationContract = ChainpointMigration(_migrationAddr); // Set CHP Migration Contract
   }
   
   ///
@@ -274,6 +287,20 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
   }
 
   /**
+   * @dev Token Migration Mint new tokens for migrator
+   * @param _amount The amount of tokens to be minted as a result of a migration.
+   * @dev TNT token holders will be invoking during token migration process
+   * @return Boolean indicating result of method execution
+   */
+  function mintForExchange(address _to, uint256 _amount) public returns (bool) {
+    _mint(_to, _amount);
+
+    // TODO: emit TokensMigrated Event
+
+    return true;
+  }
+
+  /**
    * @dev Sets the contract address for the Chainpoint Registry
    * @param _addr The contract address of the Chainpoint Registry
    * @dev Can only be invoked by contract owner
@@ -321,5 +348,9 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
 
   function toEthSignedMessageHash(bytes32 hash) public pure returns (bytes32) {
     return hash.toEthSignedMessageHash();
+  }
+
+  function isMigrationContract() public view returns (bool) {
+    return (msg.sender == address(migrationContract));
   }
 }
