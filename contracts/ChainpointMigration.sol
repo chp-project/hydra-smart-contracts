@@ -60,7 +60,7 @@ contract ChainpointMigration is Ownable, Pausable {
     require(_amount > 0, "Amount has to be greater than 0");
 
     // Burn Old Tokens by sending to 0x00...0
-    require(oldToken.transferFrom(msg.sender, address(0), _amount), "transferFrom failed");
+    require(oldToken.transferFrom(msg.sender, address(this), _amount), "transferFrom failed");
     // Mint corresponding amount of new $TKNs
     require(newToken.mintForExchange(msg.sender, _amount), "mintForExchange failed");
 

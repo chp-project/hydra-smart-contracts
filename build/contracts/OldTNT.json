@@ -8914,6 +8914,12 @@
     "version": "0.5.0+commit.1d4f565a.Emscripten.clang"
   },
   "networks": {
+    "3": {
+      "events": {},
+      "links": {},
+      "address": "0x9D57A4a1CeCc71DF1Dde670e9E3eFCd663f86782",
+      "transactionHash": "0xc77e6a095cc1679a33c9bf768e315491566fee93b0752e3652cf3a72322cc542"
+    },
     "5777": {
       "events": {
         "0x62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a258": {
@@ -9034,12 +9040,12 @@
         }
       },
       "links": {},
-      "address": "0xb1E2cbDbB2FBf9C063ebd56f959fDD81553F8184",
-      "transactionHash": "0x3791830a406492102dfd48a8ba3bd132c7965cae2675e54d3a7f7d722363265c"
+      "address": "0x776E22666c902211b99f58217Bc4453B4CCB9a6b",
+      "transactionHash": "0x9fdda212c2ad4b3b8e0674c61229c0269326e9cf56c99c67bc2bf5fa176b3ea5"
     }
   },
   "schemaVersion": "3.0.1",
-  "updatedAt": "2019-05-14T18:58:08.839Z",
+  "updatedAt": "2019-05-15T14:25:34.897Z",
   "devdoc": {
     "details": "ERC20 (OLD) Tierion Network Token (TNT) * TNT Tokens are divisible by 1e8 (100,000,000) base units referred to as 'Grains'. * TNT are displayed using 8 decimal places of precision. * 1 TNT is equivalent to:  100000000 == 1 * 10**8 == 1e8 == One Hundred Million Grains * 1 Billion TNT (total supply) is equivalent to:  100000000000000000 == 1000000000 * 10**8 == 1e17 == One Hundred Quadrillion Grains * All initial TNT Grains are assigned to the creator of this contract. ",
     "methods": {

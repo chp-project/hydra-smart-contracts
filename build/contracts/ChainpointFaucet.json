@@ -4266,6 +4266,12 @@
     "version": "0.5.0+commit.1d4f565a.Emscripten.clang"
   },
   "networks": {
+    "3": {
+      "events": {},
+      "links": {},
+      "address": "0x17da20c6e3f9561638dc71620e3050aF3CCaf21D",
+      "transactionHash": "0xb256f0d785cdac833cfd05489552f9da84d5ec2956cd294d402086bc828f4307"
+    },
     "5777": {
       "events": {
         "0x62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a258": {
@@ -4340,12 +4346,12 @@
         }
       },
       "links": {},
-      "address": "0x2085410E2228928432AC33d36Bdd3D0A14DFCa72",
-      "transactionHash": "0xad193294b28b2c4d453a94c49ad2d4b95e27f21fbb9ae45549acd9f502ec52e7"
+      "address": "0xA5BF071a5309ABE906842FEdF4C4110D2146fc6B",
+      "transactionHash": "0xaf328398428d0515d8dd121aa26eee198a9d6c7257e2757ecde981a1d43b895c"
     }
   },
   "schemaVersion": "3.0.1",
-  "updatedAt": "2019-05-14T18:58:08.820Z",
+  "updatedAt": "2019-05-15T14:25:34.891Z",
   "devdoc": {
     "details": "Faucet contract for $TKN & the Chainpoint Network ",
     "methods": {
