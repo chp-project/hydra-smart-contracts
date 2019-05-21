@@ -22,15 +22,15 @@ const NODE_TNT_STAKE_AMOUNT = 500000000000;
 const NODE_ETH_AMOUNT = '0.02';
 
 // Transfer TNT Tokens to Accounts
-let creditAccountsNodes = R.curry(creditAccounts)(NODE_TNT_STAKE_AMOUNT);
+let creditAccountsNodes = R.curry(creditAccounts)('$TKN')(NODE_TNT_STAKE_AMOUNT);
 let creditAccountsNodesEth = R.curry(creditAccountsEth)(NODE_ETH_AMOUNT);
 
 // Check that balances of Nodes and Cores match the default amount of TNT that has been tranferred to each
-const checkBalancesNodes = R.curry(checkBalances)(NODE_TNT_STAKE_AMOUNT);
+const checkBalancesNodes = R.curry(checkBalances)('$TKN')(NODE_TNT_STAKE_AMOUNT);
 // Grant allowances to the ChainpointRegistry Contract on behalf of every Node or Core
-const approveAllowancesNodes = R.curry(approveAllowances)(NODE_TNT_STAKE_AMOUNT);
+const approveAllowancesNodes = R.curry(approveAllowances)('registry')(NODE_TNT_STAKE_AMOUNT);
 // Check allowances granted to the ChainpointRegistry Contract
-const checkAllowancesNodes = R.curry(checkAllowances)(NODE_TNT_STAKE_AMOUNT);
+const checkAllowancesNodes = R.curry(checkAllowances)('registry')(NODE_TNT_STAKE_AMOUNT);
 
 (async function() {
   // Chainpoint Hydra Smart Contract Testing Suite

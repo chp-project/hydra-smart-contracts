@@ -21,17 +21,17 @@ const NODE_TNT_STAKE_AMOUNT = 500000000000;
 const CORE_TNT_STAKE_AMOUNT = 2500000000000;
 
 // Transfer TNT Tokens to Accounts
-let creditAccountsNodes = R.curry(creditAccounts)(NODE_TNT_STAKE_AMOUNT);
-const creditAccountsCores = R.curry(creditAccounts)(CORE_TNT_STAKE_AMOUNT - NODE_TNT_STAKE_AMOUNT);
+let creditAccountsNodes = R.curry(creditAccounts)('$TKN')(NODE_TNT_STAKE_AMOUNT);
+const creditAccountsCores = R.curry(creditAccounts)('$TKN')(CORE_TNT_STAKE_AMOUNT - NODE_TNT_STAKE_AMOUNT);
 // Check that balances of Nodes and Cores match the default amount of TNT that has been tranferred to each
-const checkBalancesNodes = R.curry(checkBalances)(NODE_TNT_STAKE_AMOUNT);
-const checkBalancesCores = R.curry(checkBalances)(CORE_TNT_STAKE_AMOUNT);
+const checkBalancesNodes = R.curry(checkBalances)('$TKN')(NODE_TNT_STAKE_AMOUNT);
+const checkBalancesCores = R.curry(checkBalances)('$TKN')(CORE_TNT_STAKE_AMOUNT);
 // Grant allowances to the ChainpointRegistry Contract on behalf of every Node or Core
-const approveAllowancesNodes = R.curry(approveAllowances)(NODE_TNT_STAKE_AMOUNT);
-const approveAllowancesCores = R.curry(approveAllowances)(CORE_TNT_STAKE_AMOUNT);
+const approveAllowancesNodes = R.curry(approveAllowances)('registry')(NODE_TNT_STAKE_AMOUNT);
+const approveAllowancesCores = R.curry(approveAllowances)('registry')(CORE_TNT_STAKE_AMOUNT);
 // Check allowances granted to the ChainpointRegistry Contract
-const checkAllowancesNodes = R.curry(checkAllowances)(NODE_TNT_STAKE_AMOUNT);
-const checkAllowancesCores = R.curry(checkAllowances)(CORE_TNT_STAKE_AMOUNT);
+const checkAllowancesNodes = R.curry(checkAllowances)('registry')(NODE_TNT_STAKE_AMOUNT);
+const checkAllowancesCores = R.curry(checkAllowances)('registry')(CORE_TNT_STAKE_AMOUNT);
 // Several actions will mutate the state of a Node & Core Staking, check that each state mutation is applied correctly
 const _1checkNodeStakings = R.curry(checkNodeStakings)('CHECK_STAKE');
 const _2checkNodeStakings = R.curry(checkNodeStakings)('CHECK_STAKE_UPDATED');

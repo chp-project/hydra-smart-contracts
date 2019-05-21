@@ -13,11 +13,11 @@ const NODE_TNT_STAKE_AMOUNT = 600000000000;
 const NODE_ETH_AMOUNT = '0.02';
 
 // Transfer TNT Tokens to Accounts
-let creditAccountsNodes = R.curry(creditAccounts)(NODE_TNT_STAKE_AMOUNT);
+let creditAccountsNodes = R.curry(creditAccounts)('$TKN')(NODE_TNT_STAKE_AMOUNT);
 let creditAccountsNodesEth = R.curry(creditAccountsEth)(NODE_ETH_AMOUNT);
 
 // Check that balances of Nodes and Cores match the default amount of TNT that has been tranferred to each
-const checkBalancesNodes = R.curry(checkBalances)(NODE_TNT_STAKE_AMOUNT);
+const checkBalancesNodes = R.curry(checkBalances)('$TKN')(NODE_TNT_STAKE_AMOUNT);
 
 async function read() {
   const projectId = 'tierion-iglesias';

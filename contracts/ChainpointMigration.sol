@@ -73,6 +73,24 @@ contract ChainpointMigration is Ownable, Pausable {
   }
 
   /**
+   * @dev Return balance for account in grains
+   * @param _addr Address for which to check the balance of
+   * @return uint256
+   */
+  function oldTokenBalance(address _addr) public view returns (uint256 balance) {
+    return oldToken.balanceOf(_addr);
+  }
+
+  /**
+   * @dev Return balance for account
+   * @param _addr Address for which to check the balance of
+   * @return uint256
+   */
+  function newTokenBalance(address _addr) public view returns (uint256 balance) {
+    return newToken.balanceOf(_addr);
+  }
+
+  /**
    * @dev Sets the contract address for the $TKN Contract
    * @param _tokenAddr The contract address of the $TKN Contract
    * @dev Can only be invoked by contract owner

@@ -47,7 +47,7 @@ async function checkNodeStakings(checkType, accounts) {
       return {
         isStaked: (checkType === 'CHECK_STAKE' || checkType === 'CHECK_STAKE_UPDATED') ? R.thunkify(R.identity)(true) : R.thunkify(R.identity)(false),
         ip: (checkType === 'CHECK_STAKE' || checkType === 'CHECK_STAKE_UPDATED') ? R.pipe((i) => ipToInt(i).toIP(), (i) => validator.isIP(i)) : R.thunkify(R.identity)(0),
-        rewardsAddr: (checkType === 'CHECK_STAKE' || checkType === 'CHECK_STAKE_UPDATED') ? R.thunkify(R.identity)(accounts[i].address) : R.thunkify(R.identity)("0x0000000000000000000000000000000000000000000000000000000000000000")
+        rewardsAddr: (checkType === 'CHECK_STAKE' || checkType === 'CHECK_STAKE_UPDATED') ? R.thunkify(R.identity)(accounts[i].address) : R.thunkify(R.identity)("0x0000000000000000000000000000000000000000")
       }
     })();
 

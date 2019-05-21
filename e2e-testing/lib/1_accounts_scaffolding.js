@@ -9,8 +9,10 @@ const async = require('async')
 const provider = require('./utils/provider');
 const accounts = require('./utils/accounts').accounts;
 
+const OLD_TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_OLD_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_old_token.txt`, 'utf8');
 const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`, 'utf8');
 const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`, 'utf8');
+const MIGRATION_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_MIGRATION_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_migration.txt`, 'utf8');
 const TierionNetworkTokenABI = require('../../build/contracts/TierionNetworkToken.json').abi
 
 const web3 = new Web3(new Web3.providers.HttpProvider(`https://ropsten.infura.io/v3/foobar`))
@@ -18,12 +20,12 @@ const tokenContract = web3.eth.Contract(TierionNetworkTokenABI, TOKEN_CONTRACT_A
 
 let ETH_TRANSFER_NONCE_COUNTER = 0
 
-async function creditAccounts(tntAmount, accounts) {
+async function creditAccounts(tknContract, tntAmount, accounts) {
   // Pull Contract Owner Address from accounts dictionary
   const owner = accounts[0];
 
   // Connect to Token Contract
-  let tokenContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, require('../../build/contracts/TierionNetworkToken.json').abi, owner);
+  let tokenContract = new ethers.Contract((tknContract === 'TNT') ? OLD_TOKEN_CONTRACT_ADDRESS : TOKEN_CONTRACT_ADDRESS, require(`../../build/contracts/${(tknContract === 'TNT') ? 'OldTNT' : 'TierionNetworkToken'}.json`).abi, accounts[0]);
 
   for (let i = 0; i < Object.keys(accounts).length; i++) {
     if (i === 0) continue;
@@ -180,9 +182,9 @@ async function creditAccountsEthAsync(amount, accounts) {
   })
 }
 
-async function checkBalances(tntAmount, accounts) {
-  // Connect to Token Contract
-  let tokenContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, require('../../build/contracts/TierionNetworkToken.json').abi, accounts[0]);
+async function checkBalances(tknContract, tntAmount, accounts) {
+  // Connect to Token Contract (TNT for OLD_TNT or $TKN for new Token)
+  let tokenContract = new ethers.Contract((tknContract === 'TNT') ? OLD_TOKEN_CONTRACT_ADDRESS : TOKEN_CONTRACT_ADDRESS, require(`../../build/contracts/${(tknContract === 'TNT') ? 'OldTNT' : 'TierionNetworkToken'}.json`).abi, accounts[0]);
   // Check Owner balance first. Should be 1B TNT - (5000TNT * 9 Nodes)
   let ownerBalance = await tokenContract.balanceOf(accounts[0].address);
   _.set(
@@ -206,40 +208,40 @@ async function checkBalances(tntAmount, accounts) {
   return accounts;
 }
 
-async function approveAllowances(tntAmount, accounts) {
+async function approveAllowances(contract, tntAmount, accounts) {
   // Iterate through accounts (skip Owner at index=0) and approve an allowance for the ChainpointRegistry contract
   for (let i = 1; i < Object.keys(accounts).length; i++) {
-    let tokenContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, require('../../build/contracts/TierionNetworkToken.json').abi, accounts[i]);
+    let tokenContract = new ethers.Contract((contract === 'registry') ? TOKEN_CONTRACT_ADDRESS : OLD_TOKEN_CONTRACT_ADDRESS, require('../../build/contracts/TierionNetworkToken.json').abi, accounts[i]);
 
     console.log(chalk.gray('-> Approving Allowance: ' + accounts[i].address))
-    let approval = await tokenContract.approve(REGISTRY_CONTRACT_ADDRESS, tntAmount);
+    let approval = await tokenContract.approve(contract === 'registry' ? REGISTRY_CONTRACT_ADDRESS : MIGRATION_CONTRACT_ADDRESS, tntAmount);
     await approval.wait();
 
     let txReceipt = await provider.getTransactionReceipt(approval.hash);
 
     _.set(
       accounts[i], 
-      'e2eTesting.node.REGISTRY_ALLOWANCE_APPROVAL',
-      _.merge(_.get(accounts[i], 'e2eTesting.node.REGISTRY_ALLOWANCE_APPROVAL', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+      `e2eTesting.node.${contract.toUpperCase()}_ALLOWANCE_APPROVAL`,
+      _.merge(_.get(accounts[i], `e2eTesting.node.${contract.toUpperCase()}_ALLOWANCE_APPROVAL`, {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
     );
   }
   return accounts;
 }
 
-async function checkAllowances(tntAmount, accounts) {
+async function checkAllowances(contract, tntAmount, accounts) {
   // Connect to Token Contract
-  let tokenContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, require('../../build/contracts/TierionNetworkToken.json').abi, accounts[0]);
+  let tokenContract = new ethers.Contract((contract === 'registry') ? TOKEN_CONTRACT_ADDRESS : OLD_TOKEN_CONTRACT_ADDRESS, require('../../build/contracts/TierionNetworkToken.json').abi, accounts[0]);
 
   for (let i = 0; i < Object.keys(accounts).length; i++) {
     if (i === 0) continue;
 
     console.log(chalk.gray('-> Checking Allowance: ' + accounts[i].address))
-    let allowance = await tokenContract.allowance(accounts[i].address, REGISTRY_CONTRACT_ADDRESS);
+    let allowance = await tokenContract.allowance(accounts[i].address, (contract === 'registry') ? REGISTRY_CONTRACT_ADDRESS : MIGRATION_CONTRACT_ADDRESS);
     
     _.set(
       accounts[i], 
-      'e2eTesting.node.REGISTRY_ALLOWANCE_APPROVAL_CHECK',
-      _.merge(_.get(accounts[i], 'e2eTesting.node.REGISTRY_ALLOWANCE_APPROVAL_CHECK', {}), { passed: parseInt(allowance.toString(), 10) === tntAmount, gasUsed: 0 })      
+      `e2eTesting.node.${contract.toUpperCase()}_ALLOWANCE_APPROVAL_CHECK`,
+      _.merge(_.get(accounts[i], `e2eTesting.node.${contract.toUpperCase()}_ALLOWANCE_APPROVAL_CHECK`, {}), { passed: parseInt(allowance.toString(), 10) === tntAmount, gasUsed: 0 })      
     );
   }
   return accounts;

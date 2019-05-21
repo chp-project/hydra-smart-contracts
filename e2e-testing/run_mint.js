@@ -15,8 +15,8 @@ const { setChpRegistry, mint, mintThrowSameSig, mintThrowMissingSig, mintThrowWr
 
 const CORE_TNT_STAKE_AMOUNT = 2500000000000;
 
-const creditAccountsCores = R.curry(creditAccounts)(CORE_TNT_STAKE_AMOUNT);
-const approveAllowancesCores = R.curry(approveAllowances)(CORE_TNT_STAKE_AMOUNT);
+const creditAccountsCores = R.curry(creditAccounts)('$TKN')(CORE_TNT_STAKE_AMOUNT);
+const approveAllowancesCores = R.curry(approveAllowances)('registry')(CORE_TNT_STAKE_AMOUNT);
 
 // These PrivKeys are those being used by testnet Cores
 const privKeysArr = [
@@ -54,7 +54,6 @@ async function main() {
     resultsLogger(accounts[i], 'MINT_THROW_WRONG_SIG', 'mint.token');
     resultsLogger(accounts[i], 'MINT_INVOKED', 'mint.token');
   }
-  
 }
 
 main()
