@@ -13,7 +13,15 @@ const { creditAccounts, checkBalances, approveAllowances, checkAllowances} = req
 const { stakeNodes, checkNodeStakings, updateStakesNodes, unStakeNodes } = require('./lib/2_staking_actions');
 const { stakeCores, checkCoreStakings, updateStakesCores, unStakeCores } = require('./lib/2a_core_staking_actions');
 
-const privKeysArr = []
+const privKeysArr = [
+  {privateKey: "0xd74408108dea58b9a7c5157ca13f9168644fbbffda08a4ce0346640cafcfafb3", ip: '35.245.53.181'},
+  {privateKey: "0xdddab7b4ec19893c86cddaa4eef5915907778e1a41764f9e90e5ef9a7603b30b", ip: '35.188.238.186'},
+  {privateKey: "0xf7e39d12945311c58091f59c41a0842a1b874941a7c6a9b403379384115a33dd", ip: '35.245.211.97'},
+  {privateKey: "0x4a9c3c814b485a6b9925b6ed4f72acafd036d2a84af568b2f35f123ec64ccdc2", ip: '35.245.9.90'},
+  {privateKey: "0x0a0ecaef321662b73acd0a59123ff595dc95e838a4ccb1a2c335e2b7da1db6e1", ip: '35.245.89.209'},
+  {privateKey: "0x1efb256136d6e50a46e53c14445cf8a59e970d754343731a71832a8803e92a16", ip: '35.245.207.91'},
+  {privateKey: "0x284dedd0857f79114cd5c1a276b56783b8ef905be9f4eceb981fa26f49014a28", ip: '35.245.1.11'},
+]
 const accounts = (privKeysArr.length) ? accountsFromPrivKey(privKeysArr) : defaultAccounts
 
 // TNT Amounts
@@ -66,16 +74,17 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
 
   let cores = R.pipeP(
     tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
+    tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
     tap(() => titleLogger('Checking Token Balances'), checkBalancesCores),
     tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
     tap(() => titleLogger('Checking Allowances'), checkAllowancesCores),
     tap(() => titleLogger('Cores Staking'), stakeCores),
     tap(() => titleLogger('Checking Cores Stakings'), _1checkCoreStakings),
-    tap(() => titleLogger('Updating Cores Stakes'), updateStakesCores),
-    tap(() => titleLogger('Checking Updated Cores Stakes'), _2checkCoreStakings),
-    (accounts) => new Promise((resolve) => setTimeout(() => resolve(accounts), 120 * 1000)), // Wait for 120seconds before un-staking
-    tap(() => titleLogger('Un-Staking Cores'), unStakeCores),
-    tap(() => titleLogger('Checking Cores Un-stakings'), _3checkCoreStakings),
+    // tap(() => titleLogger('Updating Cores Stakes'), updateStakesCores),
+    // tap(() => titleLogger('Checking Updated Cores Stakes'), _2checkCoreStakings),
+    // (accounts) => new Promise((resolve) => setTimeout(() => resolve(accounts), 120 * 1000)), // Wait for 120seconds before un-staking
+    // tap(() => titleLogger('Un-Staking Cores'), unStakeCores),
+    // tap(() => titleLogger('Checking Cores Un-stakings'), _3checkCoreStakings),
   )
   if (args.includes('--cores')) await cores(accounts);
 
