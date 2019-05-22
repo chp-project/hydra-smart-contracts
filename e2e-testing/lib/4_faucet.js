@@ -16,8 +16,6 @@ const FAUCET_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_FAUC
 async function setToken(accounts) {
   const owner = accounts[0];
 
-  debugger;
-
   let faucetContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_FAUCET_CONTRACT_ADDRESS`], require('../../build/contracts/ChainpointFaucet.json').abi, owner);
 
   console.log(chalk.gray('-> Setting $TKN contract address'));
@@ -90,8 +88,6 @@ async function isSubscribed(accounts) {
 
   console.log(chalk.gray('-> Is Subscribed'));
   let result = await faucetContract.isSubscribed(subscriber.address);
-
-  debugger;
 
   _.set(
     subscriber, 

@@ -59,8 +59,6 @@ async function checkNodeStakings(checkType, accounts) {
         { passed: (stakeResult.isStaked === expectedNodeValues.isStaked() && expectedNodeValues.ip(stakeResult.nodeIp) === true), gasUsed: 0 }
       )
     );
-
-    debugger;
   }
   return accounts;
 }
