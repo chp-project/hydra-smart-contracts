@@ -11,7 +11,7 @@ const defaultAccounts = require('./lib/utils/accounts').accounts;
 const {accountsFromPrivKey} = require('./lib/utils/accounts');
 const { creditAccounts, checkBalances, approveAllowances, checkAllowances} = require('./lib/1_accounts_scaffolding');
 const { stakeNodes, checkNodeStakings, updateStakesNodes, unStakeNodes } = require('./lib/2_staking_actions');
-const { approveCores, stakeCores, checkCoreStakings, updateStakesCores, unStakeCores } = require('./lib/2a_core_staking_actions');
+const { approveCores, approveCoresMultiSig, stakeCores, checkCoreStakings, updateStakesCores, unStakeCores } = require('./lib/2a_core_staking_actions');
 
 const privKeysArr = [
   {privateKey: "0xd74408108dea58b9a7c5157ca13f9168644fbbffda08a4ce0346640cafcfafb3", ip: '35.245.53.181'},
@@ -73,18 +73,19 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
   if (args.includes('--cores')) console.log('\n' + chalk.magenta('CORE ACTIONS:'));
 
   let cores = R.pipeP(
-    // tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
-    // tap(() => titleLogger('Checking Token Balances'), checkBalancesCores),
-    // tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
-    // tap(() => titleLogger('Checking Allowances'), checkAllowancesCores),
-    // tap(() => titleLogger('Approving Cores'), approveCores),
-    // tap(() => titleLogger('Cores Staking'), stakeCores),
-    // tap(() => titleLogger('Checking Cores Stakings'), _1checkCoreStakings),
-    // tap(() => titleLogger('Updating Cores Stakes'), updateStakesCores),
-    // tap(() => titleLogger('Checking Updated Cores Stakes'), _2checkCoreStakings),
-    // (accounts) => new Promise((resolve) => setTimeout(() => resolve(accounts), 120 * 1000)), // Wait for 120seconds before un-staking
-    // tap(() => titleLogger('Un-Staking Cores'), unStakeCores),
+    tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
+    tap(() => titleLogger('Checking Token Balances'), checkBalancesCores),
+    tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
+    tap(() => titleLogger('Checking Allowances'), checkAllowancesCores),
+    tap(() => titleLogger('Approving Cores'), approveCores),
+    tap(() => titleLogger('Cores Staking'), stakeCores),
+    tap(() => titleLogger('Checking Cores Stakings'), _1checkCoreStakings),
+    tap(() => titleLogger('Updating Cores Stakes'), updateStakesCores),
+    tap(() => titleLogger('Checking Updated Cores Stakes'), _2checkCoreStakings),
+    (accounts) => new Promise((resolve) => setTimeout(() => resolve(accounts), 120 * 1000)), // Wait for 120seconds before un-staking
+    tap(() => titleLogger('Un-Staking Cores'), unStakeCores),
     tap(() => titleLogger('Checking Cores Un-stakings'), _3checkCoreStakings),
+    tap(() => titleLogger('Approving Cores (Multi-sig)'), approveCoresMultiSig),
   )
   if (args.includes('--cores')) await cores(accounts);
 
@@ -113,6 +114,7 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
       resultsLogger(accounts[i], 'CHECK_STAKE_UPDATED', 'core')
       resultsLogger(accounts[i], 'UN_STAKE', 'core')
       resultsLogger(accounts[i], 'CHECK_UN_STAKE', 'core')
+      resultsLogger(accounts[i], 'CORE_APPROVAL_MULTISIG', 'core')
     }
   }
 })();

@@ -1,12 +1,17 @@
 pragma solidity >=0.4.22 <0.6.0;
+pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
+import "bytes/BytesLib.sol";
 
 import "./lib/ERC20.sol";
 import "./lib/SafeMath.sol";
 
 contract ChainpointRegistry is Ownable, Pausable {
+    using ECDSA for bytes32;
+    using BytesLib for bytes;
     using SafeMath for uint256;
     
     /// @title TNT Token Contract
@@ -50,6 +55,8 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev Key is the Cores ETH Address
     /// @dev Value is a boolean (defaults to false) which informs whether or not the Core is allowed to Stake
     mapping (address => bool) public eligibleCores;
+
+    mapping(address => mapping(address => bool)) public coreApprovalSignaturesUsed;
     
     ///
     /// TYPES 
@@ -177,6 +184,13 @@ contract ChainpointRegistry is Ownable, Pausable {
         address indexed _sender,
         uint32 _coreIp,
         uint256 _amountStaked
+    );
+
+    event CoreApproval(
+        address indexed _sender,
+        address indexed _approvedCore,
+        uint256 _majority,
+        uint256 _recoveredSigs
     );
     
     ///
@@ -346,9 +360,40 @@ contract ChainpointRegistry is Ownable, Pausable {
         return true;
     }
 
-    function approveCoreStaking(address _core) public onlyOwnerOrCoreOperator returns (bool) {
+    function approveCoreStaking(address _core, bytes32 _coreHash, bytes[126] memory sigs) public onlyOwnerOrCoreOperator returns (bool) {
+        bytes memory btsNull = new bytes(0);
         // Allow specified Core to Stake into the Registry at a future point in time
-        eligibleCores[_core] = true;
+        if(msg.sender == owner()) {
+            eligibleCores[_core] = true;
+            emit CoreApproval(msg.sender, _core, 0, 0);
+        } else {
+            // Validate parameters provided
+            bytes32 calculatedCoreHash = keccak256(abi.encodePacked(_core));
+            require(calculatedCoreHash.toEthSignedMessageHash() == _coreHash, "_coreHash supplied toEthSignedMessageHash does not equal value calculated");
+
+            uint256 recoveredSigs = 0;
+            // TODO: hardcoded for now
+            uint256 majority = 1;
+
+            // Recover Signer addresses and verify they are staked Core Operators
+            for(uint8 i=0; i < sigs.length; i++) {
+                if(sigs[i].equal(btsNull))
+                    break;
+
+                address recoveredAddress = _coreHash.recover(sigs[i]);
+                require(isHealthyCore(recoveredAddress), "signer is not a staked core operator");
+
+                if(coreApprovalSignaturesUsed[_core][recoveredAddress] == false) {
+                    coreApprovalSignaturesUsed[_core][recoveredAddress] = true;
+
+                    recoveredSigs = recoveredSigs.add(1);
+                }
+            }
+            if(recoveredSigs >= majority) {
+                eligibleCores[_core] = true;
+                emit CoreApproval(msg.sender, _core, majority, recoveredSigs);
+            }
+        }
 
         return true;
     }
