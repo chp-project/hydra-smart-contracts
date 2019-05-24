@@ -21,9 +21,9 @@ function accountsFromPrivKey(privKeys = []) {
       accounts[i] = ethers.Wallet.fromMnemonic(process.env.CHP_HYDRA_DEV_MNEMONIC, `${process.env.CHP_HYDRA_DEV_MNEMONIC_PATH}/${i}`);
     } else {
       accounts[i] = new ethers.Wallet(privKeys[i].privateKey);
+      accounts[i].metadata = { ip: privKeys[i].ip}
     }
     accounts[i] = accounts[i].connect(provider);
-    accounts[i].metadata = { ip: privKeys[i].ip}
   }
 
   return accounts;

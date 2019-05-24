@@ -1,4 +1,5 @@
 pragma solidity >=0.4.22 <0.6.0;
+pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
@@ -132,7 +133,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     uint8 public decimals = 8; // Set the number of decimals for display
     uint256 public INITIAL_SUPPLY = 2000000 * 10 ** uint256(decimals); // 1M TNT specified in Grains
     uint256 public mintAmount = 2000 * 10 ** uint256(decimals); // 2000 TNT specified in Grains
-    
+
     ///
     /// Minting Parameters
     ///
@@ -154,6 +155,8 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     /// @title Chainpoint Migration
     /// @notice Chainpoint Migration Contract
     ChainpointMigration public migrationContract;
+
+    mapping(uint256 => mapping(address => bool)) public coreMintingSignaturesUsed;
   
     ///
     /// MODIFIERS
@@ -201,6 +204,11 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
   event UsagePurchased(
       address _buyer,
       uint256 _value
+  );
+
+  event MintCores(
+    uint256 _recoveredSigs,
+    uint256 _majority
   );
 
   /**
@@ -270,6 +278,44 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
       emit Mint(_nodes, mintAmount, block.number);
       
       return true;
+  }
+
+  function mintCores(address[] memory _cores, bytes32 _hash, bytes[126] memory sigs) public whenNotPaused returns (bool) {
+    bytes memory btsNull = new bytes(0);
+
+    // Validate parameters provided
+    bytes32 coresHash = keccak256(abi.encodePacked(_cores));
+    require(coresHash.toEthSignedMessageHash() == _hash, "_hash supplied toEthSignedMessageHash does not equal value calculated");
+
+    uint256 recoveredSigs = 0;
+    // TODO: hardcoded for now
+    uint256 majority = uint256(6).div(2).add(1);
+
+    // Recover Signer addresses and verify they are staked Core Operators
+    for(uint8 i=0; i < sigs.length; i++) {
+      if(sigs[i].equal(btsNull))
+        break;
+
+      address memory recoveredAddress = _hash.recover(sigs[i]);
+      require(chainpointRegistry.isHealthyCore(recoveredAddress), "signer is not a staked core operator");
+
+      if(coreMintingSignaturesUsed[block.number][recoveredAddress] == false) {
+        coreMintingSignaturesUsed[block.number][recoveredAddress] = true;
+
+        recoveredSigs = recoveredSigs.add(1);
+      }
+    }
+
+    // Number of valid recovered signatures must be greater than or equal to the majority before minting
+    // require(recoveredSigs >= majority, "quorum was not reached");
+    // Iterate through list of Nodes and award tokens
+    for(uint8 i=0; i < _nodes.length; i++) {
+        _mint(_nodes[i], mintAmount);
+    }
+
+    emit MintCores(recoveredSigs, majority);
+
+    return true;
   }
 
   /**

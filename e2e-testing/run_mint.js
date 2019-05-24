@@ -11,7 +11,7 @@ const defaultAccounts = require('./lib/utils/accounts').accounts;
 const {accountsFromPrivKey} = require('./lib/utils/accounts');
 const { creditAccounts, approveAllowances} = require('./lib/1_accounts_scaffolding');
 const { stakeCores, unStakeCores } = require('./lib/2a_core_staking_actions');
-const { setChpRegistry, mint, mintThrowSameSig, mintThrowMissingSig, mintThrowWrongSig } = require('./lib/3_tnt_quorum');
+const { setChpRegistry, mint, mintThrowSameSig, mintThrowMissingSig, mintThrowWrongSig, mintCores, mintCoresRaw } = require('./lib/3_tnt_mint');
 
 const CORE_TNT_STAKE_AMOUNT = 2500000000000;
 
@@ -36,13 +36,15 @@ async function main() {
 
   let actions = R.pipeP(
     tap(() => titleLogger('Set Chainpoint Registry contract addresses and bootstrap'), setChpRegistry),
-    // tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
-    // tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
-    // tap(() => titleLogger('Cores Staking'), stakeCores),
-    tap(() => titleLogger('Invoke mint() MINT_THROW_SAME_SIG'), mintThrowSameSig),
-    tap(() => titleLogger('Invoke mint() MINT_MISSING_SIG'), mintThrowMissingSig),
-    tap(() => titleLogger('Invoke mint() MINT_THROW_WRONG_SIG'), mintThrowWrongSig),
-    tap(() => titleLogger('Invoke mint()'), mint)
+    tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
+    tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
+    tap(() => titleLogger('Cores Staking'), stakeCores),
+    // tap(() => titleLogger('Invoke mint() MINT_THROW_SAME_SIG'), mintThrowSameSig),
+    // tap(() => titleLogger('Invoke mint() MINT_MISSING_SIG'), mintThrowMissingSig),
+    // tap(() => titleLogger('Invoke mint() MINT_THROW_WRONG_SIG'), mintThrowWrongSig),
+    // tap(() => titleLogger('Invoke mint()'), mint)
+    tap(() => titleLogger('Invoke mintCores()'), mintCores)
+    // tap(() => titleLogger('Invoke mintCores()'), mintCoresRaw)
   )
   await actions(accounts);
 

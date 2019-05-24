@@ -198,8 +198,133 @@ async function mintThrowWrongSig(accounts) {
   return accounts;
 }
 
+async function mintCores(accounts) {
+  const owner = accounts[0];
+  const leader = accounts[1];
+
+  let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, leader);
+  tokenContract.on("MintCores", (a, b, event) => {
+
+    console.log('====================================');
+    console.log(a.toString(), b.toString());
+    console.log('====================================');
+});
+  let rewardsListHash = ethers.utils.keccak256(abiCoder.encode(REWARDS_LIST_KEY, REWARDS_LIST));
+
+  let sigs = [];
+  let messageHash;
+  for (let i = 2; i < Object.keys(accounts).length; i++) { // Starting at i=2 because accounts[0] is contract owner & accounts[1] is elected leader
+  
+    let web3Owner = web3.eth.accounts.privateKeyToAccount(accounts[i].privateKey);
+    let signature = await web3Owner.sign(rewardsListHash);
+
+    if (!messageHash) { messageHash = signature.messageHash }
+
+    sigs.push(signature.signature);
+  }
+
+  try {
+    let mintResult = await tokenContract.mintCores(
+      REWARDS_LIST,
+      messageHash,
+      sigs.splice(0,2)
+    );
+
+    debugger;
+
+    await mintResult.wait();
+
+    console.log('====================================');
+    console.log(mintResult, mintResult.majority);
+    console.log('====================================');
+  
+    let txReceipt = await provider.getTransactionReceipt(mintResult.hash);
+
+    debugger;
+  
+    _.set(
+      owner, 
+      'e2eTesting.mint.token.MINT_CORES_INVOKED', 
+      _.merge(_.get(owner, 'e2eTesting.mint.token.MINT_CORES_INVOKED', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+    );
+  } catch (error) {
+    console.error(error)
+  }
+  
+  return accounts;
+}
+
+async function mintCoresRaw(accounts) {
+  const owner = accounts[0];
+  const leader = accounts[1];
+  const leaderWallet = new ethers.Wallet(accounts[1].privateKey)
+
+  let tokenContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`], require('../../build/contracts/TierionNetworkToken.json').abi, leader);
+  tokenContract.on("MintCores", (a, b, event) => {
+    console.log('====================================');
+    console.log(a.toString(), b.toString());
+    console.log('====================================');
+  });
+
+  
+  let rewardsListHash = ethers.utils.keccak256(abiCoder.encode(REWARDS_LIST_KEY, REWARDS_LIST));
+  let sigs = [];
+  let messageHash;
+  for (let i = 2; i < Object.keys(accounts).length; i++) { // Starting at i=2 because accounts[0] is contract owner & accounts[1] is elected leader
+    let web3Owner = web3.eth.accounts.privateKeyToAccount(accounts[i].privateKey);
+    let signature = await web3Owner.sign(rewardsListHash);
+
+    if (!messageHash) { messageHash = signature.messageHash }
+
+    sigs.push(signature.signature);
+  }
+
+  // Create Raw Tx
+  const tokenContractInterface = new ethers.utils.Interface(require('../../build/contracts/TierionNetworkToken.json').abi)
+  let functionInfo = tokenContractInterface.functions.mintCores
+  let functionData = functionInfo.encode([REWARDS_LIST, messageHash, sigs])
+  let functionData1 = ethers.utils.solidityPack(['address[]', 'bytes32', 'bytes[]'], [REWARDS_LIST, messageHash, sigs])
+
+  const tx = {
+    gasPrice: 1000000000,
+    gasLimit: 185000,
+    data: functionData1,
+    to: TOKEN_CONTRACT_ADDRESS,
+    nonce: 32,
+    chainId: parseInt(3, 10)
+  }
+
+  let signedTx = await leaderWallet.sign(tx)
+
+  debugger;
+
+  let sendResponse = await provider.sendTransaction(signedTx)
+  let txReceipt = await provider.waitForTransaction(sendResponse.hash)
+  let transactionHash = txReceipt.transactionHash
+  let blockHash = txReceipt.blockHash
+  let blockNumber = txReceipt.blockNumber
+  let gasUsed = txReceipt.gasUsed.toNumber() // convert from BigNumber to native number
+  let result = { transactionHash, blockHash, blockNumber, gasUsed }
+
+  debugger;
+
+  console.log('====================================');
+  console.log(result, 'result');
+  console.log('====================================');
+  
+  _.set(
+    owner, 
+    'e2eTesting.mint.token.MINT_CORES_INVOKED', 
+    _.merge(_.get(owner, 'e2eTesting.mint.token.MINT_CORES_INVOKED', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+  );
+  
+  return accounts;
+}
+
 module.exports.setChpRegistry = setChpRegistry;
 module.exports.mint = mint;
+module.exports.mintCores = mintCores;
+module.exports.mintCoresRaw = mintCoresRaw;
 module.exports.mintThrowSameSig = mintThrowSameSig;
 module.exports.mintThrowMissingSig = mintThrowMissingSig;
 module.exports.mintThrowWrongSig = mintThrowWrongSig;
