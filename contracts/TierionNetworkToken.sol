@@ -296,7 +296,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
       if(sigs[i].equal(btsNull))
         break;
 
-      address memory recoveredAddress = _hash.recover(sigs[i]);
+      address recoveredAddress = _hash.recover(sigs[i]);
       require(chainpointRegistry.isHealthyCore(recoveredAddress), "signer is not a staked core operator");
 
       if(coreMintingSignaturesUsed[block.number][recoveredAddress] == false) {
@@ -309,8 +309,8 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     // Number of valid recovered signatures must be greater than or equal to the majority before minting
     // require(recoveredSigs >= majority, "quorum was not reached");
     // Iterate through list of Nodes and award tokens
-    for(uint8 i=0; i < _nodes.length; i++) {
-        _mint(_nodes[i], mintAmount);
+    for(uint8 i=0; i < _cores.length; i++) {
+        _mint(_cores[i], mintAmount);
     }
 
     emit MintCores(recoveredSigs, majority);

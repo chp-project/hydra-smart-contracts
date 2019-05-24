@@ -208,7 +208,7 @@ async function mintCores(accounts) {
     console.log('====================================');
     console.log(a.toString(), b.toString());
     console.log('====================================');
-});
+  });
   let rewardsListHash = ethers.utils.keccak256(abiCoder.encode(REWARDS_LIST_KEY, REWARDS_LIST));
 
   let sigs = [];
@@ -227,16 +227,12 @@ async function mintCores(accounts) {
     let mintResult = await tokenContract.mintCores(
       REWARDS_LIST,
       messageHash,
-      sigs.splice(0,2)
+      sigs.splice(0,2).concat((new Array(124)).fill("0x"))
     );
 
     debugger;
 
     await mintResult.wait();
-
-    console.log('====================================');
-    console.log(mintResult, mintResult.majority);
-    console.log('====================================');
   
     let txReceipt = await provider.getTransactionReceipt(mintResult.hash);
 
