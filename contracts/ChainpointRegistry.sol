@@ -21,6 +21,8 @@ contract ChainpointRegistry is Ownable, Pausable {
     
     uint256 public CORE_STAKING_AMOUNT = 2500000000000; // 25,000 TNT specified in grains
     uint256 public CORE_STAKING_DURATION = 120; // 10mins specified in seconds TODO: fix for PROD
+
+    uint256 public stakedCoresCount = 0;
     
     ///
     /// MAPPINGS
@@ -42,6 +44,12 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev Key is the sum of the public IP address
     /// @dev Value is a boolean (defaults to false) which informs whether or not the IP address is being used
     mapping (uint32 => bool) public allocatedIps;
+
+    /// @title Whitelist of Cores eligible to Stake
+    /// @notice Contains all of the Core ETH Addresses allowed to stake into the Registry
+    /// @dev Key is the Cores ETH Address
+    /// @dev Value is a boolean (defaults to false) which informs whether or not the Core is allowed to Stake
+    mapping (address => bool) public eligibleCores;
     
     ///
     /// TYPES 
@@ -201,8 +209,11 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @param _coreIp is the IPV4 address of the Node
     /// @return true if successful, otherwise false
     function stakeCore(uint32 _coreIp) public whenNotPaused returns (bool) {
+        require(eligibleCores[msg.sender] == true, "not eligible to Stake into the Network as a Core");
         require(_addCoreToRegistry(_coreIp), "node did not stake into the chainpoint network");
         
+        require(token.transferFrom(msg.sender, address(this), CORE_STAKING_AMOUNT), "transferFrom failed");
+
         emit CoreStaked(
             msg.sender,
             _coreIp,
@@ -210,8 +221,6 @@ contract ChainpointRegistry is Ownable, Pausable {
             CORE_STAKING_AMOUNT,
             CORE_STAKING_DURATION
         );
-        
-        require(token.transferFrom(msg.sender, address(this), CORE_STAKING_AMOUNT), "transferFrom failed");
 
         return true;
     }
@@ -324,6 +333,7 @@ contract ChainpointRegistry is Ownable, Pausable {
         
         delete allocatedIps[coreIp];
         delete cores[msg.sender];
+        stakedCoresCount = stakedCoresCount.sub(1);
         
         require(token.transfer(msg.sender, amountStaked), "transfer failed");
         
@@ -332,6 +342,13 @@ contract ChainpointRegistry is Ownable, Pausable {
             coreIp,
             amountStaked
         );
+
+        return true;
+    }
+
+    function approveCoreStaking(address _core) public onlyOwnerOrCoreOperator returns (bool) {
+        // Allow specified Core to Stake into the Registry at a future point in time
+        eligibleCores[_core] = true;
 
         return true;
     }
@@ -402,6 +419,10 @@ contract ChainpointRegistry is Ownable, Pausable {
 
         // Allocate IP to ensure uniqueness
         allocatedIps[_coreIp] = true;
+        // Core has Staked, remove from eligibleCores mapping
+        eligibleCores[msg.sender] = false;
+        // Core has Staked, increment stakedCoresCount
+        stakedCoresCount = stakedCoresCount.add(1);
         
         return true;
     }

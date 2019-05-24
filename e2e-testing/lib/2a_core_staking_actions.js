@@ -9,6 +9,30 @@ const provider = require('./utils/provider');
 const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`, 'utf8');
 const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`, 'utf8');
 
+async function approveCores(accounts) {
+  const owner = accounts[0];
+
+  for (let i = 0; i < Object.keys(accounts).length; i++) {
+    if (i === 0) continue;
+    
+    console.log(chalk.gray('-> Approving Core: ' + accounts[i].address));
+    let registryContract = new ethers.Contract(REGISTRY_CONTRACT_ADDRESS, require('../../build/contracts/ChainpointRegistry.json').abi, owner);
+    
+    let approveResult = await registryContract.approveCoreStaking(accounts[i].address);
+    await approveResult.wait();
+
+    let txReceipt = await provider.getTransactionReceipt(approveResult.hash);
+
+    _.set(
+      accounts[i], 
+      'e2eTesting.core.APPROVE_CORE', 
+      _.merge(_.get(accounts[i], 'e2eTesting.core.APPROVE_CORE', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+    );
+  }
+
+  return accounts;
+}
+
 async function stakeCores(accounts) {
   for (let i = 0; i < Object.keys(accounts).length; i++) {
     if (i === 0) continue;
@@ -41,15 +65,16 @@ async function checkCoreStakings(checkType, accounts) {
     let expectedCoreValues = (function() {
       if (checkType === 'CHECK_STAKE') return [true, ipToInt(`172.168.0.${i}`).toInt()]; // i === 172.168.0.x
       else if (checkType === 'CHECK_STAKE_UPDATED') return [true, ipToInt(`11.0.0.${i}`).toInt()]; // i === 11.0.0.x
-      else return [false, "0x0000000000000000000000000000000000000000000000000000000000000000"]
+      else return [false, 0]
     })();
 
     _.set(
       accounts[i],
       `e2eTesting.core.${checkType}`,
-      _.merge(_.get(accounts[i], `e2eTesting.core.${checkType}`, {}), { passed: (stakeResult.isStaked === expectedCoreValues[0] && _.isEqual(stakeResult.coreIp, expectedCoreValues[1]) && _.isEqual(stakeResult.corePublicKey, expectedCoreValues[1])), gasUsed: 0 })
+      _.merge(_.get(accounts[i], `e2eTesting.core.${checkType}`, {}), { passed: (stakeResult.isStaked === expectedCoreValues[0] && _.isEqual(stakeResult.coreIp, expectedCoreValues[1])), gasUsed: 0 })
     );
   }
+
   return accounts;
 }
 
@@ -95,6 +120,7 @@ async function unStakeCores(accounts) {
   return accounts;
 }
 
+module.exports.approveCores = approveCores;
 module.exports.stakeCores = stakeCores;
 module.exports.checkCoreStakings = checkCoreStakings;
 module.exports.updateStakesCores = updateStakesCores;
