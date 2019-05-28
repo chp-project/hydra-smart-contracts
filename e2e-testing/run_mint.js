@@ -40,12 +40,12 @@ async function main() {
     tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
     tap(() => titleLogger('Approving Cores'), approveCores),
     tap(() => titleLogger('Cores Staking'), stakeCores),
-    // tap(() => titleLogger('Invoke mint() MINT_THROW_SAME_SIG'), mintThrowSameSig),
-    // tap(() => titleLogger('Invoke mint() MINT_MISSING_SIG'), mintThrowMissingSig),
-    // tap(() => titleLogger('Invoke mint() MINT_THROW_WRONG_SIG'), mintThrowWrongSig),
-    // tap(() => titleLogger('Invoke mint()'), mint)
+    tap(() => titleLogger('Invoke mint() MINT_THROW_SAME_SIG'), mintThrowSameSig),
+    tap(() => titleLogger('Invoke mint() MINT_MISSING_SIG'), mintThrowMissingSig),
+    tap(() => titleLogger('Invoke mint() MINT_THROW_WRONG_SIG'), mintThrowWrongSig),
+    tap(() => titleLogger('Invoke mint()'), mint)
     tap(() => titleLogger('Invoke mintCores()'), mintCores)
-    // tap(() => titleLogger('Invoke mintCores()'), mintCoresRaw)
+    tap(() => titleLogger('Invoke mintCores()'), mintCoresRaw)
   )
   await actions(accounts);
 

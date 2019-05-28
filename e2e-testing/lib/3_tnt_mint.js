@@ -69,7 +69,7 @@ async function mint(accounts) {
     _.set(
       owner, 
       'e2eTesting.mint.token.MINT_INVOKED', 
-      _.merge(_.get(owner, 'e2eTesting.mint.token.MINT_INVOKED', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+      _.merge(_.get(leader, 'e2eTesting.mint.token.MINT_INVOKED', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
     );
   } catch (error) {
     console.error(error)
