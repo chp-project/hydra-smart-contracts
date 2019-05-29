@@ -349,7 +349,7 @@ contract ChainpointRegistry is Ownable, Pausable {
 
         Core storage c = cores[msg.sender];
         uint32 coreIp = c.coreIp;
-        bytes coreId = c.coreId;
+        bytes memory coreId = c.coreId;
         uint256 amountStaked = c.amountStaked;
         
         delete allocatedIps[coreIp];
