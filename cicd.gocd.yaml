@@ -104,7 +104,7 @@ pipelines:
                     - run
                     - test:e2e:bootstrap
       - e2etest-nodes-ropsten: # Stage: (e2etest-nodes-ropsten) Run E2E Test-suite for Nodes on Ropsten testnet
-          clean_workspace: false
+          clean_workspace: true
           environment_variables:
             ETH_ENVIRONMENT: ROPSTEN
           jobs:
