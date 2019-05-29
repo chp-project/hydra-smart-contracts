@@ -75,6 +75,9 @@ pipelines:
                   git clone https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git tmp-git
                   cp ./build/contracts/TierionNetworkToken.json tmp-git/
                   cp ./build/contracts/ChainpointRegistry.json tmp-git/
+                  cp ./build/contracts/OldTNT.json tmp-git/
+                  cp ./build/contracts/ChainpointFaucet.json tmp-git/
+                  cp ./build/contracts/ChainpointMigration.json tmp-git/
                   cd ./tmp-git
                   git add .
                   git commit -m "Pushing Ropsten Deployment Artififacts From GOCD (Hydra Smart Contracts) - Revision - $(echo $GO_PIPELINE_LABEL)"
