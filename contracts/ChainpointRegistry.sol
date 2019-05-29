@@ -158,6 +158,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     event CoreStaked(
         address indexed _sender,
         uint32 _coreIp,
+        bytes coreId,
         bool _isHealthy,
         uint256 _amountStaked,
         uint256 _duration
@@ -172,6 +173,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     event CoreStakeUpdated(
         address indexed _sender,
         uint32 _coreIp,
+        bytes coreId,
         bool _isHealthy,
         uint256 _amountStaked,
         uint256 _duration
@@ -184,6 +186,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     event CoreUnStaked(
         address indexed _sender,
         uint32 _coreIp,
+        bytes coreId,
         uint256 _amountStaked
     );
 
@@ -232,6 +235,7 @@ contract ChainpointRegistry is Ownable, Pausable {
         emit CoreStaked(
             msg.sender,
             _coreIp,
+            _coreId,
             true,
             CORE_STAKING_AMOUNT,
             CORE_STAKING_DURATION
@@ -291,6 +295,7 @@ contract ChainpointRegistry is Ownable, Pausable {
             emit CoreStakeUpdated(
                 msg.sender,
                 c.coreIp,
+                c.coreId,
                 c.isHealthy,
                 c.amountStaked,
                 c.stakeLockedUntil
@@ -344,6 +349,7 @@ contract ChainpointRegistry is Ownable, Pausable {
 
         Core storage c = cores[msg.sender];
         uint32 coreIp = c.coreIp;
+        bytes coreId = c.coreId;
         uint256 amountStaked = c.amountStaked;
         
         delete allocatedIps[coreIp];
@@ -355,6 +361,7 @@ contract ChainpointRegistry is Ownable, Pausable {
         emit CoreUnStaked(
             msg.sender,
             coreIp,
+            coreId,
             amountStaked
         );
 
