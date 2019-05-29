@@ -138,7 +138,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     /// Minting Parameters
     ///
     /// @title Minting Interval (in # of blocks)
-    uint256 public mintingInterval = 5760; // 86,400 (seconds in 1 day) / 15 (average block time in seconds)
+    uint256 public mintingInterval = 6400; // Avg. # of blocks mined daily according to Etherscan on mainnet
     /// @title Nodes Last Token Minting timestamp
     uint256 public nodeLastMintedAt = 0;
     /// @title Nodes Last Token Minting block height
