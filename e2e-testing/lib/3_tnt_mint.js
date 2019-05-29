@@ -292,8 +292,6 @@ async function mintCoresRaw(accounts) {
 
   let signedTx = await leaderWallet.sign(tx)
 
-  debugger;
-
   let sendResponse = await provider.sendTransaction(signedTx)
   let txReceipt = await provider.waitForTransaction(sendResponse.hash)
   let transactionHash = txReceipt.transactionHash

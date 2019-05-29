@@ -85,6 +85,7 @@ contract ChainpointRegistry is Ownable, Pausable {
       uint32 coreIp;
       bool isStaked;
       bool isHealthy;
+      bytes coreId;
       uint256 amountStaked;
       uint256 stakeLockedUntil;
     }
@@ -222,9 +223,9 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @notice Allows a Node to stake into the Chainpoint Network
     /// @param _coreIp is the IPV4 address of the Node
     /// @return true if successful, otherwise false
-    function stakeCore(uint32 _coreIp) public whenNotPaused returns (bool) {
+    function stakeCore(uint32 _coreIp, bytes memory _coreId) public whenNotPaused returns (bool) {
         require(eligibleCores[msg.sender] == true, "not eligible to Stake into the Network as a Core");
-        require(_addCoreToRegistry(_coreIp), "node did not stake into the chainpoint network");
+        require(_addCoreToRegistry(_coreIp, _coreId), "node did not stake into the chainpoint network");
         
         require(token.transferFrom(msg.sender, address(this), CORE_STAKING_AMOUNT), "transferFrom failed");
 
@@ -448,7 +449,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev msg.sender is expected to be the Core Operator
     /// @dev tokens will be deducted from the Core Operator and added to the balance of the ChainpointRegistry Address
     /// @dev owner has ability to pause this operation indirectly
-    function _addCoreToRegistry(uint32 _coreIp) internal returns (bool) {
+    function _addCoreToRegistry(uint32 _coreIp, bytes memory _coreId) internal returns (bool) {
         require(!cores[msg.sender].isStaked, "core has already staked. invoke updateStake() method to update");
         require(_coreIp != 0 && allocatedIps[_coreIp] == false, "node IP address is required");
         
@@ -459,6 +460,7 @@ contract ChainpointRegistry is Ownable, Pausable {
         c.coreIp = _coreIp;
         c.isStaked = true;
         c.isHealthy = true;
+        c.coreId = _coreId;
         c.amountStaked = CORE_STAKING_AMOUNT;
         c.stakeLockedUntil = stakeLockedUntil;
 

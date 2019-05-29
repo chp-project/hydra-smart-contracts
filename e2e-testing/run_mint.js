@@ -10,8 +10,8 @@ const provider = require('./lib/utils/provider');
 const defaultAccounts = require('./lib/utils/accounts').accounts;
 const {accountsFromPrivKey} = require('./lib/utils/accounts');
 const { creditAccounts, approveAllowances} = require('./lib/1_accounts_scaffolding');
-const { approveCores, stakeCores, unStakeCores } = require('./lib/2a_core_staking_actions');
-const { setChpRegistry, mint, mintThrowSameSig, mintThrowMissingSig, mintThrowWrongSig, mintCores, mintCoresRaw } = require('./lib/3_tnt_mint');
+const { approveCores, approveCoresMultiSig, stakeCores, unStakeCores } = require('./lib/2a_core_staking_actions');
+const { setChpRegistry, mint, mintThrowSameSig, mintThrowMissingSig, mintThrowWrongSig, mintCores } = require('./lib/3_tnt_mint');
 
 const CORE_TNT_STAKE_AMOUNT = 2500000000000;
 
@@ -45,7 +45,7 @@ async function main() {
     tap(() => titleLogger('Invoke mint() MINT_THROW_WRONG_SIG'), mintThrowWrongSig),
     tap(() => titleLogger('Invoke mint()'), mint)
     tap(() => titleLogger('Invoke mintCores()'), mintCores)
-    tap(() => titleLogger('Invoke mintCores()'), mintCoresRaw)
+    tap(() => titleLogger('Approving Cores (Multi-sig)'), approveCoresMultiSig),
   )
   await actions(accounts);
 
