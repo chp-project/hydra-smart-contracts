@@ -37,7 +37,7 @@ async function tkn_setChpRegistry(accounts) {
 async function migration_setToken(accounts) {
   const owner = accounts[0];
 
-  let migrationContract = new ethers.Contract(process.env[`${process.env.ETH_ENVIRONMENT}_MIGRATION_CONTRACT_ADDRESS`], require('../../build/contracts/ChainpointMigration.json').abi, owner);
+  let migrationContract = new ethers.Contract(MIGRATION_CONTRACT_ADDRESS, require('../../build/contracts/ChainpointMigration.json').abi, owner);
 
   console.log(chalk.gray('-> Setting $TKN contract address'));
   let migrationInit = await migrationContract.setToken(TOKEN_CONTRACT_ADDRESS);
