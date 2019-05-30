@@ -281,7 +281,6 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
   }
 
   function mintCores(address[] memory _cores, bytes32 _hash, bytes[126] memory sigs) public whenNotPaused returns (bool) {
-    bytes memory btsNull = new bytes(0);
 
     // Validate parameters provided
     bytes32 coresHash = keccak256(abi.encodePacked(_cores));
@@ -293,7 +292,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
 
     // Recover Signer addresses and verify they are staked Core Operators
     for(uint8 i=0; i < sigs.length; i++) {
-      if(sigs[i].equal(btsNull))
+      if(sigs[i].length == 0)
         break;
 
       address recoveredAddress = _hash.recover(sigs[i]);
