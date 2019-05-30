@@ -36,6 +36,8 @@ make build
 
 make build-rocksdb
 
+echo CHAINPOINT_CORE_CONNECT_IP_LIST=35.245.211.97,35.245.9.90,35.188.238.186 >> .env
+
 make deploy
 
 curl -X POST \

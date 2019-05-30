@@ -14,13 +14,13 @@ const { stakeNodes, checkNodeStakings, updateStakesNodes, unStakeNodes } = requi
 const { approveCores, approveCoresMultiSig, stakeCores, checkCoreStakings, updateStakesCores, unStakeCores } = require('./lib/2a_core_staking_actions');
 
 const privKeysArr = [
-  {privateKey: "0xd74408108dea58b9a7c5157ca13f9168644fbbffda08a4ce0346640cafcfafb3", ip: '35.245.53.181'},
-  {privateKey: "0xdddab7b4ec19893c86cddaa4eef5915907778e1a41764f9e90e5ef9a7603b30b", ip: '35.188.238.186'},
-  {privateKey: "0xf7e39d12945311c58091f59c41a0842a1b874941a7c6a9b403379384115a33dd", ip: '35.245.211.97'},
-  {privateKey: "0x4a9c3c814b485a6b9925b6ed4f72acafd036d2a84af568b2f35f123ec64ccdc2", ip: '35.245.9.90'},
-  {privateKey: "0x0a0ecaef321662b73acd0a59123ff595dc95e838a4ccb1a2c335e2b7da1db6e1", ip: '35.245.89.209'},
-  {privateKey: "0x1efb256136d6e50a46e53c14445cf8a59e970d754343731a71832a8803e92a16", ip: '35.245.207.91'},
-  {privateKey: "0x284dedd0857f79114cd5c1a276b56783b8ef905be9f4eceb981fa26f49014a28", ip: '35.245.1.11'},
+  {privateKey: "0xd74408108dea58b9a7c5157ca13f9168644fbbffda08a4ce0346640cafcfafb3", ip: '35.245.53.181', coreId: '0x73d315d7c92e60df6aa92632259def61cace59de'},
+  {privateKey: "0xdddab7b4ec19893c86cddaa4eef5915907778e1a41764f9e90e5ef9a7603b30b", ip: '35.188.238.186', coreId: '0xcbc0f714430ccf30e2a5cfb3da60c26d317abe72'},
+  {privateKey: "0xf7e39d12945311c58091f59c41a0842a1b874941a7c6a9b403379384115a33dd", ip: '35.245.211.97', coreId: '0xcdd67dd555fe452362a0f30d6b5e594f2ae15f6c'},
+  {privateKey: "0x4a9c3c814b485a6b9925b6ed4f72acafd036d2a84af568b2f35f123ec64ccdc2", ip: '35.245.9.90', coreId: '0x98e6af4729a445974a561307df7a02d6e692d742'},
+  {privateKey: "0x0a0ecaef321662b73acd0a59123ff595dc95e838a4ccb1a2c335e2b7da1db6e1", ip: '35.245.89.209', coreId: '0x4e56ebb5fde24636b7fc7a3902f350a56bf2fce9'},
+  {privateKey: "0x1efb256136d6e50a46e53c14445cf8a59e970d754343731a71832a8803e92a16", ip: '35.245.207.91', coreId: '0xa6d184fe9761dde60a245f1f3968f08f0c62c7b3'},
+  {privateKey: "0x284dedd0857f79114cd5c1a276b56783b8ef905be9f4eceb981fa26f49014a28", ip: '35.245.1.11', coreId: '0xf64a45587a65d42c08954deaa177782b9b340268'},
 ]
 const accounts = (privKeysArr.length) ? accountsFromPrivKey(privKeysArr) : defaultAccounts
 
@@ -64,7 +64,7 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
     tap(() => titleLogger('Checking Nodes Stakings'), _1checkNodeStakings),
     tap(() => titleLogger('Updating Nodes Stakes'), updateStakesNodes),
     tap(() => titleLogger('Checking Updated Nodes Stakes'), _2checkNodeStakings),
-    // (accounts) => new Promise((resolve) => setTimeout(() => resolve(accounts), 120 * 1000)), // Wait for 120seconds before un-staking
+    (accounts) => new Promise((resolve) => setTimeout(() => resolve(accounts), 120 * 1000)), // Wait for 120seconds before un-staking
     tap(() => titleLogger('Un-Staking Nodes'), unStakeNodes),
     tap(() => titleLogger('Checking Nodes Un-stakings'), _3checkNodeStakings),
   )
@@ -80,8 +80,8 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
     tap(() => titleLogger('Approving Cores'), approveCores),
     tap(() => titleLogger('Cores Staking'), stakeCores),
     tap(() => titleLogger('Checking Cores Stakings'), _1checkCoreStakings),
-    tap(() => titleLogger('Updating Cores Stakes'), updateStakesCores),
-    tap(() => titleLogger('Checking Updated Cores Stakes'), _2checkCoreStakings),
+    // tap(() => titleLogger('Updating Cores Stakes'), updateStakesCores),
+    // tap(() => titleLogger('Checking Updated Cores Stakes'), _2checkCoreStakings),
     // (accounts) => new Promise((resolve) => setTimeout(() => resolve(accounts), 120 * 1000)), // Wait for 120seconds before un-staking
     // tap(() => titleLogger('Un-Staking Cores'), unStakeCores),
     // tap(() => titleLogger('Checking Cores Un-stakings'), _3checkCoreStakings),

@@ -19,11 +19,12 @@ function accountsFromPrivKey(privKeys = []) {
   for (let i = 0; i < privKeys.length; i++) {
     if (i === 0) {
       accounts[i] = ethers.Wallet.fromMnemonic(process.env.CHP_HYDRA_DEV_MNEMONIC, `${process.env.CHP_HYDRA_DEV_MNEMONIC_PATH}/${i}`);
+      accounts[i] = accounts[i].connect(provider);
     } else {
       accounts[i] = new ethers.Wallet(privKeys[i].privateKey);
-      accounts[i].metadata = { ip: privKeys[i].ip}
+      accounts[i] = accounts[i].connect(provider);
+      accounts[i].metadata = { ip: privKeys[i].ip, coreId: privKeys[i].coreId }
     }
-    accounts[i] = accounts[i].connect(provider);
   }
 
   return accounts;

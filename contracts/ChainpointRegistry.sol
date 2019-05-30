@@ -158,7 +158,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     event CoreStaked(
         address indexed _sender,
         uint32 _coreIp,
-        bytes coreId,
+        bytes _coreId,
         bool _isHealthy,
         uint256 _amountStaked,
         uint256 _duration
