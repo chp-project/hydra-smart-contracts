@@ -56,6 +56,7 @@ async function main() {
     resultsLogger(accounts[i], 'MINT_MISSING_SIG', 'mint.token');
     resultsLogger(accounts[i], 'MINT_THROW_WRONG_SIG', 'mint.token');
     resultsLogger(accounts[i], 'MINT_INVOKED', 'mint.token');
+    resultsLogger(accounts[i], 'MINT_CORES_INVOKED', 'mint.token');
   }
 }
 

@@ -16,6 +16,10 @@ if ! [ -x "$(command -v yarn)" ]; then
     sudo apt-get update -y && sudo apt-get install -y --no-install-recommends yarn
 fi
 
+# Install Stackdriver Agent
+curl -sSO https://dl.google.com/cloudagents/install-monitoring-agent.sh
+sudo bash install-monitoring-agent.sh
+
 cd /srv
 sudo mkdir chp
 

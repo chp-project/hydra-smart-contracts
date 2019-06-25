@@ -1,6 +1,6 @@
 format_version: 3
 pipelines:
-  smart-contracts: # definition of mypipe1 pipeline
+  smart-contracts: # definition of smart-contracts pipeline
     group: hydra # note that the group name can contain only of alphanumeric & underscore characters
     label_template: "${gitrepo[:8]}"
     lock_behavior: none

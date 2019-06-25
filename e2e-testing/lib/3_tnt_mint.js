@@ -9,12 +9,12 @@ const accounts = require('./utils/accounts');
 
 const web3 = new Web3(provider)
 const abiCoder = ethers.utils.defaultAbiCoder;
-
+ 
 const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`, 'utf8');
 const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`, 'utf8');
 
-const REWARDS_LIST_KEY = (new Array(1)).fill("address")
-const REWARDS_LIST = (new Array(1)).fill("0x2ff39aa5ee4f19168894af67f3eff25266376b23")
+const REWARDS_LIST_KEY = (new Array(72)).fill("address")
+const REWARDS_LIST = (new Array(72)).fill("0x2ff39aa5ee4f19168894af67f3eff25266376b23")
 
 async function setChpRegistry(accounts) {
   const owner = accounts[0];
@@ -28,7 +28,7 @@ async function setChpRegistry(accounts) {
   let txReceipt = await provider.getTransactionReceipt(registryInit.hash);
 
   _.set(
-    owner, 
+    owner,
     'e2eTesting.mint.token.SET_CHP_REGISTRY_CONTRACT', 
     _.merge(_.get(owner, 'e2eTesting.mint.token.SET_CHP_REGISTRY_CONTRACT', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
   );
@@ -214,7 +214,6 @@ async function mintCores(accounts) {
   let sigs = [];
   let messageHash;
   for (let i = 2; i < Object.keys(accounts).length; i++) { // Starting at i=2 because accounts[0] is contract owner & accounts[1] is elected leader
-  
     let web3Owner = web3.eth.accounts.privateKeyToAccount(accounts[i].privateKey);
     let signature = await web3Owner.sign(rewardsListHash);
 
@@ -227,7 +226,7 @@ async function mintCores(accounts) {
     let mintResult = await tokenContract.mintCores(
       REWARDS_LIST,
       messageHash,
-      sigs.splice(0,2).concat((new Array(124)).fill("0x"))
+      sigs.concat((new Array(120)).fill("0x"))
     );
 
     debugger;
@@ -241,7 +240,7 @@ async function mintCores(accounts) {
     _.set(
       owner, 
       'e2eTesting.mint.token.MINT_CORES_INVOKED', 
-      _.merge(_.get(owner, 'e2eTesting.mint.token.MINT_CORES_INVOKED', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
+      _.merge(_.get(leader, 'e2eTesting.mint.token.MINT_CORES_INVOKED', {}), { passed: true, gasUsed: txReceipt.gasUsed.toString() })
     );
   } catch (error) {
     console.error(error)
