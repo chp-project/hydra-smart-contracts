@@ -9,7 +9,7 @@ const defaultAccounts = require('../../e2e-testing/lib/utils/accounts').accounts
 const { creditAccounts, creditAccountsEth, creditAccountsAsync, creditAccountsEthAsync, checkBalances } = require('../../e2e-testing/lib/1_accounts_scaffolding');
 
 // TNT Amounts
-const NODE_TNT_STAKE_AMOUNT = 600000000000;
+const NODE_TNT_STAKE_AMOUNT = 550000000000;
 const NODE_ETH_AMOUNT = '0.02';
 
 // Transfer TNT Tokens to Accounts
@@ -62,11 +62,10 @@ async function main() {
     return acc
   }, {})
 
-  // Transfer $TKNs & ETH in parallel
-  await Promise.all([
-    creditAccountsAsync(NODE_TNT_STAKE_AMOUNT, accountsDictionary),
-    creditAccountsEthAsync(NODE_ETH_AMOUNT, accountsDictionary)
-  ])
+  // Transfer ETH in parallel
+  await Promise.all([creditAccountsEthAsync(NODE_ETH_AMOUNT, accountsDictionary)])
+  // Transfer $TKNs in parallel
+  await Promise.all([creditAccountsAsync(NODE_TNT_STAKE_AMOUNT, accountsDictionary)])
 
   let nodes = R.pipeP(
     tap(() => titleLogger('Checking Token Balances'), checkBalancesNodes),
