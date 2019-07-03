@@ -131,7 +131,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     string public name = 'Tierion Network Token'; // Set the token name for display
     string public symbol = 'TNT'; // Set the token symbol for display
     uint8 public decimals = 8; // Set the number of decimals for display
-    uint256 public INITIAL_SUPPLY = 2000000 * 10 ** uint256(decimals); // 1M TNT specified in Grains
+    uint256 public INITIAL_SUPPLY = 1000000000 * 10 ** uint256(decimals); // 1B TNT specified in Grains
     uint256 public mintAmount = 2000 * 10 ** uint256(decimals); // 2000 TNT specified in Grains
 
     ///
@@ -179,8 +179,8 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
    */
   constructor(address _faucetAddr, address _migrationAddr) public {
     totalSupply = INITIAL_SUPPLY; // Set the total supply
-    balances[_faucetAddr] = INITIAL_SUPPLY.div(2); // 1M $TKNs is minted to Chainpoint Faucet
-    balances[msg.sender] = INITIAL_SUPPLY.div(2); // 1M 1M $TKNs is minted to Chainpoint/Tierion for bootstrapping Network
+    balances[_faucetAddr] = 1000000 * 10 ** uint256(decimals); // 1M $TKNs is minted to Chainpoint Faucet
+    balances[msg.sender] = INITIAL_SUPPLY; // 1B $TKNs is minted to Chainpoint/Tierion for bootstrapping Network
 
     migrationContract = ChainpointMigration(_migrationAddr); // Set CHP Migration Contract
   }
