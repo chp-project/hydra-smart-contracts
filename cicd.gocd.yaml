@@ -230,8 +230,40 @@ pipelines:
                     - compile
                - script: docker-compose run chp-slither /share/scripts/slither-audit.sh
                - script: cat slither-output.json
+  chp-testnet-mass-provisioner:
+    group: hydra # note that the group name can contain only of alphanumeric & underscore characters
+    label_template: "audit ${gitrepo[:8]}"
+    lock_behavior: none
+    parameters: # list of parameters that can be configured for a pipeline
+      env: hydra
+    materials:
+      gitrepo: # this is the name of material, the name can contain only of alphanumeric & underscore characters
+        # keyword git says about type of material and url at once
+        git: https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/hydra-smart-contracts.git
+        branch: master
+        whitelist:
+          - load-testing/chp-node-tf/**/*.*
+    stages: # list of stages in order
+      - terraform-create:
+          clean_workspace: true
+          jobs:
+            provision-resources: # Job: provision-resources
+              tasks: # ordered list of tasks to execute in job "provision-resources"
+               - script: |
+                  terraform init -backend-config "bucket=hashblaster-chp-testnet-nodes"
+                  terraform apply -auto-approve
+      - terraform-destroy:
+          clean_workspace: true
+          approval: manual
+          jobs:
+            provision-resources: # Job: provision-resources
+              tasks: # ordered list of tasks to execute in job "provision-resources"
+               - script: |
+                  terraform init -backend-config "bucket=hashblaster-chp-testnet-nodes"
+                  terraform destroy -auto-approve
 environments:
   hydra:
     pipelines:
       - smart-contracts
       - smart-contract-audits
+      - chp-testnet-mass-provisioner

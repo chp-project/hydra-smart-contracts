@@ -178,7 +178,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
    * Runs only on initial contract creation.
    */
   constructor(address _faucetAddr, address _migrationAddr) public {
-    totalSupply = INITIAL_SUPPLY; // Set the total supply
+    totalSupply = INITIAL_SUPPLY + 1000000 * 10 ** uint256(decimals); // Set the total supply
     balances[_faucetAddr] = 1000000 * 10 ** uint256(decimals); // 1M $TKNs is minted to Chainpoint Faucet
     balances[msg.sender] = INITIAL_SUPPLY; // 1B $TKNs is minted to Chainpoint/Tierion for bootstrapping Network
 

@@ -1,7 +1,13 @@
 provider "google" {
-  credentials = "${file("~/.gcloud/tierion-iglesias-f4b34449d457.json")}"
-  project     = "tierion-iglesias"
+  credentials = "${file("/var/go/.gcloud/chainpoint-hashblaster-c2b2c6e39e76.json")}"
+  project     = "chainpoint-hashblaster"
   region      = "us-central1"
+}
+
+terraform {
+  backend "gcs" {
+    bucket = "hashblaster-chp-testnet-nodes"
+  }
 }
 
 resource "google_compute_instance" "chp-node" {

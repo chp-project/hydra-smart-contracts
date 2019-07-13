@@ -47,7 +47,7 @@ contract("TierionNetworkToken", async (accounts) => {
     await tokenContract.transferFrom(accounts[1], accounts[0], 500000000000, { from: accounts[0] })
     let balance = await tokenContract.balanceOf.call(accounts[0]);
 
-    assert.equal(balance.valueOf(), 500000000000);
+    assert.equal(balance.valueOf(), 100000000000000000);
   });
 
 });
