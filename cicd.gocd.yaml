@@ -243,6 +243,9 @@ pipelines:
         branch: master
         whitelist:
           - load-testing/chp-node-tf/**/*.*
+      upstreamDep:
+        pipeline: smart-contracts
+        stage: deploy-ropsten
     stages: # list of stages in order
       - terraform-create:
           clean_workspace: true
@@ -259,6 +262,7 @@ pipelines:
             provision-resources: # Job: provision-resources
               tasks: # ordered list of tasks to execute in job "provision-resources"
                - fetch:
+                   run_if: any
                    pipeline: smart-contracts
                    stage: deploy-ropsten
                    job: truffle
