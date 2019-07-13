@@ -73,11 +73,11 @@ const _3checkCoreStakings = R.curry(checkCoreStakings)('CHECK_UN_STAKE');
   if (args.includes('--cores')) console.log('\n' + chalk.magenta('CORE ACTIONS:'));
 
   let cores = R.pipeP(
-    // tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
-    // tap(() => titleLogger('Checking Token Balances'), checkBalancesCores),
-    // tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
-    // tap(() => titleLogger('Checking Allowances'), checkAllowancesCores),
-    // tap(() => titleLogger('Approving Cores'), approveCores),
+    tap(() => titleLogger('Transferring Tokens'), creditAccountsCores),
+    tap(() => titleLogger('Checking Token Balances'), checkBalancesCores),
+    tap(() => titleLogger('Approving Allowances'), approveAllowancesCores),
+    tap(() => titleLogger('Checking Allowances'), checkAllowancesCores),
+    tap(() => titleLogger('Approving Cores'), approveCores),
     tap(() => titleLogger('Cores Staking'), stakeCores),
     tap(() => titleLogger('Checking Cores Stakings'), _1checkCoreStakings),
     // tap(() => titleLogger('Updating Cores Stakes'), updateStakesCores),
