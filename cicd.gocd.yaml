@@ -254,6 +254,7 @@ pipelines:
             provision-resources: # Job: provision-resources
               tasks: # ordered list of tasks to execute in job "provision-resources"
                - script: |
+                  cd load-testing/chp-node-tf
                   terraform init -backend-config "bucket=hashblaster-chp-testnet-nodes"
                   terraform apply -auto-approve
       - terraform-destroy:
