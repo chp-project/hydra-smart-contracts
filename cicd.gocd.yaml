@@ -258,7 +258,14 @@ pipelines:
           jobs:
             provision-resources: # Job: provision-resources
               tasks: # ordered list of tasks to execute in job "provision-resources"
+               - fetch:
+                   pipeline: smart-contracts
+                   stage: deploy-ropsten
+                   job: truffle
+                   source: contract-addresses/
+                   destination: contract-addresses/
                - script: |
+                  cd load-testing/chp-node-tf
                   terraform init -backend-config "bucket=hashblaster-chp-testnet-nodes"
                   terraform destroy -auto-approve
 environments:
