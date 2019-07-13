@@ -19,6 +19,9 @@ const NODE_TNT_STAKE_AMOUNT = 500000000000;
 const wait = (ms) => new Promise(resolve => { setTimeout(() => resolve(), ms) })
 
 async function main() {
+  console.log('====================================');
+  console.log(process.env.ROPSTEN_TOKEN_CONTRACT_ADDRESS);
+  console.log('====================================');
   let owner = ethers.Wallet.createRandom({ extraEntropy: ethers.utils.formatBytes32String(`${Date.now()}`) });
   owner = owner.connect(infuraProvider);
   // Connect to Token Contract

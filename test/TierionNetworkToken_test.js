@@ -12,15 +12,15 @@ contract("TierionNetworkToken", async (accounts) => {
     let balance = await tokenContract.balanceOf.call(faucetContract.address);
     let balance1 = await tokenContract.balanceOf.call(accounts[0]);
 
-    assert.equal(balance.valueOf(), 1000000000 * (10 ** 8));
-    assert.equal(balance1.valueOf(), 1000000000 * (10 ** 8));
+    assert.equal(balance.valueOf(), 1000000 * (10 ** 8));
+    assert.equal(balance1.valueOf(), 100000000000000000);
   });
 
   it("should return 1000000 * (10 ** 8) Grains as totalSupply", async () => {
     let tokenContract = await TierionNetworkToken.deployed();
     let balance = await tokenContract.totalSupply.call();
 
-    assert.equal(balance.valueOf(), 1000000 * (10 ** 8));
+    assert.equal(balance.valueOf(), 100000000000000000 + 1000000 * (10 ** 8));
   });
 
   it("should transfer 500000000000 Grains from Account #0 -> Account #1", async () => {
@@ -47,7 +47,7 @@ contract("TierionNetworkToken", async (accounts) => {
     await tokenContract.transferFrom(accounts[1], accounts[0], 500000000000, { from: accounts[0] })
     let balance = await tokenContract.balanceOf.call(accounts[0]);
 
-    assert.equal(balance.valueOf(), 1000000 * (10 ** 8));
+    assert.equal(balance.valueOf(), 500000000000);
   });
 
 });

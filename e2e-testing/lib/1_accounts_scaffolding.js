@@ -12,7 +12,7 @@ const accounts = require('./utils/accounts').accounts;
 const OLD_TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_OLD_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_old_token.txt`, 'utf8');
 const TOKEN_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_TOKEN_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_token.txt`, 'utf8');
 const REGISTRY_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_REGISTRY_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_registry.txt`, 'utf8');
-const MIGRATION_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_MIGRATION_CONTRACT_ADDRESS`] || fs.readFileSync(`./contract-addresses/contract-addresses/${process.env.ETH_ENVIRONMENT.toLowerCase()}_migration.txt`, 'utf8');
+const MIGRATION_CONTRACT_ADDRESS = process.env[`${process.env.ETH_ENVIRONMENT}_MIGRATION_CONTRACT_ADDRESS`]
 const TierionNetworkTokenABI = require('../../build/contracts/TierionNetworkToken.json').abi
 
 const web3 = new Web3(new Web3.providers.HttpProvider(`https://ropsten.infura.io/v3/foobar`))

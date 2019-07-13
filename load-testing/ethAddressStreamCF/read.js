@@ -1,5 +1,8 @@
 const {Datastore} = require('@google-cloud/datastore');
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
 const R = require('ramda')
+const _ = require('lodash')
 const chalk = require('chalk')
 const provider = require('../../e2e-testing/lib/utils/provider');
 const tap = require('../../e2e-testing/lib/utils/tap');
@@ -8,9 +11,12 @@ const resultsLogger = require('../../e2e-testing/lib/utils/resultsLogger');
 const defaultAccounts = require('../../e2e-testing/lib/utils/accounts').accounts;
 const { creditAccounts, creditAccountsEth, creditAccountsAsync, creditAccountsEthAsync, checkBalances } = require('../../e2e-testing/lib/1_accounts_scaffolding');
 
+const adapter = new FileSync('db.json')
+const db = low(adapter)
+
 // TNT Amounts
 const NODE_TNT_STAKE_AMOUNT = 550000000000;
-const NODE_ETH_AMOUNT = '0.02';
+const NODE_ETH_AMOUNT = '0.005';
 
 // Transfer TNT Tokens to Accounts
 let creditAccountsNodes = R.curry(creditAccounts)('$TKN')(NODE_TNT_STAKE_AMOUNT);
@@ -32,6 +38,13 @@ async function read() {
   return results
 }
 
+async function getItem() {
+  const projectId = 'tierion-iglesias';
+  const datastore = new Datastore({
+    projectId: projectId,
+  });
+}
+
 async function batchDelete(accts) {
   const projectId = 'tierion-iglesias';
   const datastore = new Datastore({
@@ -39,7 +52,7 @@ async function batchDelete(accts) {
   });
 
   for (let i = 0; i < accts.length; i++) {
-    const key = accts[i][datastore.KEY];
+    const key = _.get(accts[i], 'datastore.KEY', datastore.key(['EthAddress', accts[i].addr]));
     
     await datastore.delete(key);
   }
@@ -48,32 +61,68 @@ async function batchDelete(accts) {
 
 
 async function main() {
+  const args = process.argv.slice(2);
   const accounts = [defaultAccounts[0]]
 
-  // Read ETH Addresses from DataStore: EthAddresses
-  let batchAddresses = await read()
-
-  // Push EthAddresses to accounts
-  batchAddresses.forEach(currVal => accounts.push({ address: currVal.addr}))
-
-  const accountsDictionary = accounts.reduce((acc, currVal, idx) => {
-    acc[idx] = currVal
-    
-    return acc
-  }, {})
-
   // Transfer ETH in parallel
-  await Promise.all([creditAccountsEthAsync(NODE_ETH_AMOUNT, accountsDictionary)])
-  // Transfer $TKNs in parallel
-  await Promise.all([creditAccountsAsync(NODE_TNT_STAKE_AMOUNT, accountsDictionary)])
+  if (args.includes('--eth')) {
+    // Read ETH Addresses from (DataStore: EthAddresses) and create a slice of the first 200elems to persist to local cache
+    let batchAddresses = await read()
+    let batchAddressesSlice = batchAddresses.splice(0, 200)
+    // Persist 'batchAddressesSlice' to local cache
+    db.set('stagingBatchAddresses', batchAddressesSlice).write()
+    
+
+    // Push EthAddresses to accounts
+    batchAddressesSlice.forEach(currVal => accounts.push({ address: currVal.addr}))
+
+    const accountsDictionary = accounts.reduce((acc, currVal, idx) => {
+      acc[idx] = currVal
+      
+      return acc
+    }, {})
+    await Promise.all([creditAccountsEthAsync(NODE_ETH_AMOUNT, accountsDictionary)])
+  }
+  
+  // Transfer $TKNs in parallel && Batch delete EthAddresses from DataStore: EthAddresses
+  if (args.includes('--tkn')) {
+    // Retrieve 'batchAddressesSlice' from local cache
+    let batchAddressesSlice = db.get('stagingBatchAddresses').value()
+
+    // Push EthAddresses to accounts
+    batchAddressesSlice.forEach(currVal => accounts.push({ address: currVal.addr}))
+
+    const accountsDictionary = accounts.reduce((acc, currVal, idx) => {
+      acc[idx] = currVal
+      
+      return acc
+    }, {})
+
+    await Promise.all([creditAccountsAsync(NODE_TNT_STAKE_AMOUNT, accountsDictionary)])
+
+    console.log('====================================');
+    console.log(batchAddressesSlice.length);
+    console.log('====================================');
+    await batchDelete(batchAddressesSlice)
+    db.unset('stagingBatchAddresses', batchAddressesSlice).write()
+  }
+
+  if (args.includes('--delete')) {
+    let batchAddressesSlice = db.get('stagingBatchAddresses').value()
+
+    console.log('====================================');
+    console.log(batchAddressesSlice.length);
+    console.log('====================================');
+
+    await batchDelete(batchAddressesSlice)
+    db.unset('stagingBatchAddresses', batchAddressesSlice).write()
+  }
 
   let nodes = R.pipeP(
     tap(() => titleLogger('Checking Token Balances'), checkBalancesNodes),
   )
   await nodes(accounts);
 
-  // Batch delete EthAddresses from DataStore: EthAddresses
-  await batchDelete(batchAddresses)
 
   // Display Results
   for (let i = 1; i < Object.keys(accounts).length; i++) {

@@ -1,0 +1,22 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Program",
+      "program": "${workspaceFolder}/load-testing/ethAddressStreamCF/read.js",
+      "env": {
+        "ETH_ENVIRONMENT":"ROPSTEN",
+        "ROPSTEN_FAUCET_CONTRACT_ADDRESS":"0x1ae9b4AA9dfA037e26652e7cD2955b4247C37080",
+        "ROPSTEN_OLD_TOKEN_CONTRACT_ADDRESS":"0x099197f5c62f113DC60F33A4C41A8b26EC401655",
+        "ROPSTEN_MIGRATION_CONTRACT_ADDRESS":"0x4986BAB40b71c39c5742d697dfaa4A59e362d023",
+        "ROPSTEN_TOKEN_CONTRACT_ADDRESS":"0x84294776884A92E6E06989DE0c675db81f8C9bD3",
+        "ROPSTEN_REGISTRY_CONTRACT_ADDRESS":"0xE05da394fAE477De2eE6F64d5C64cf1D8F67a803"
+      },
+    }
+  ]
+}

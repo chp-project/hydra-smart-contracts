@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export HOME=/root
+
 if [ -x "$(command -v docker)" ]; then
     echo "Docker already installed"
 else
@@ -30,17 +32,18 @@ sudo chmod 775 chainpoint-node-src
 cd ./chainpoint-node-src
 git checkout -b v2 origin/v2
 
-sudo git clone https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git artifacts/ethcontracts
+git submodule add https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/go-hydra-smart-contract-files.git artifacts/ethcontracts
 
 curl "http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip" -H "Metadata-Flavor: Google" > eip.txt
 
 make init
 
-make build
-
 make build-rocksdb
 
 echo CHAINPOINT_CORE_CONNECT_IP_LIST=35.245.211.97,35.245.9.90,35.188.238.186 >> .env
+echo NODE_ENV=development >> .env
+echo NETWORK=testnet >> .env
+
 
 make deploy
 
