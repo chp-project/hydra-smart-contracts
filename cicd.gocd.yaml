@@ -11,6 +11,16 @@ pipelines:
         # keyword git says about type of material and url at once
         git: https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/hydra-smart-contracts.git
         branch: master
+        whitelist:
+          - contracts/**/*.*
+          - e2e-testing/**/*.*
+          - migrations/**/*.*
+          - test/**/*.*
+          - truffle-config.js
+          - package.json
+          - package-lock.json
+          - README.md
+          - cicd.gocd.yaml
     stages: # list of stages in order
       - faucet: # Stage: (faucet) Responsible for running Cypress to submit address[0] to receive ETH from Ropsten Faucet
           clean_workspace: true
@@ -234,6 +244,7 @@ pipelines:
     group: hydra # note that the group name can contain only of alphanumeric & underscore characters
     label_template: "audit ${gitrepo[:8]}"
     lock_behavior: none
+    approval: manual
     parameters: # list of parameters that can be configured for a pipeline
       env: hydra
     materials:
@@ -243,10 +254,6 @@ pipelines:
         branch: master
         whitelist:
           - load-testing/chp-node-tf/**/*.*
-          - cicd.gocd.yaml
-      upstreamDep:
-        pipeline: smart-contracts
-        stage: deploy-ropsten
     stages: # list of stages in order
       - terraform-create:
           clean_workspace: true
@@ -263,17 +270,36 @@ pipelines:
           jobs:
             provision-resources: # Job: provision-resources
               tasks: # ordered list of tasks to execute in job "provision-resources"
-               - fetch:
-                   run_if: any
-                   pipeline: smart-contracts
-                   stage: deploy-ropsten
-                   job: truffle
-                   source: contract-addresses/
-                   destination: contract-addresses/
                - script: |
                   cd load-testing/chp-node-tf
                   terraform init -backend-config "bucket=hashblaster-chp-testnet-nodes"
                   terraform destroy -auto-approve
+  chp-testnet-eth-subscriber-pkg:
+    group: hydra
+    label_template: "audit ${gitrepo[:8]}"
+    lock_behavior: none
+    parameters: # list of parameters that can be configured for a pipeline
+      env: hydra
+    materials:
+      upstreamDep:
+        pipeline: smart-contracts
+        stage: deploy-ropsten
+    stages: # list of stages in order
+      - npm-deploy:
+          clean_workspace: true
+          approval: manual
+          jobs:
+            deploy: # Job: deploy
+              tasks: # ordered list of tasks to execute in job "deploy"
+               - fetch:
+                   pipeline: smart-contracts
+                   stage: deploy-ropsten
+                   job: truffle
+                   source: dist/
+                   destination: load-testing-node-utils/
+               - script: |
+                  cd load-testing-node-utils/
+                  export ROPSTEN_TOKEN_CONTRACT_ADDRESS=$(cat dist/contracts/TierionNetworkToken.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/') && npm run pub
 environments:
   hydra:
     pipelines:
