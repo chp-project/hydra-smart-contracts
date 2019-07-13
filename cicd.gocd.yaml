@@ -276,7 +276,7 @@ pipelines:
                   terraform destroy -auto-approve
   chp-testnet-eth-subscriber-pkg:
     group: hydra
-    label_template: "chp-testnet-eth-subscriber-pkg"
+    label_template: "ethSubscriberPkg ${COUNT}"
     lock_behavior: none
     parameters: # list of parameters that can be configured for a pipeline
       env: hydra
