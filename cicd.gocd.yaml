@@ -305,3 +305,4 @@ environments:
       - smart-contracts
       - smart-contract-audits
       - chp-testnet-mass-provisioner
+      - chp-testnet-eth-subscriber-pkg
