@@ -287,7 +287,6 @@ pipelines:
     stages: # list of stages in order
       - npm-deploy:
           clean_workspace: true
-          approval: manual
           jobs:
             deploy: # Job: deploy
               tasks: # ordered list of tasks to execute in job "deploy"
