@@ -297,11 +297,10 @@ pipelines:
                    source: dist/
                    destination: smart-contract-artifacts/
                - script: |
-                  ls -la
-                  git clone https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/hydra-smart-contracts.git .
-                  cd load-testing-node-utils/
+                  git clone https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/hydra-smart-contracts.git hydra-smart-contracts
+                  cd ./hydra-smart-contracts/load-testing-node-utils
                   npm install --silent --quiet
-                  export ROPSTEN_TOKEN_CONTRACT_ADDRESS=$(cat ../smart-contract-artifacts/dist/contracts/TierionNetworkToken.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/') && npm run pub
+                  export ROPSTEN_TOKEN_CONTRACT_ADDRESS=$(cat ../../smart-contract-artifacts/dist/contracts/TierionNetworkToken.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/') && npm run pub
 environments:
   hydra:
     pipelines:
