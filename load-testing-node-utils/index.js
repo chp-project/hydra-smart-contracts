@@ -8,7 +8,7 @@ const R = require('ramda');
 const _ = require('lodash');
 const chalk = require('chalk')
 
-const TierionNetworkTokenABI = require('../build/contracts/TierionNetworkToken.json').abi
+const TierionNetworkTokenABI = require('../../smart-contract-artifacts/dist/contracts/TierionNetworkToken.json').abi
 const infuraProvider = new ethers.providers.InfuraProvider('ropsten', process.env.ETH_INFURA_API_KEY)
 const ethAddress = fs.readFileSync('./eth-address.txt', 'utf8').replace(/(\r\n|\n|\r)/gm, "")
 const publicIP = fs.readFileSync('./eip.txt', 'utf8').replace(/(\r\n|\n|\r)/gm, "")
