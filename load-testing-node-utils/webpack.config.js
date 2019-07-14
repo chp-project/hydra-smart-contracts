@@ -3,8 +3,8 @@ const path = require('path');
 const _ = require('lodash')
 const webpack = require('webpack')
 
-const TierionNetworkToken = require(path.resolve('../artifacts/ethcontracts/TierionNetworkToken.json'))
-const ChainpointRegistry = require(path.resolve('../artifacts/ethcontracts/ChainpointRegistry.json'))
+const TierionNetworkToken = require(path.resolve('../../smart-contract-artifacts/dist/contracts/TierionNetworkToken.json'))
+const ChainpointRegistry = require(path.resolve('../../smart-contract-artifacts/dist/contracts/ChainpointRegistry.json'))
 
 const chainId = process.env.ETH_ENVIRONMENT === 'ROPSTEN' ? 3 : 3
 
