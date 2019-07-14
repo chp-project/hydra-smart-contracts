@@ -295,11 +295,12 @@ pipelines:
                    stage: deploy-ropsten
                    job: truffle
                    source: dist/
-                   destination: load-testing-node-utils/
+                   destination: load-testing-node-utils/artifacts/
                - script: |
+                  ls -la
                   cd load-testing-node-utils/
                   npm install --silent --quiet
-                  export ROPSTEN_TOKEN_CONTRACT_ADDRESS=$(cat dist/contracts/TierionNetworkToken.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/') && npm run pub
+                  export ROPSTEN_TOKEN_CONTRACT_ADDRESS=$(cat artifacts/dist/contracts/TierionNetworkToken.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/') && npm run pub
 environments:
   hydra:
     pipelines:
