@@ -322,7 +322,7 @@ pipelines:
     label_template: "ethSubscriberPkg ${COUNT}"
     lock_behavior: none
     timer:
-      spec: "0 0/3 * 1/1 * ? *" # every 3mins
+      spec: "0 0/10 * 1/1 * ? *" # every 10mins
       only_on_changes: no
     parameters: # list of parameters that can be configured for a pipeline
       env: hydra
