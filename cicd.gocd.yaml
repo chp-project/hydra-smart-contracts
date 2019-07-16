@@ -300,6 +300,8 @@ pipelines:
           clean_workspace: true
           jobs:
             deploy: # Job: deploy
+              resources:
+                - run-on-gocd-master
               tasks: # ordered list of tasks to execute in job "deploy"
                - fetch:
                    pipeline: smart-contracts
