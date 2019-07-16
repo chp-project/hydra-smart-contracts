@@ -338,6 +338,8 @@ pipelines:
           clean_workspace: true
           jobs:
             deploy: # Job: deploy
+              environment_variables:
+                ETH_ENVIRONMENT: ROPSTEN
               tasks: # ordered list of tasks to execute in job "deploy"
                - script: |
                   git clone https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/hydra-smart-contracts.git
