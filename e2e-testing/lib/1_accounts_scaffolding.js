@@ -62,7 +62,7 @@ async function creditAccountsAsync(tntAmount, accounts) {
     const funcSigEncoded = tokenContract.methods.transfer(accounts[i].address, tntAmount).encodeABI()
     let txData = {
       gasLimit: gasLimit,
-      gasPrice: (gasPrice * 2) - ETH_TRANSFER_NONCE_COUNTER,
+      gasPrice: (gasPrice * 3) - ETH_TRANSFER_NONCE_COUNTER,
       to: TOKEN_CONTRACT_ADDRESS,
       data: funcSigEncoded,
       nonce: nonce + ETH_TRANSFER_NONCE_COUNTER,
@@ -149,7 +149,7 @@ async function creditAccountsEthAsync(amount, accounts) {
 
     let txData = {
       gasLimit: gasLimit,
-      gasPrice: (gasPrice * 2) - ETH_TRANSFER_NONCE_COUNTER,
+      gasPrice: (gasPrice * 3) - ETH_TRANSFER_NONCE_COUNTER,
       to: accounts[i].address,
       nonce: nonce + ETH_TRANSFER_NONCE_COUNTER,
       value,
