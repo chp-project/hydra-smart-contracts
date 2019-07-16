@@ -343,11 +343,11 @@ pipelines:
                   cd ./load-testing/ethAddressStreamCF/
                   gsutil cp gs://go-hydra-contract-files/* .
                   npm install --silent --quiet
-                  export ROPSTEN_FAUCET_CONTRACT_ADDRESS=$(cat ./dist/contracts/ChainpointFaucet.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/')
-                  export ROPSTEN_OLD_TOKEN_CONTRACT_ADDRESS=$(cat ./dist/contracts/OldTNT.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/')
-                  export ROPSTEN_MIGRATION_CONTRACT_ADDRESS=$(cat ./dist/contracts/ChainpointMigration.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/')
-                  export ROPSTEN_TOKEN_CONTRACT_ADDRESS=$(cat ./dist/contracts/TierionNetworkToken.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/')
-                  export ROPSTEN_REGISTRY_CONTRACT_ADDRESS=$(cat ./dist/contracts/ChainpointRegistry.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/')
+                  export ROPSTEN_FAUCET_CONTRACT_ADDRESS=$(cat ./ChainpointFaucet.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/')
+                  export ROPSTEN_OLD_TOKEN_CONTRACT_ADDRESS=$(cat ./OldTNT.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/')
+                  export ROPSTEN_MIGRATION_CONTRACT_ADDRESS=$(cat ./ChainpointMigration.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/')
+                  export ROPSTEN_TOKEN_CONTRACT_ADDRESS=$(cat ./TierionNetworkToken.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/')
+                  export ROPSTEN_REGISTRY_CONTRACT_ADDRESS=$(cat ./ChainpointRegistry.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/')
                   node read.js --eth
                   node read.js --tkn
 environments:
