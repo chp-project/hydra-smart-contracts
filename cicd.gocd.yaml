@@ -323,6 +323,7 @@ pipelines:
     lock_behavior: none
     timer:
       spec: "0 0/3 0 ? * * *" # every 3mins
+      only_on_changes: yes
     parameters: # list of parameters that can be configured for a pipeline
       env: hydra
     materials:
