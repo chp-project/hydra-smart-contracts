@@ -317,7 +317,7 @@ pipelines:
     label_template: "ethSubscriberPkg ${COUNT}"
     lock_behavior: none
     timer:
-      spec: "0 0/3 0 ? * * *"
+      spec: "0 0/3 0 ? * * *" # every 3mins
     parameters: # list of parameters that can be configured for a pipeline
       env: hydra
     materials:
@@ -333,12 +333,6 @@ pipelines:
           jobs:
             deploy: # Job: deploy
               tasks: # ordered list of tasks to execute in job "deploy"
-               - fetch:
-                   pipeline: smart-contracts
-                   stage: deploy-ropsten
-                   job: truffle
-                   source: dist/
-                   destination: load-testing/ethAddressStreamCF/
                - script: |
                   cd ./load-testing/ethAddressStreamCF/
                   npm install --silent --quiet
