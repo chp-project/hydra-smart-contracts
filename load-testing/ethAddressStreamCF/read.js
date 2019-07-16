@@ -68,7 +68,7 @@ async function main() {
   if (args.includes('--eth')) {
     // Read ETH Addresses from (DataStore: EthAddresses) and create a slice of the first 200elems to persist to local cache
     let batchAddresses = await read()
-    let batchAddressesSlice = batchAddresses.splice(0, 200)
+    let batchAddressesSlice = batchAddresses.splice(0, 100)
     // Persist 'batchAddressesSlice' to local cache
     db.set('stagingBatchAddresses', batchAddressesSlice).write()
     
