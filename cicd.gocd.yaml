@@ -314,6 +314,9 @@ pipelines:
                   cd ./hydra-smart-contracts/load-testing-node-utils
                   npm install --silent --quiet
                   export ROPSTEN_TOKEN_CONTRACT_ADDRESS=$(cat ../../smart-contract-artifacts/dist/contracts/TierionNetworkToken.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/') && npm run pub
+                  git add package.json
+                  git commit -m 'GOCD Automated NPM Version Bump (load-testing-node-utils)'
+                  git push
   chp-testnet-eth-issuer:
     group: hydra
     label_template: "ethSubscriberPkg ${COUNT}"

@@ -1,6 +1,6 @@
 {
   "name": "load-testing-node-utils",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "Development only package",
   "main": "index.js",
   "scripts": {
