@@ -334,6 +334,7 @@ pipelines:
             deploy: # Job: deploy
               tasks: # ordered list of tasks to execute in job "deploy"
                - script: |
+                  npm install --silent --quiet
                   cd ./load-testing/ethAddressStreamCF/
                   npm install --silent --quiet
                   export ROPSTEN_FAUCET_CONTRACT_ADDRESS=$(cat ./dist/contracts/ChainpointFaucet.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/')
