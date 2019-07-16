@@ -333,9 +333,15 @@ pipelines:
           jobs:
             deploy: # Job: deploy
               tasks: # ordered list of tasks to execute in job "deploy"
+               - exec: # Install Cypress and other NPM packages
+                   command: npm
+                   arguments:
+                    - install
+                    - --silent
+                    - --quiet
                - script: |
-                  npm install --silent --quiet
                   cd ./load-testing/ethAddressStreamCF/
+                  gsutil cp gs://go-hydra-contract-files/* .
                   npm install --silent --quiet
                   export ROPSTEN_FAUCET_CONTRACT_ADDRESS=$(cat ./dist/contracts/ChainpointFaucet.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/')
                   export ROPSTEN_OLD_TOKEN_CONTRACT_ADDRESS=$(cat ./dist/contracts/OldTNT.json | jq '.networks."3".address' | sed 's/^"\(.*\)"$/\1/')
