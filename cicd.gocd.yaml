@@ -165,6 +165,12 @@ pipelines:
           jobs:
             compile-token-contract: # Job: compile-token-contract
               tasks: # ordered list of tasks to execute in job "compile-token-contract"
+               - fetch:
+                   pipeline: smart-contracts
+                   stage: deploy-ropsten
+                   job: truffle
+                   source: contract-addresses/
+                   destination: contract-addresses/
                - exec: # Install NPM packages
                    command: npm
                    arguments:
@@ -256,13 +262,12 @@ pipelines:
     stages: # list of stages in order
       - terraform-create:
           clean_workspace: true
-          approval: manual
           jobs:
             provision-resources: # Job: provision-resources
               tasks: # ordered list of tasks to execute in job "provision-resources"
                - script: |
                   cd load-testing/chp-node-tf
-                  terraform init -backend-config "bucket=hashblaster-chp-testnet-nodes"
+                  terraform init -backend-config "bucket=hashblaster-chp-testnet-nodes" -lock=false
                   terraform apply -auto-approve
       - terraform-destroy:
           clean_workspace: true
