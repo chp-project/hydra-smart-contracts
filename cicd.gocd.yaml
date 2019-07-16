@@ -322,8 +322,8 @@ pipelines:
     label_template: "ethSubscriberPkg ${COUNT}"
     lock_behavior: none
     timer:
-      spec: "0 0/3 0 ? * * *" # every 3mins
-      only_on_changes: yes
+      spec: "0 0/3 * 1/1 * ? *" # every 3mins
+      only_on_changes: no
     parameters: # list of parameters that can be configured for a pipeline
       env: hydra
     materials:
@@ -339,13 +339,10 @@ pipelines:
           jobs:
             deploy: # Job: deploy
               tasks: # ordered list of tasks to execute in job "deploy"
-               - exec: # Install Cypress and other NPM packages
-                   command: npm
-                   arguments:
-                    - install
-                    - --silent
-                    - --quiet
                - script: |
+                  git clone https://michael-iglesias:faca2c20b50c456892f3b6a601ae457d7a49ff10@github.com/chainpoint/hydra-smart-contracts.git
+                  cd ./hydra-smart-contracts
+                  npm install --silent --quiet
                   cd ./load-testing/ethAddressStreamCF/
                   gsutil cp gs://go-hydra-contract-files/* .
                   npm install --silent --quiet
