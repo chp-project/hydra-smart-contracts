@@ -268,7 +268,7 @@ pipelines:
                - script: |
                   cd load-testing/chp-node-tf
                   terraform init -backend-config "bucket=hashblaster-chp-testnet-nodes" -lock=false
-                  terraform apply -auto-approve
+                  terraform apply -auto-approve -lock=false
       - terraform-destroy:
           clean_workspace: true
           approval: manual
