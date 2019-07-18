@@ -71,7 +71,8 @@ async function updateStakesNodes(accounts) {
     let registryContract = new ethers.Contract(REGISTRY_CONTRACT_ADDRESS, require('../../build/contracts/ChainpointRegistry.json').abi, accounts[i]);
 
     let update = await registryContract.updateStake(
-      ipToInt(`${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}`).toInt()
+      ipToInt(`${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254)}`).toInt(),
+      accounts[i].address
     );
     await update.wait();
 
