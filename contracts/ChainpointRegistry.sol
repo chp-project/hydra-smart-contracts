@@ -135,6 +135,7 @@ contract ChainpointRegistry is Ownable, Pausable {
     event NodeStakeUpdated(
         address indexed _sender,
         uint32 _nodeIp,
+        address _rewardsAddr,
         uint256 _amountStaked,
         uint256 _duration
     );
@@ -253,18 +254,21 @@ contract ChainpointRegistry is Ownable, Pausable {
     /// @dev msg.sender is expected to be the Node Operator
     /// @dev tokens will be deducted from the Node Operator and added to the balance of the ChainpointRegistry Address
     /// @dev owner has ability to pause this operation
-    function updateStake(uint32 _nodeIp) public whenNotPaused returns (bool) {
+    function updateStake(uint32 _nodeIp, address _rewardsAddress) public whenNotPaused returns (bool) {
         require(nodes[msg.sender].isStaked, "node has not staked into the Chainpoint network");
-        require(_nodeIp != 0, "node IP address is required");
+        require(_nodeIp != 0, "Node IP is required");
+        require(_rewardsAddress != address(0));
         
         Node storage n = nodes[msg.sender];
         if (n.nodeIp != _nodeIp) {
             require(allocatedIps[_nodeIp] == false, "Public IP Address is already in use");
             n.nodeIp = _nodeIp;
+            n.rewardsAddr = _rewardsAddress;
 
             emit NodeStakeUpdated(
                 msg.sender,
                 n.nodeIp,
+                n.rewardsAddr,
                 n.amountStaked,
                 n.stakeLockedUntil
             );
