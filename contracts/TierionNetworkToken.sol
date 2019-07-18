@@ -272,7 +272,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
       
       // Iterate through list of Nodes and award tokens
       for(uint8 i=0; i < _nodes.length; i++) {
-          _mint(_nodes[i], mintAmount);
+          require(_mint(_nodes[i], mintAmount), "Failed to mint new tokens");
       }
       
       emit Mint(_nodes, mintAmount, block.number);
@@ -324,7 +324,7 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
    * @return Boolean indicating result of method execution
    */
   function purchaseUsage(uint256 _value) public returns (bool) {
-      _burn(msg.sender, _value);
+      require(_burn(msg.sender, _value), "Failed to burn tokens as part of purchaseUsage()");
       
       emit UsagePurchased(msg.sender, _value);
       
