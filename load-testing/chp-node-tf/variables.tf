@@ -1,4 +1,4 @@
 variable "node_count" {
   description = "Number of Chainpoint Nodes to provision"
-  default     = 2300
+  default     = 2100
 }
