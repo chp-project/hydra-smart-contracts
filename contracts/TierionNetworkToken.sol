@@ -365,13 +365,15 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
    * @param _value The number of tokens to burn
    * @dev Internal function that is called within - purchaseUsage()
    */
-  function _burn(address _account, uint256 _value) internal {
-    require(_account != address(0));
+  function _burn(address _account, uint256 _value) internal returns (bool) {
+    require(_account != address(0), "Only burn tokens by transferring to address(0)");
 
     totalSupply = totalSupply.sub(_value);
     balances[_account] = balances[_account].sub(_value);
     
     emit Transfer(_account, address(0), _value);
+
+    return true;
   }
 
   /**
@@ -379,12 +381,14 @@ contract TierionNetworkToken is StandardToken, Ownable, Pausable {
     * @param _account The account that will receive the created tokens.
     * @param _value The amount of tokens minted
     */
-  function _mint(address _account, uint256 _value) internal {
-    require(_account != address(0));
+  function _mint(address _account, uint256 _value) internal returns (bool) {
+    require(_account != address(0), "Cannot mint to address(0)");
 
     totalSupply = totalSupply.add(_value);
     balances[_account] = balances[_account].add(_value);
     emit Transfer(address(0), _account, _value);
+
+    return true;
   }
   
   function recover(bytes32 hash, bytes memory signature) public pure returns (address) {
