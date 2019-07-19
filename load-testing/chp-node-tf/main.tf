@@ -11,7 +11,7 @@ terraform {
 }
 
 resource "google_compute_instance" "chp-node" {
-  name         = "chp-node-r2-${count.index}"
+  name         = "chp-node-r3-${count.index}"
   machine_type = "n1-standard-1"
   zone         = "us-central1-a"
   count        = "${var.node_count}"
